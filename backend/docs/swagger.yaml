@@ -1,0 +1,1323 @@
+basePath: /api/v1
+definitions:
+  controllers.Returninvoice:
+    properties:
+      addedtime:
+        type: string
+      employee:
+        type: integer
+      repairinvoice:
+        type: integer
+      statust:
+        type: integer
+    type: object
+  controllers.User:
+    properties:
+      branch:
+        type: integer
+      building:
+        type: integer
+      faculty:
+        type: integer
+      personalID:
+        type: string
+      personalName:
+        type: string
+      room:
+        type: integer
+    type: object
+  ent.Branch:
+    properties:
+      brname:
+        description: Brname holds the value of the "brname" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.BranchEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the BranchQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.BranchEdges:
+    properties:
+      faculty:
+        $ref: '#/definitions/ent.Faculty'
+        description: Faculty holds the value of the faculty edge.
+        type: object
+      userInformations:
+        description: UserInformations holds the value of the user_informations edge.
+        items:
+          $ref: '#/definitions/ent.User'
+        type: array
+    type: object
+  ent.Building:
+    properties:
+      buname:
+        description: Buname holds the value of the "buname" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.BuildingEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the BuildingQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.BuildingEdges:
+    properties:
+      rooms:
+        description: Rooms holds the value of the rooms edge.
+        items:
+          $ref: '#/definitions/ent.Room'
+        type: array
+      userInformations:
+        description: UserInformations holds the value of the user_informations edge.
+        items:
+          $ref: '#/definitions/ent.User'
+        type: array
+    type: object
+  ent.Employee:
+    properties:
+      edges:
+        $ref: '#/definitions/ent.EmployeeEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the EmployeeQuery when eager-loading is set.
+        type: object
+      employeeemail:
+        description: Employeeemail holds the value of the "employeeemail" field.
+        type: string
+      employeename:
+        description: Employeename holds the value of the "employeename" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: integer
+      password:
+        description: Password holds the value of the "password" field.
+        type: string
+    type: object
+  ent.EmployeeEdges:
+    properties:
+      employees:
+        description: Employees holds the value of the employees edge.
+        items:
+          $ref: '#/definitions/ent.Returninvoice'
+        type: array
+    type: object
+  ent.Faculty:
+    properties:
+      edges:
+        $ref: '#/definitions/ent.FacultyEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the FacultyQuery when eager-loading is set.
+        type: object
+      fname:
+        description: Fname holds the value of the "fname" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.FacultyEdges:
+    properties:
+      branchs:
+        description: Branchs holds the value of the branchs edge.
+        items:
+          $ref: '#/definitions/ent.Branch'
+        type: array
+      userInformations:
+        description: UserInformations holds the value of the user_informations edge.
+        items:
+          $ref: '#/definitions/ent.User'
+        type: array
+    type: object
+  ent.Repairinvoice:
+    properties:
+      deviceid:
+        description: Deviceid holds the value of the "deviceid" field.
+        type: integer
+      edges:
+        $ref: '#/definitions/ent.RepairinvoiceEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the RepairinvoiceQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+      statusrepairid:
+        description: Statusrepairid holds the value of the "statusrepairid" field.
+        type: integer
+      symptomid:
+        description: Symptomid holds the value of the "symptomid" field.
+        type: integer
+      userid:
+        description: Userid holds the value of the "userid" field.
+        type: integer
+    type: object
+  ent.RepairinvoiceEdges:
+    properties:
+      repairinvoices:
+        $ref: '#/definitions/ent.Returninvoice'
+        description: Repairinvoices holds the value of the repairinvoices edge.
+        type: object
+    type: object
+  ent.Returninvoice:
+    properties:
+      addedtime:
+        description: Addedtime holds the value of the "addedtime" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.ReturninvoiceEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the ReturninvoiceQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.ReturninvoiceEdges:
+    properties:
+      employee:
+        $ref: '#/definitions/ent.Employee'
+        description: Employee holds the value of the Employee edge.
+        type: object
+      repairinvoice:
+        $ref: '#/definitions/ent.Repairinvoice'
+        description: Repairinvoice holds the value of the Repairinvoice edge.
+        type: object
+      statust:
+        $ref: '#/definitions/ent.Statust'
+        description: Statust holds the value of the Statust edge.
+        type: object
+    type: object
+  ent.Room:
+    properties:
+      edges:
+        $ref: '#/definitions/ent.RoomEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the RoomQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+      rname:
+        description: Rname holds the value of the "rname" field.
+        type: string
+    type: object
+  ent.RoomEdges:
+    properties:
+      building:
+        $ref: '#/definitions/ent.Building'
+        description: Building holds the value of the building edge.
+        type: object
+      userInformations:
+        description: UserInformations holds the value of the user_informations edge.
+        items:
+          $ref: '#/definitions/ent.User'
+        type: array
+    type: object
+  ent.Statust:
+    properties:
+      edges:
+        $ref: '#/definitions/ent.StatustEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the StatustQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+      statustname:
+        description: Statustname holds the value of the "statustname" field.
+        type: string
+    type: object
+  ent.StatustEdges:
+    properties:
+      statusts:
+        description: Statusts holds the value of the statusts edge.
+        items:
+          $ref: '#/definitions/ent.Returninvoice'
+        type: array
+    type: object
+  ent.User:
+    properties:
+      edges:
+        $ref: '#/definitions/ent.UserEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the UserQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+      personalID:
+        description: PersonalID holds the value of the "personalID" field.
+        type: string
+      personalName:
+        description: PersonalName holds the value of the "personalName" field.
+        type: string
+    type: object
+  ent.UserEdges:
+    properties:
+      branch:
+        $ref: '#/definitions/ent.Branch'
+        description: Branch holds the value of the branch edge.
+        type: object
+      building:
+        $ref: '#/definitions/ent.Building'
+        description: Building holds the value of the building edge.
+        type: object
+      faculty:
+        $ref: '#/definitions/ent.Faculty'
+        description: Faculty holds the value of the faculty edge.
+        type: object
+      room:
+        $ref: '#/definitions/ent.Room'
+        description: Room holds the value of the room edge.
+        type: object
+    type: object
+  gin.H:
+    additionalProperties: true
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server for SUT SE 2563
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: SUT SA Example API
+  version: "1.0"
+paths:
+  /branch/{id}:
+    delete:
+      description: get branch by ID
+      operationId: delete-branch
+      parameters:
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a branch entity by ID
+  /branchs:
+    get:
+      description: list branch entities
+      operationId: list-branch
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Branch'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List branch entities
+    post:
+      consumes:
+      - application/json
+      description: Create branch
+      operationId: create-branch
+      parameters:
+      - description: Branch entity
+        in: body
+        name: branch
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Branch'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Branch'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create branch
+  /branchs/{id}:
+    get:
+      description: get branch by ID
+      operationId: get-branch
+      parameters:
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Branch'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a branch entity by ID
+  /building/{id}:
+    delete:
+      description: get building by ID
+      operationId: delete-building
+      parameters:
+      - description: Building ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a building entity by ID
+  /buildings:
+    get:
+      description: list building entities
+      operationId: list-building
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Building'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List building entities
+    post:
+      consumes:
+      - application/json
+      description: Create building
+      operationId: create-building
+      parameters:
+      - description: Building entity
+        in: body
+        name: building
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Building'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Building'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create building
+  /buildings/{id}:
+    get:
+      description: get building by ID
+      operationId: get-building
+      parameters:
+      - description: Building ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Building'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a building entity by ID
+  /employee/{id}:
+    delete:
+      description: get employee by ID
+      operationId: delete-employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a employee entity by ID
+  /employees:
+    get:
+      description: list employee entities
+      operationId: list-employee
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Employee'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List employee entities
+    post:
+      consumes:
+      - application/json
+      description: Create employee
+      operationId: create-employee
+      parameters:
+      - description: Employee entity
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Employee'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Employee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create employee
+  /employees/{id}:
+    get:
+      description: get employee by ID
+      operationId: get-employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Employee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a employee entity by ID
+  /faculty/{id}:
+    delete:
+      description: get faculty by ID
+      operationId: delete-faculty
+      parameters:
+      - description: Faculty ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a faculty entity by ID
+  /facultys:
+    get:
+      description: list faculty entities
+      operationId: list-faculty
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Faculty'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List faculty entities
+    post:
+      consumes:
+      - application/json
+      description: Create faculty
+      operationId: create-faculty
+      parameters:
+      - description: Faculty entity
+        in: body
+        name: faculty
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Faculty'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Faculty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create faculty
+  /facultys/{id}:
+    get:
+      description: get faculty by ID
+      operationId: get-faculty
+      parameters:
+      - description: Faculty ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Faculty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a faculty entity by ID
+  /repairinvoice/{id}:
+    delete:
+      description: get repairinvoice by ID
+      operationId: delete-repairinvoice
+      parameters:
+      - description: Repairinvoice ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a repairinvoice entity by ID
+  /repairinvoices:
+    get:
+      description: list repairinvoice entities
+      operationId: list-repairinvoice
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Repairinvoice'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List repairinvoice entities
+    post:
+      consumes:
+      - application/json
+      description: Create repairinvoice
+      operationId: create-repairinvoice
+      parameters:
+      - description: Repairinvoice entity
+        in: body
+        name: repairinvoice
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Repairinvoice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Repairinvoice'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create repairinvoice
+  /repairinvoices/{id}:
+    get:
+      description: get repairinvoice by ID
+      operationId: get-repairinvoice
+      parameters:
+      - description: Repairinvoice ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Repairinvoice'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a repairinvoice entity by ID
+  /returninvoices:
+    get:
+      description: list returninvoice entities
+      operationId: list-returninvoice
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Returninvoice'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List returninvoice entities
+    post:
+      consumes:
+      - application/json
+      description: Create returninvoice
+      operationId: create-returninvoice
+      parameters:
+      - description: Returninvoice entity
+        in: body
+        name: returninvoice
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Returninvoice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.Returninvoice'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create returninvoice
+  /room/{id}:
+    delete:
+      description: get room by ID
+      operationId: delete-room
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a room entity by ID
+  /rooms:
+    get:
+      description: list room entities
+      operationId: list-room
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Room'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List room entities
+    post:
+      consumes:
+      - application/json
+      description: Create room
+      operationId: create-room
+      parameters:
+      - description: Room entity
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Room'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Room'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create room
+  /rooms/{id}:
+    get:
+      description: get room by ID
+      operationId: get-room
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Room'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a room entity by ID
+  /statust/{id}:
+    delete:
+      description: get statust by ID
+      operationId: delete-statust
+      parameters:
+      - description: Statust ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a statust entity by ID
+  /statusts:
+    get:
+      description: list statust entities
+      operationId: list-statust
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Statust'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List statust entities
+    post:
+      consumes:
+      - application/json
+      description: Create statust
+      operationId: create-statust
+      parameters:
+      - description: Statust entity
+        in: body
+        name: statust
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Statust'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Statust'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create statust
+  /statusts/{id}:
+    get:
+      description: get statust by ID
+      operationId: get-statust
+      parameters:
+      - description: Statust ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Statust'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a statust entity by ID
+  /users:
+    get:
+      description: list user entities
+      operationId: list-user
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List user entities
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      operationId: create-user
+      parameters:
+      - description: User entity
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create user
+  /users/{id}:
+    delete:
+      description: get user by ID
+      operationId: delete-user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a user entity by ID
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+  OAuth2AccessCode:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: accessCode
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Application:
+    flow: application
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      write: ' Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Implicit:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: implicit
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      write: ' Grants write access'
+    type: oauth2
+  OAuth2Password:
+    flow: password
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      read: ' Grants read access'
+      write: ' Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+swagger: "2.0"

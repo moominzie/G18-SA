@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import Button from '@material-ui/core/Button';
-import AddBoxRoundedIcon from '@material-ui/icons/AddBoxRounded';
+import LocalFloristRoundedIcon from '@material-ui/icons/LocalFloristRounded';
 import ExitToAppRoundedIcon from '@material-ui/icons/ExitToAppRounded';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import {
@@ -41,8 +41,26 @@ export default function WelcomePage() {
               variant="outlined" 
               color="secondary" 
               href="/recordusertable" 
-              startIcon={<AddBoxRoundedIcon />}> 
-              User information record
+              startIcon={<LocalFloristRoundedIcon />}> 
+              User information
+            </Button>
+           <div></div>
+
+            <Button className={classes.margin}
+               variant="outlined" 
+              color="secondary" 
+             href="/recordrepairinvoicetable" 
+              startIcon={<LocalFloristRoundedIcon />}> 
+             Repair invoice
+               </Button>
+               <div></div>
+
+               <Button className={classes.margin}
+              variant="outlined" 
+              color="secondary" 
+              href="/recordusertable" 
+              startIcon={<LocalFloristRoundedIcon />}> 
+              Part Order
             </Button>
            <div></div>
 
@@ -50,22 +68,24 @@ export default function WelcomePage() {
               variant="outlined" 
               color="secondary" 
               href="/recordreturninvoicetable" 
-              startIcon={<AddBoxRoundedIcon />}> 
-              Returninvoice
+              startIcon={<LocalFloristRoundedIcon />}> 
+              Return invoice
             </Button>
             <div></div>
 
             <Button className={classes.margin}
               variant="outlined" 
               color="secondary" 
-              href="/recordrepairinvoicetable" 
-              startIcon={<AddBoxRoundedIcon />}> 
-              Repairinvoice
+              href="/recordusertable" 
+              startIcon={<LocalFloristRoundedIcon />}> 
+              Payment Bill
             </Button>
+           <div></div>
+
+            
 
         </Content>
       </div>
    </Page>
  );
 };
-

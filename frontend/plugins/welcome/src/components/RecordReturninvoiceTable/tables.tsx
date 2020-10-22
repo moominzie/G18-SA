@@ -45,7 +45,7 @@ export default function ComponentsRecordReturninvoiceTable() {
 
     const getRepairinvoices = async () => {
       const res = await http.listRepairInvoice({ limit: 10, offset: 0 });
-      setLoading(false);
+      setLoading(true);
       setRepairinvoices(res);
       console.log(res);
     };
@@ -53,7 +53,7 @@ export default function ComponentsRecordReturninvoiceTable() {
 
     const getUsers = async () => {
       const res = await http.listUser({ limit: 10, offset: 0 });
-      setLoading(false);
+      setLoading(true);
       setUsers(res);
       console.log(res);
     };

@@ -187,7 +187,7 @@ const CreateReturninvoice = async () => {
                 <InputLabel className={classes.insideLabel}>NO.(Repairinvoice)</InputLabel>
 
                 {repairinvoices.map((item: EntRepairInvoice) => (
-                  <MenuItem value={item.id}>{item.id}</MenuItem>
+                  <MenuItem value={item.id}>{item.rename}</MenuItem>
                 ))}
               </Select>
 

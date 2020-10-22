@@ -135,7 +135,7 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 
-	client, err := ent.Open("sqlite3", "file:user_record.db?&cache=shared&_fk=1")
+	client, err := ent.Open("sqlite3", "file:g18_repaircom.db?&cache=shared&_fk=1")
 	if err != nil {
 		log.Fatalf("fail to open sqlite3: %v", err)
 	}
@@ -162,8 +162,7 @@ func main() {
 	// Set Facultys Data
 	facultys := Facultys{
 		Faculty: []Faculty{
-			Faculty{"engineering"},
-			Faculty{"medicine"},
+			Faculty{"Engineering"},
 		},
 	}
 	for _, f := range facultys.Faculty {
@@ -176,12 +175,12 @@ func main() {
 	// Set Branchs Data
 	branchs := Branchs{
 		Branch: []Branch{
-			Branch{"computer engineering", 1},
-			Branch{"civil engineering", 1},
-			Branch{"aeronautical engineering", 1},
-			Branch{"angiology/vascular medicine", 2},
-			Branch{"cardiology", 2},
-			Branch{"endocrinology", 2},
+			Branch{"Computer Engineering", 1},
+			Branch{"Civil Engineering", 1},
+			Branch{"Electrical Engineering", 1},
+			Branch{"Aeronautical Engineering", 2},
+			Branch{"Engineering Management", 2},
+			Branch{"Chemical Engineering", 2},
 		},
 	}
 	for _, br := range branchs.Branch {
@@ -194,8 +193,8 @@ func main() {
 	// Set Buildings Data
 	buildings := Buildings{
 		Building: []Building{
-			Building{"studying building 1"},
-			Building{"studying building 2"},
+			Building{"Studying building 1"},
+			Building{"Studying building 2"},
 		},
 	}
 	for _, bu := range buildings.Building {
@@ -208,10 +207,14 @@ func main() {
 	// Set Rooms Data
 	rooms := Rooms{
 		Room: []Room{
-			Room{"b1120", 2001},
-			Room{"b1112", 2001},
-			Room{"b2502", 2002},
-			Room{"b2510", 2002},
+			Room{"B1120", 2001},
+			Room{"B1112", 2001},
+			Room{"B1215", 2001},
+			Room{"B1217", 2001},
+			Room{"B2502", 2002},
+			Room{"B2510", 2002},
+			Room{"B2512", 2002},
+			Room{"B2515", 2002},
 		},
 	}
 	for _, r := range rooms.Room {
@@ -224,9 +227,11 @@ func main() {
 	// Set Employees Data
 	employees := Employees{
 		Employee: []Employee{
-			Employee{"john", "qwwe@gmail.com", "1223"},
-			Employee{"gain", "sddf@gmail.com", "2334"},
-			Employee{"tod", "zxxc@gmail.com", "3445"},
+			Employee{"Steve Rogers", "qwwe@gmail.com", "1223"},
+			Employee{"Tony Stark", "sddf@gmail.com", "2334"},
+			Employee{"Nick Fury", "zxxc@gmail.com", "3445"},
+			Employee{"Bruce Banner", "bbbb@gmail.com", "5556"},
+			Employee{"Natasha Romanoff", "nnnn@gmail.com", "6667"},
 		},
 	}
 	for _, em := range employees.Employee {
@@ -241,8 +246,8 @@ func main() {
 	// Set Statusts Data
 	statusts := Statusts{
 		Statust: []Statust{
-			Statust{"in delivery"},
-			Statust{"completed"},
+			Statust{"In delivery"},
+			Statust{"Completed"},
 		},
 	}
 	for _, s := range statusts.Statust {
@@ -256,7 +261,7 @@ func main() {
 	statusrs := StatusRs{
 		StatusR: []StatusR{
 			StatusR{"In process "},
-			StatusR{"done"},
+			StatusR{"Done"},
 		},
 	}
 	for _, s := range statusrs.StatusR {

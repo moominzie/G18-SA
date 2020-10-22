@@ -1,11 +1,11 @@
-import React, { FC,useState,useEffect,Component } from 'react';
+import React, { FC,useState } from 'react';
+import { Link } from "react-router-dom";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { Alert, AlertTitle } from '@material-ui/lab';
+import { Alert } from '@material-ui/lab';
 import {
   Header,
   Page,
@@ -14,26 +14,14 @@ import {
  } from '@backstage/core';
 import { DefaultApi } from '../../api/apis';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      Group 18 SA-63{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const useStyles = makeStyles(theme => ({
   paper: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
     marginLeft: theme.spacing(1),
-    //display: 'flex',
-   // flexDirection: 'column',
-    //alignItems: 'center',
-    //align: 'center',
+  },
+  head: {
+    marginLeft: theme.spacing(70),
     fontSize: '18px',
   },
   avatar: {
@@ -48,43 +36,69 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(2, 0, 2),
+    marginLeft: theme.spacing(83),
   },
   textField: {
     width: 350 ,
-    marginLeft:7,
-    marginRight:-7,
+    marginLeft: theme.spacing(67),
    },
    margin: {
     margin: theme.spacing(2),
  },
+ signin: {
+   margin: theme.spacing(2, 0, 2),
+   width: 350 ,
+   marginLeft: theme.spacing(67),
+ }
 
 }));
 
 
 const SignIn: FC<{}> = () => {
   const classes = useStyles();
-  const http = new DefaultApi();
 
   const [alert, setAlert] = useState(true);
+  const [status, setStatus] = useState(false);
 
-  const [employeeemail, setEmployeeEmail] = useState(String);
+  const [username, setUsername] = useState(String);
   const [password, setPassword] = useState(String);
 
-  const handleEmployeeEmailChange = (event: any) => {
-    setEmployeeEmail(event.target.value as string);
+  const handleUsernameChange = (event: any) => {
+    setUsername(event.target.value as string);
   };
-
+  
   const handlePasswordChange = (event: any) => {
     setPassword(event.target.value as string);
   };
 
-  const EmployeeLogin = async () => {
-  if (employeeemail === 'admin' && password === 'system') {
+  /*function EmployeeLogin() {
+  if (username === 'admin' && password === 'system') {
+    <Link to="/home" /> ;
+ } else {
+   setAlert(true);
+ }
+}*/
+
+const EmployeeLogin = async () => {
+  const employee = {
+    username: 'admin',
+    password: 'system',
+  };
+  console.log(employee);
+    setStatus(true);
+    console.log('Enter this Username and Password');
+  if (username == 'admin' && password == 'system') {
+    window.location.href = "http://localhost:3000/Home";
     setAlert(true);
+    console.log('kluay');
   } else {
     setAlert(false);
   }
-}
+
+  const timer = setTimeout(() => {
+    setStatus(false);
+  }, 3000);
+};
 
   return (
     <Page theme={pageTheme.tool}>
@@ -93,29 +107,25 @@ const SignIn: FC<{}> = () => {
        title="Login" type="Repairing computer systems"> 
      </Header>
 
-     <Content align="center">
+     <Content>
   <div className={classes.paper}> <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar></div>
-     <div className={classes.paper}><strong>พนักงานศูนย์บริการแจ้งซ่อมคอมพิวเตอร์</strong></div>
-     <TextField className={classes.textField}
-    //          style={{ width: 500 ,marginLeft:7,marginRight:-7}}
+     <div className={classes.head}><strong>พนักงานศูนย์บริการแจ้งซ่อมคอมพิวเตอร์</strong></div>
+
+     <form noValidate autoComplete="off">
+     <div><TextField className={classes.textField}
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
-                id="employeeemail"
-                label="Email Address"
-                type="email"
-                name="email"
-                autoFocus
-                onChange={handleEmployeeEmailChange}
-               // value={personalid}
-                //onChange={handlePersonalIDChange}
-              />
- <div></div>
-      <TextField className={classes.textField}
-    //          style={{ width: 500 ,marginLeft:7,marginRight:-7}}
+                id="username"
+                label="Username"
+                type="username"
+                name="username"
+                onChange={handleUsernameChange}
+              /></div>
+      <div><TextField className={classes.textField}
                 variant="outlined"
                 margin="normal"
                 required
@@ -125,13 +135,11 @@ const SignIn: FC<{}> = () => {
                 type="password"
                 id="password"
                 onChange={handlePasswordChange}
-               // value={personalid}
-                //onChange={handlePersonalIDChange}  
-              />
+              /></div></form>
+
             <div> 
             <Button
               onClick={() => {EmployeeLogin();}}
-              href="/home"
               type="submit"
               variant="contained"
               color="primary"
@@ -141,10 +149,10 @@ const SignIn: FC<{}> = () => {
             </Button></div>
 
             {status ? ( 
-                      <div className={classes.margin} style={{ width: 500 ,marginLeft:30,marginRight:-7,marginTop:16}}>
-              {alert ? ( 
-                      <Alert severity="success"> <AlertTitle>Success</AlertTitle> Complete data — check it out! </Alert>) 
-              : (     <Alert severity="warning"> <AlertTitle>Warining</AlertTitle> Incomplete data — please try again!</Alert>)} </div>
+                      <div className={classes.signin}>
+              { alert ? ( 
+                    <Link to="/home" />   ) 
+              : ( <Alert variant="outlined" severity="info"> Incorrect Username or Password </Alert> )} </div>
             ) : null}
      </Content>
     </Page>

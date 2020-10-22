@@ -14,41 +14,85 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    EntDevice,
+    EntDeviceFromJSON,
+    EntDeviceFromJSONTyped,
+    EntDeviceToJSON,
     EntReturninvoice,
     EntReturninvoiceFromJSON,
     EntReturninvoiceFromJSONTyped,
     EntReturninvoiceToJSON,
+    EntStatusR,
+    EntStatusRFromJSON,
+    EntStatusRFromJSONTyped,
+    EntStatusRToJSON,
+    EntSymptom,
+    EntSymptomFromJSON,
+    EntSymptomFromJSONTyped,
+    EntSymptomToJSON,
+    EntUser,
+    EntUserFromJSON,
+    EntUserFromJSONTyped,
+    EntUserToJSON,
 } from './';
 
 /**
  * 
  * @export
- * @interface EntRepairinvoiceEdges
+ * @interface EntRepairInvoiceEdges
  */
-export interface EntRepairinvoiceEdges {
+export interface EntRepairInvoiceEdges {
+    /**
+     * 
+     * @type {EntDevice}
+     * @memberof EntRepairInvoiceEdges
+     */
+    device?: EntDevice;
     /**
      * 
      * @type {EntReturninvoice}
-     * @memberof EntRepairinvoiceEdges
+     * @memberof EntRepairInvoiceEdges
      */
-    repairinvoices?: EntReturninvoice;
+    returninvoice?: EntReturninvoice;
+    /**
+     * 
+     * @type {EntStatusR}
+     * @memberof EntRepairInvoiceEdges
+     */
+    status?: EntStatusR;
+    /**
+     * 
+     * @type {EntSymptom}
+     * @memberof EntRepairInvoiceEdges
+     */
+    symptom?: EntSymptom;
+    /**
+     * 
+     * @type {EntUser}
+     * @memberof EntRepairInvoiceEdges
+     */
+    user?: EntUser;
 }
 
-export function EntRepairinvoiceEdgesFromJSON(json: any): EntRepairinvoiceEdges {
-    return EntRepairinvoiceEdgesFromJSONTyped(json, false);
+export function EntRepairInvoiceEdgesFromJSON(json: any): EntRepairInvoiceEdges {
+    return EntRepairInvoiceEdgesFromJSONTyped(json, false);
 }
 
-export function EntRepairinvoiceEdgesFromJSONTyped(json: any, ignoreDiscriminator: boolean): EntRepairinvoiceEdges {
+export function EntRepairInvoiceEdgesFromJSONTyped(json: any, ignoreDiscriminator: boolean): EntRepairInvoiceEdges {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'repairinvoices': !exists(json, 'repairinvoices') ? undefined : EntReturninvoiceFromJSON(json['repairinvoices']),
+        'device': !exists(json, 'Device') ? undefined : EntDeviceFromJSON(json['Device']),
+        'returninvoice': !exists(json, 'Returninvoice') ? undefined : EntReturninvoiceFromJSON(json['Returninvoice']),
+        'status': !exists(json, 'Status') ? undefined : EntStatusRFromJSON(json['Status']),
+        'symptom': !exists(json, 'Symptom') ? undefined : EntSymptomFromJSON(json['Symptom']),
+        'user': !exists(json, 'User') ? undefined : EntUserFromJSON(json['User']),
     };
 }
 
-export function EntRepairinvoiceEdgesToJSON(value?: EntRepairinvoiceEdges | null): any {
+export function EntRepairInvoiceEdgesToJSON(value?: EntRepairInvoiceEdges | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -57,7 +101,11 @@ export function EntRepairinvoiceEdgesToJSON(value?: EntRepairinvoiceEdges | null
     }
     return {
         
-        'repairinvoices': EntReturninvoiceToJSON(value.repairinvoices),
+        'device': EntDeviceToJSON(value.device),
+        'returninvoice': EntReturninvoiceToJSON(value.returninvoice),
+        'status': EntStatusRToJSON(value.status),
+        'symptom': EntSymptomToJSON(value.symptom),
+        'user': EntUserToJSON(value.user),
     };
 }
 

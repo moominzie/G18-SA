@@ -16,7 +16,8 @@ type FacultyController struct {
 }
 
 type Faculty struct {
-	Fname string
+	Fname     string
+	Facultyid int
 }
 
 // CreateFaculty handles POST requests for adding faculty entities

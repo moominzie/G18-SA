@@ -42,9 +42,11 @@ type UserEdges struct {
 	Building *Building
 	// Room holds the value of the room edge.
 	Room *Room
+	// RepairinvoiceInformations holds the value of the repairinvoice_informations edge.
+	RepairinvoiceInformations []*RepairInvoice
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // FacultyOrErr returns the Faculty value or an error if the edge
@@ -101,6 +103,15 @@ func (e UserEdges) RoomOrErr() (*Room, error) {
 		return e.Room, nil
 	}
 	return nil, &NotLoadedError{edge: "room"}
+}
+
+// RepairinvoiceInformationsOrErr returns the RepairinvoiceInformations value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) RepairinvoiceInformationsOrErr() ([]*RepairInvoice, error) {
+	if e.loadedTypes[4] {
+		return e.RepairinvoiceInformations, nil
+	}
+	return nil, &NotLoadedError{edge: "repairinvoice_informations"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -192,6 +203,11 @@ func (u *User) QueryBuilding() *BuildingQuery {
 // QueryRoom queries the room edge of the User.
 func (u *User) QueryRoom() *RoomQuery {
 	return (&UserClient{config: u.config}).QueryRoom(u)
+}
+
+// QueryRepairinvoiceInformations queries the repairinvoice_informations edge of the User.
+func (u *User) QueryRepairinvoiceInformations() *RepairInvoiceQuery {
+	return (&UserClient{config: u.config}).QueryRepairinvoiceInformations(u)
 }
 
 // Update returns a builder for updating this User.

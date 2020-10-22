@@ -46,13 +46,23 @@ export default function WelcomePage() {
             </Button>
            <div></div>
 
-            <Button 
+            <Button className={classes.margin}
               variant="outlined" 
               color="secondary" 
               href="/recordreturninvoicetable" 
               startIcon={<AddBoxRoundedIcon />}> 
-              Record Returninvoice Table
+              Returninvoice
             </Button>
+            <div></div>
+
+            <Button className={classes.margin}
+              variant="outlined" 
+              color="secondary" 
+              href="/recordrepairinvoicetable" 
+              startIcon={<AddBoxRoundedIcon />}> 
+              Repairinvoice
+            </Button>
+
         </Content>
       </div>
    </Page>

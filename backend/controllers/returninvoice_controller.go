@@ -57,7 +57,7 @@ func (ctl *ReturninvoiceController) CreateReturninvoice(c *gin.Context) {
 		return
 	}
 
-	rep, err := ctl.client.Repairinvoice.
+	r, err := ctl.client.RepairInvoice.
 		Query().
 		Where(repairinvoice.IDEQ(int(obj.Repairinvoice))).
 		Only(context.Background())
@@ -86,7 +86,7 @@ func (ctl *ReturninvoiceController) CreateReturninvoice(c *gin.Context) {
 		Create().
 		SetAddedtime(time).
 		SetEmployee(em).
-		SetRepairinvoice(rep).
+		SetRepairinvoice(r).
 		SetStatust(s).
 		Save(context.Background())
 	if err != nil {

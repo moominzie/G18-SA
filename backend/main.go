@@ -58,23 +58,37 @@ type Employee struct {
 	Password      string
 }
 
-type Repairinvoices struct {
-	Repairinvoice []Repairinvoice
-}
-
-type Repairinvoice struct {
-	Symptomid      int
-	Deviceid       int
-	Userid         int
-	Statusrepairid int
-}
-
 type Statusts struct {
 	Statust []Statust
 }
 
 type Statust struct {
 	Statustname string
+}
+
+type Devices struct {
+	Device []Device
+}
+
+type Device struct {
+	Dname string
+	id    int
+}
+
+type Symptoms struct {
+	Symptom []Symptom
+}
+
+type Symptom struct {
+	Syname string
+}
+
+type StatusRs struct {
+	StatusR []StatusR
+}
+
+type StatusR struct {
+	Sname string
 }
 
 // @title SUT SA Example API
@@ -138,9 +152,12 @@ func main() {
 	controllers.NewRoomController(v1, client)
 	controllers.NewUserController(v1, client)
 	controllers.NewEmployeeController(v1, client)
-	controllers.NewRepairinvoiceController(v1, client)
 	controllers.NewStatustController(v1, client)
 	controllers.NewReturninvoiceController(v1, client)
+	controllers.NewDeviceController(v1, client)
+	controllers.NewStatusRController(v1, client)
+	controllers.NewSymptomController(v1, client)
+	controllers.NewRepairInvoiceController(v1, client)
 
 	// Set Facultys Data
 	facultys := Facultys{
@@ -191,10 +208,10 @@ func main() {
 	// Set Rooms Data
 	rooms := Rooms{
 		Room: []Room{
-			Room{"b1120", 1},
-			Room{"b1112", 1},
-			Room{"b2502", 2},
-			Room{"b2510", 2},
+			Room{"b1120", 2001},
+			Room{"b1112", 2001},
+			Room{"b2502", 2002},
+			Room{"b2510", 2002},
 		},
 	}
 	for _, r := range rooms.Room {
@@ -221,24 +238,6 @@ func main() {
 			Save(context.Background())
 	}
 
-	// Set Repairinvoices Data
-	repairinvoices := Repairinvoices{
-		Repairinvoice: []Repairinvoice{
-			Repairinvoice{101, 201, 301, 1001},
-			Repairinvoice{102, 202, 302, 1002},
-			Repairinvoice{101, 203, 303, 1001},
-		},
-	}
-	for _, rep := range repairinvoices.Repairinvoice {
-		client.Repairinvoice.
-			Create().
-			SetSymptomid(rep.Symptomid).
-			SetDeviceid(rep.Deviceid).
-			SetUserid(rep.Userid).
-			SetStatusrepairid(rep.Statusrepairid).
-			Save(context.Background())
-	}
-
 	// Set Statusts Data
 	statusts := Statusts{
 		Statust: []Statust{
@@ -250,6 +249,52 @@ func main() {
 		client.Statust.
 			Create().
 			SetStatustname(s.Statustname).
+			Save(context.Background())
+	}
+
+	// Set Statusrs Data
+	statusrs := StatusRs{
+		StatusR: []StatusR{
+			StatusR{"In process "},
+			StatusR{"done"},
+		},
+	}
+	for _, s := range statusrs.StatusR {
+		client.StatusR.
+			Create().
+			SetSname(s.Sname).
+			Save(context.Background())
+	}
+
+	// Set Devices Data
+	devices := Devices{
+		Device: []Device{
+			Device{"Acer Predator", 1},
+			Device{"Mi Air", 1},
+			Device{"Huawei Y800", 1},
+			Device{"Lenovo NotePad", 2},
+			Device{"Samsung ok10", 2},
+			Device{"MacBook Pro 2020", 2},
+		},
+	}
+	for _, d := range devices.Device {
+		client.Device.
+			Create().
+			SetDname(d.Dname).
+			Save(context.Background())
+	}
+
+	// Set Symptoms Data
+	symptoms := Symptoms{
+		Symptom: []Symptom{
+			Symptom{"Damaged Hardware"},
+			Symptom{"Damaged Software"},
+		},
+	}
+	for _, sy := range symptoms.Symptom {
+		client.Symptom.
+			Create().
+			SetSyname(sy.Syname).
 			Save(context.Background())
 	}
 

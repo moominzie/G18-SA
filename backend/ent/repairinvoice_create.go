@@ -9,100 +9,153 @@ import (
 
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
+	"github.com/moominzie/user-record/ent/statusr"
+	"github.com/moominzie/user-record/ent/symptom"
+	"github.com/moominzie/user-record/ent/user"
 )
 
-// RepairinvoiceCreate is the builder for creating a Repairinvoice entity.
-type RepairinvoiceCreate struct {
+// RepairInvoiceCreate is the builder for creating a RepairInvoice entity.
+type RepairInvoiceCreate struct {
 	config
-	mutation *RepairinvoiceMutation
+	mutation *RepairInvoiceMutation
 	hooks    []Hook
 }
 
-// SetSymptomid sets the symptomid field.
-func (rc *RepairinvoiceCreate) SetSymptomid(i int) *RepairinvoiceCreate {
-	rc.mutation.SetSymptomid(i)
-	return rc
+// SetRename sets the Rename field.
+func (ric *RepairInvoiceCreate) SetRename(s string) *RepairInvoiceCreate {
+	ric.mutation.SetRename(s)
+	return ric
 }
 
-// SetDeviceid sets the deviceid field.
-func (rc *RepairinvoiceCreate) SetDeviceid(i int) *RepairinvoiceCreate {
-	rc.mutation.SetDeviceid(i)
-	return rc
+// SetDeviceID sets the device edge to Device by id.
+func (ric *RepairInvoiceCreate) SetDeviceID(id int) *RepairInvoiceCreate {
+	ric.mutation.SetDeviceID(id)
+	return ric
 }
 
-// SetUserid sets the userid field.
-func (rc *RepairinvoiceCreate) SetUserid(i int) *RepairinvoiceCreate {
-	rc.mutation.SetUserid(i)
-	return rc
-}
-
-// SetStatusrepairid sets the statusrepairid field.
-func (rc *RepairinvoiceCreate) SetStatusrepairid(i int) *RepairinvoiceCreate {
-	rc.mutation.SetStatusrepairid(i)
-	return rc
-}
-
-// SetRepairinvoicesID sets the repairinvoices edge to Returninvoice by id.
-func (rc *RepairinvoiceCreate) SetRepairinvoicesID(id int) *RepairinvoiceCreate {
-	rc.mutation.SetRepairinvoicesID(id)
-	return rc
-}
-
-// SetNillableRepairinvoicesID sets the repairinvoices edge to Returninvoice by id if the given value is not nil.
-func (rc *RepairinvoiceCreate) SetNillableRepairinvoicesID(id *int) *RepairinvoiceCreate {
+// SetNillableDeviceID sets the device edge to Device by id if the given value is not nil.
+func (ric *RepairInvoiceCreate) SetNillableDeviceID(id *int) *RepairInvoiceCreate {
 	if id != nil {
-		rc = rc.SetRepairinvoicesID(*id)
+		ric = ric.SetDeviceID(*id)
 	}
-	return rc
+	return ric
 }
 
-// SetRepairinvoices sets the repairinvoices edge to Returninvoice.
-func (rc *RepairinvoiceCreate) SetRepairinvoices(r *Returninvoice) *RepairinvoiceCreate {
-	return rc.SetRepairinvoicesID(r.ID)
+// SetDevice sets the device edge to Device.
+func (ric *RepairInvoiceCreate) SetDevice(d *Device) *RepairInvoiceCreate {
+	return ric.SetDeviceID(d.ID)
 }
 
-// Mutation returns the RepairinvoiceMutation object of the builder.
-func (rc *RepairinvoiceCreate) Mutation() *RepairinvoiceMutation {
-	return rc.mutation
+// SetStatusID sets the status edge to StatusR by id.
+func (ric *RepairInvoiceCreate) SetStatusID(id int) *RepairInvoiceCreate {
+	ric.mutation.SetStatusID(id)
+	return ric
 }
 
-// Save creates the Repairinvoice in the database.
-func (rc *RepairinvoiceCreate) Save(ctx context.Context) (*Repairinvoice, error) {
-	if _, ok := rc.mutation.Symptomid(); !ok {
-		return nil, &ValidationError{Name: "symptomid", err: errors.New("ent: missing required field \"symptomid\"")}
+// SetNillableStatusID sets the status edge to StatusR by id if the given value is not nil.
+func (ric *RepairInvoiceCreate) SetNillableStatusID(id *int) *RepairInvoiceCreate {
+	if id != nil {
+		ric = ric.SetStatusID(*id)
 	}
-	if _, ok := rc.mutation.Deviceid(); !ok {
-		return nil, &ValidationError{Name: "deviceid", err: errors.New("ent: missing required field \"deviceid\"")}
+	return ric
+}
+
+// SetStatus sets the status edge to StatusR.
+func (ric *RepairInvoiceCreate) SetStatus(s *StatusR) *RepairInvoiceCreate {
+	return ric.SetStatusID(s.ID)
+}
+
+// SetSymptomID sets the symptom edge to Symptom by id.
+func (ric *RepairInvoiceCreate) SetSymptomID(id int) *RepairInvoiceCreate {
+	ric.mutation.SetSymptomID(id)
+	return ric
+}
+
+// SetNillableSymptomID sets the symptom edge to Symptom by id if the given value is not nil.
+func (ric *RepairInvoiceCreate) SetNillableSymptomID(id *int) *RepairInvoiceCreate {
+	if id != nil {
+		ric = ric.SetSymptomID(*id)
 	}
-	if _, ok := rc.mutation.Userid(); !ok {
-		return nil, &ValidationError{Name: "userid", err: errors.New("ent: missing required field \"userid\"")}
+	return ric
+}
+
+// SetSymptom sets the symptom edge to Symptom.
+func (ric *RepairInvoiceCreate) SetSymptom(s *Symptom) *RepairInvoiceCreate {
+	return ric.SetSymptomID(s.ID)
+}
+
+// SetUserID sets the user edge to User by id.
+func (ric *RepairInvoiceCreate) SetUserID(id int) *RepairInvoiceCreate {
+	ric.mutation.SetUserID(id)
+	return ric
+}
+
+// SetNillableUserID sets the user edge to User by id if the given value is not nil.
+func (ric *RepairInvoiceCreate) SetNillableUserID(id *int) *RepairInvoiceCreate {
+	if id != nil {
+		ric = ric.SetUserID(*id)
 	}
-	if _, ok := rc.mutation.Statusrepairid(); !ok {
-		return nil, &ValidationError{Name: "statusrepairid", err: errors.New("ent: missing required field \"statusrepairid\"")}
+	return ric
+}
+
+// SetUser sets the user edge to User.
+func (ric *RepairInvoiceCreate) SetUser(u *User) *RepairInvoiceCreate {
+	return ric.SetUserID(u.ID)
+}
+
+// SetReturninvoiceID sets the returninvoice edge to Returninvoice by id.
+func (ric *RepairInvoiceCreate) SetReturninvoiceID(id int) *RepairInvoiceCreate {
+	ric.mutation.SetReturninvoiceID(id)
+	return ric
+}
+
+// SetNillableReturninvoiceID sets the returninvoice edge to Returninvoice by id if the given value is not nil.
+func (ric *RepairInvoiceCreate) SetNillableReturninvoiceID(id *int) *RepairInvoiceCreate {
+	if id != nil {
+		ric = ric.SetReturninvoiceID(*id)
+	}
+	return ric
+}
+
+// SetReturninvoice sets the returninvoice edge to Returninvoice.
+func (ric *RepairInvoiceCreate) SetReturninvoice(r *Returninvoice) *RepairInvoiceCreate {
+	return ric.SetReturninvoiceID(r.ID)
+}
+
+// Mutation returns the RepairInvoiceMutation object of the builder.
+func (ric *RepairInvoiceCreate) Mutation() *RepairInvoiceMutation {
+	return ric.mutation
+}
+
+// Save creates the RepairInvoice in the database.
+func (ric *RepairInvoiceCreate) Save(ctx context.Context) (*RepairInvoice, error) {
+	if _, ok := ric.mutation.Rename(); !ok {
+		return nil, &ValidationError{Name: "Rename", err: errors.New("ent: missing required field \"Rename\"")}
 	}
 	var (
 		err  error
-		node *Repairinvoice
+		node *RepairInvoice
 	)
-	if len(rc.hooks) == 0 {
-		node, err = rc.sqlSave(ctx)
+	if len(ric.hooks) == 0 {
+		node, err = ric.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*RepairinvoiceMutation)
+			mutation, ok := m.(*RepairInvoiceMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
 			}
-			rc.mutation = mutation
-			node, err = rc.sqlSave(ctx)
+			ric.mutation = mutation
+			node, err = ric.sqlSave(ctx)
 			mutation.done = true
 			return node, err
 		})
-		for i := len(rc.hooks) - 1; i >= 0; i-- {
-			mut = rc.hooks[i](mut)
+		for i := len(ric.hooks) - 1; i >= 0; i-- {
+			mut = ric.hooks[i](mut)
 		}
-		if _, err := mut.Mutate(ctx, rc.mutation); err != nil {
+		if _, err := mut.Mutate(ctx, ric.mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -110,30 +163,30 @@ func (rc *RepairinvoiceCreate) Save(ctx context.Context) (*Repairinvoice, error)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (rc *RepairinvoiceCreate) SaveX(ctx context.Context) *Repairinvoice {
-	v, err := rc.Save(ctx)
+func (ric *RepairInvoiceCreate) SaveX(ctx context.Context) *RepairInvoice {
+	v, err := ric.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return v
 }
 
-func (rc *RepairinvoiceCreate) sqlSave(ctx context.Context) (*Repairinvoice, error) {
-	r, _spec := rc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, rc.driver, _spec); err != nil {
+func (ric *RepairInvoiceCreate) sqlSave(ctx context.Context) (*RepairInvoice, error) {
+	ri, _spec := ric.createSpec()
+	if err := sqlgraph.CreateNode(ctx, ric.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
 		}
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	r.ID = int(id)
-	return r, nil
+	ri.ID = int(id)
+	return ri, nil
 }
 
-func (rc *RepairinvoiceCreate) createSpec() (*Repairinvoice, *sqlgraph.CreateSpec) {
+func (ric *RepairInvoiceCreate) createSpec() (*RepairInvoice, *sqlgraph.CreateSpec) {
 	var (
-		r     = &Repairinvoice{config: rc.config}
+		ri    = &RepairInvoice{config: ric.config}
 		_spec = &sqlgraph.CreateSpec{
 			Table: repairinvoice.Table,
 			ID: &sqlgraph.FieldSpec{
@@ -142,44 +195,96 @@ func (rc *RepairinvoiceCreate) createSpec() (*Repairinvoice, *sqlgraph.CreateSpe
 			},
 		}
 	)
-	if value, ok := rc.mutation.Symptomid(); ok {
+	if value, ok := ric.mutation.Rename(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: repairinvoice.FieldSymptomid,
+			Column: repairinvoice.FieldRename,
 		})
-		r.Symptomid = value
+		ri.Rename = value
 	}
-	if value, ok := rc.mutation.Deviceid(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldDeviceid,
-		})
-		r.Deviceid = value
+	if nodes := ric.mutation.DeviceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.DeviceTable,
+			Columns: []string{repairinvoice.DeviceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: device.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if value, ok := rc.mutation.Userid(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldUserid,
-		})
-		r.Userid = value
+	if nodes := ric.mutation.StatusIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.StatusTable,
+			Columns: []string{repairinvoice.StatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: statusr.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if value, ok := rc.mutation.Statusrepairid(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldStatusrepairid,
-		})
-		r.Statusrepairid = value
+	if nodes := ric.mutation.SymptomIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.SymptomTable,
+			Columns: []string{repairinvoice.SymptomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: symptom.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.RepairinvoicesIDs(); len(nodes) > 0 {
+	if nodes := ric.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.UserTable,
+			Columns: []string{repairinvoice.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ric.mutation.ReturninvoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   repairinvoice.RepairinvoicesTable,
-			Columns: []string{repairinvoice.RepairinvoicesColumn},
+			Table:   repairinvoice.ReturninvoiceTable,
+			Columns: []string{repairinvoice.ReturninvoiceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -193,5 +298,5 @@ func (rc *RepairinvoiceCreate) createSpec() (*Repairinvoice, *sqlgraph.CreateSpe
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	return r, _spec
+	return ri, _spec
 }

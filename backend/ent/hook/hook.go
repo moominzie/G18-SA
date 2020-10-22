@@ -35,6 +35,19 @@ func (f BuildingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return f(ctx, mv)
 }
 
+// The DeviceFunc type is an adapter to allow the use of ordinary
+// function as Device mutator.
+type DeviceFunc func(context.Context, *ent.DeviceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DeviceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DeviceMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeviceMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The EmployeeFunc type is an adapter to allow the use of ordinary
 // function as Employee mutator.
 type EmployeeFunc func(context.Context, *ent.EmployeeMutation) (ent.Value, error)
@@ -61,15 +74,15 @@ func (f FacultyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
-// The RepairinvoiceFunc type is an adapter to allow the use of ordinary
-// function as Repairinvoice mutator.
-type RepairinvoiceFunc func(context.Context, *ent.RepairinvoiceMutation) (ent.Value, error)
+// The RepairInvoiceFunc type is an adapter to allow the use of ordinary
+// function as RepairInvoice mutator.
+type RepairInvoiceFunc func(context.Context, *ent.RepairInvoiceMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f RepairinvoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.RepairinvoiceMutation)
+func (f RepairInvoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.RepairInvoiceMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RepairinvoiceMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RepairInvoiceMutation", m)
 	}
 	return f(ctx, mv)
 }
@@ -100,6 +113,19 @@ func (f RoomFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return f(ctx, mv)
 }
 
+// The StatusRFunc type is an adapter to allow the use of ordinary
+// function as StatusR mutator.
+type StatusRFunc func(context.Context, *ent.StatusRMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StatusRFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.StatusRMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StatusRMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The StatustFunc type is an adapter to allow the use of ordinary
 // function as Statust mutator.
 type StatustFunc func(context.Context, *ent.StatustMutation) (ent.Value, error)
@@ -109,6 +135,19 @@ func (f StatustFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	mv, ok := m.(*ent.StatustMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StatustMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The SymptomFunc type is an adapter to allow the use of ordinary
+// function as Symptom mutator.
+type SymptomFunc func(context.Context, *ent.SymptomMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SymptomFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.SymptomMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SymptomMutation", m)
 	}
 	return f(ctx, mv)
 }

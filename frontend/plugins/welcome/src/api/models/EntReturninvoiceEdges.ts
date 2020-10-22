@@ -18,10 +18,10 @@ import {
     EntEmployeeFromJSON,
     EntEmployeeFromJSONTyped,
     EntEmployeeToJSON,
-    EntRepairinvoice,
-    EntRepairinvoiceFromJSON,
-    EntRepairinvoiceFromJSONTyped,
-    EntRepairinvoiceToJSON,
+    EntRepairInvoice,
+    EntRepairInvoiceFromJSON,
+    EntRepairInvoiceFromJSONTyped,
+    EntRepairInvoiceToJSON,
     EntStatust,
     EntStatustFromJSON,
     EntStatustFromJSONTyped,
@@ -42,10 +42,10 @@ export interface EntReturninvoiceEdges {
     employee?: EntEmployee;
     /**
      * 
-     * @type {EntRepairinvoice}
+     * @type {EntRepairInvoice}
      * @memberof EntReturninvoiceEdges
      */
-    repairinvoice?: EntRepairinvoice;
+    repairinvoice?: EntRepairInvoice;
     /**
      * 
      * @type {EntStatust}
@@ -65,7 +65,7 @@ export function EntReturninvoiceEdgesFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'employee': !exists(json, 'Employee') ? undefined : EntEmployeeFromJSON(json['Employee']),
-        'repairinvoice': !exists(json, 'Repairinvoice') ? undefined : EntRepairinvoiceFromJSON(json['Repairinvoice']),
+        'repairinvoice': !exists(json, 'Repairinvoice') ? undefined : EntRepairInvoiceFromJSON(json['Repairinvoice']),
         'statust': !exists(json, 'Statust') ? undefined : EntStatustFromJSON(json['Statust']),
     };
 }
@@ -80,7 +80,7 @@ export function EntReturninvoiceEdgesToJSON(value?: EntReturninvoiceEdges | null
     return {
         
         'employee': EntEmployeeToJSON(value.employee),
-        'repairinvoice': EntRepairinvoiceToJSON(value.repairinvoice),
+        'repairinvoice': EntRepairInvoiceToJSON(value.repairinvoice),
         'statust': EntStatustToJSON(value.statust),
     };
 }

@@ -27,7 +27,7 @@ type ReturninvoiceQuery struct {
 	unique     []string
 	predicates []predicate.Returninvoice
 	// eager-loading edges.
-	withRepairinvoice *RepairinvoiceQuery
+	withRepairinvoice *RepairInvoiceQuery
 	withEmployee      *EmployeeQuery
 	withStatust       *StatustQuery
 	withFKs           bool
@@ -61,8 +61,8 @@ func (rq *ReturninvoiceQuery) Order(o ...OrderFunc) *ReturninvoiceQuery {
 }
 
 // QueryRepairinvoice chains the current query on the Repairinvoice edge.
-func (rq *ReturninvoiceQuery) QueryRepairinvoice() *RepairinvoiceQuery {
-	query := &RepairinvoiceQuery{config: rq.config}
+func (rq *ReturninvoiceQuery) QueryRepairinvoice() *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: rq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -295,8 +295,8 @@ func (rq *ReturninvoiceQuery) Clone() *ReturninvoiceQuery {
 
 //  WithRepairinvoice tells the query-builder to eager-loads the nodes that are connected to
 // the "Repairinvoice" edge. The optional arguments used to configure the query builder of the edge.
-func (rq *ReturninvoiceQuery) WithRepairinvoice(opts ...func(*RepairinvoiceQuery)) *ReturninvoiceQuery {
-	query := &RepairinvoiceQuery{config: rq.config}
+func (rq *ReturninvoiceQuery) WithRepairinvoice(opts ...func(*RepairInvoiceQuery)) *ReturninvoiceQuery {
+	query := &RepairInvoiceQuery{config: rq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -433,7 +433,7 @@ func (rq *ReturninvoiceQuery) sqlAll(ctx context.Context) ([]*Returninvoice, err
 		ids := make([]int, 0, len(nodes))
 		nodeids := make(map[int][]*Returninvoice)
 		for i := range nodes {
-			if fk := nodes[i].reparinvoice_id; fk != nil {
+			if fk := nodes[i].returninvoice_id; fk != nil {
 				ids = append(ids, *fk)
 				nodeids[*fk] = append(nodeids[*fk], nodes[i])
 			}
@@ -446,7 +446,7 @@ func (rq *ReturninvoiceQuery) sqlAll(ctx context.Context) ([]*Returninvoice, err
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "reparinvoice_id" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "returninvoice_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
 				nodes[i].Edges.Repairinvoice = n

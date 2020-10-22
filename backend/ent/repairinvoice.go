@@ -7,65 +7,138 @@ import (
 	"strings"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
+	"github.com/moominzie/user-record/ent/statusr"
+	"github.com/moominzie/user-record/ent/symptom"
+	"github.com/moominzie/user-record/ent/user"
 )
 
-// Repairinvoice is the model entity for the Repairinvoice schema.
-type Repairinvoice struct {
+// RepairInvoice is the model entity for the RepairInvoice schema.
+type RepairInvoice struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Symptomid holds the value of the "symptomid" field.
-	Symptomid int `json:"symptomid,omitempty"`
-	// Deviceid holds the value of the "deviceid" field.
-	Deviceid int `json:"deviceid,omitempty"`
-	// Userid holds the value of the "userid" field.
-	Userid int `json:"userid,omitempty"`
-	// Statusrepairid holds the value of the "statusrepairid" field.
-	Statusrepairid int `json:"statusrepairid,omitempty"`
+	// Rename holds the value of the "Rename" field.
+	Rename string `json:"Rename,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the RepairinvoiceQuery when eager-loading is set.
-	Edges RepairinvoiceEdges `json:"edges"`
+	// The values are being populated by the RepairInvoiceQuery when eager-loading is set.
+	Edges            RepairInvoiceEdges `json:"edges"`
+	device_id        *int
+	statusr_id       *int
+	symptom_id       *int
+	repairinvoice_id *int
 }
 
-// RepairinvoiceEdges holds the relations/edges for other nodes in the graph.
-type RepairinvoiceEdges struct {
-	// Repairinvoices holds the value of the repairinvoices edge.
-	Repairinvoices *Returninvoice
+// RepairInvoiceEdges holds the relations/edges for other nodes in the graph.
+type RepairInvoiceEdges struct {
+	// Device holds the value of the device edge.
+	Device *Device
+	// Status holds the value of the status edge.
+	Status *StatusR
+	// Symptom holds the value of the symptom edge.
+	Symptom *Symptom
+	// User holds the value of the user edge.
+	User *User
+	// Returninvoice holds the value of the returninvoice edge.
+	Returninvoice *Returninvoice
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [5]bool
 }
 
-// RepairinvoicesOrErr returns the Repairinvoices value or an error if the edge
+// DeviceOrErr returns the Device value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RepairinvoiceEdges) RepairinvoicesOrErr() (*Returninvoice, error) {
+func (e RepairInvoiceEdges) DeviceOrErr() (*Device, error) {
 	if e.loadedTypes[0] {
-		if e.Repairinvoices == nil {
-			// The edge repairinvoices was loaded in eager-loading,
+		if e.Device == nil {
+			// The edge device was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: device.Label}
+		}
+		return e.Device, nil
+	}
+	return nil, &NotLoadedError{edge: "device"}
+}
+
+// StatusOrErr returns the Status value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RepairInvoiceEdges) StatusOrErr() (*StatusR, error) {
+	if e.loadedTypes[1] {
+		if e.Status == nil {
+			// The edge status was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: statusr.Label}
+		}
+		return e.Status, nil
+	}
+	return nil, &NotLoadedError{edge: "status"}
+}
+
+// SymptomOrErr returns the Symptom value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RepairInvoiceEdges) SymptomOrErr() (*Symptom, error) {
+	if e.loadedTypes[2] {
+		if e.Symptom == nil {
+			// The edge symptom was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: symptom.Label}
+		}
+		return e.Symptom, nil
+	}
+	return nil, &NotLoadedError{edge: "symptom"}
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RepairInvoiceEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[3] {
+		if e.User == nil {
+			// The edge user was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
+// ReturninvoiceOrErr returns the Returninvoice value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RepairInvoiceEdges) ReturninvoiceOrErr() (*Returninvoice, error) {
+	if e.loadedTypes[4] {
+		if e.Returninvoice == nil {
+			// The edge returninvoice was loaded in eager-loading,
 			// but was not found.
 			return nil, &NotFoundError{label: returninvoice.Label}
 		}
-		return e.Repairinvoices, nil
+		return e.Returninvoice, nil
 	}
-	return nil, &NotLoadedError{edge: "repairinvoices"}
+	return nil, &NotLoadedError{edge: "returninvoice"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Repairinvoice) scanValues() []interface{} {
+func (*RepairInvoice) scanValues() []interface{} {
 	return []interface{}{
-		&sql.NullInt64{}, // id
-		&sql.NullInt64{}, // symptomid
-		&sql.NullInt64{}, // deviceid
-		&sql.NullInt64{}, // userid
-		&sql.NullInt64{}, // statusrepairid
+		&sql.NullInt64{},  // id
+		&sql.NullString{}, // Rename
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*RepairInvoice) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // device_id
+		&sql.NullInt64{}, // statusr_id
+		&sql.NullInt64{}, // symptom_id
+		&sql.NullInt64{}, // repairinvoice_id
 	}
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Repairinvoice fields.
-func (r *Repairinvoice) assignValues(values ...interface{}) error {
+// to the RepairInvoice fields.
+func (ri *RepairInvoice) assignValues(values ...interface{}) error {
 	if m, n := len(values), len(repairinvoice.Columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -73,76 +146,102 @@ func (r *Repairinvoice) assignValues(values ...interface{}) error {
 	if !ok {
 		return fmt.Errorf("unexpected type %T for field id", value)
 	}
-	r.ID = int(value.Int64)
+	ri.ID = int(value.Int64)
 	values = values[1:]
-	if value, ok := values[0].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field symptomid", values[0])
+	if value, ok := values[0].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field Rename", values[0])
 	} else if value.Valid {
-		r.Symptomid = int(value.Int64)
+		ri.Rename = value.String
 	}
-	if value, ok := values[1].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field deviceid", values[1])
-	} else if value.Valid {
-		r.Deviceid = int(value.Int64)
-	}
-	if value, ok := values[2].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field userid", values[2])
-	} else if value.Valid {
-		r.Userid = int(value.Int64)
-	}
-	if value, ok := values[3].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field statusrepairid", values[3])
-	} else if value.Valid {
-		r.Statusrepairid = int(value.Int64)
+	values = values[1:]
+	if len(values) == len(repairinvoice.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field device_id", value)
+		} else if value.Valid {
+			ri.device_id = new(int)
+			*ri.device_id = int(value.Int64)
+		}
+		if value, ok := values[1].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field statusr_id", value)
+		} else if value.Valid {
+			ri.statusr_id = new(int)
+			*ri.statusr_id = int(value.Int64)
+		}
+		if value, ok := values[2].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field symptom_id", value)
+		} else if value.Valid {
+			ri.symptom_id = new(int)
+			*ri.symptom_id = int(value.Int64)
+		}
+		if value, ok := values[3].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field repairinvoice_id", value)
+		} else if value.Valid {
+			ri.repairinvoice_id = new(int)
+			*ri.repairinvoice_id = int(value.Int64)
+		}
 	}
 	return nil
 }
 
-// QueryRepairinvoices queries the repairinvoices edge of the Repairinvoice.
-func (r *Repairinvoice) QueryRepairinvoices() *ReturninvoiceQuery {
-	return (&RepairinvoiceClient{config: r.config}).QueryRepairinvoices(r)
+// QueryDevice queries the device edge of the RepairInvoice.
+func (ri *RepairInvoice) QueryDevice() *DeviceQuery {
+	return (&RepairInvoiceClient{config: ri.config}).QueryDevice(ri)
 }
 
-// Update returns a builder for updating this Repairinvoice.
-// Note that, you need to call Repairinvoice.Unwrap() before calling this method, if this Repairinvoice
+// QueryStatus queries the status edge of the RepairInvoice.
+func (ri *RepairInvoice) QueryStatus() *StatusRQuery {
+	return (&RepairInvoiceClient{config: ri.config}).QueryStatus(ri)
+}
+
+// QuerySymptom queries the symptom edge of the RepairInvoice.
+func (ri *RepairInvoice) QuerySymptom() *SymptomQuery {
+	return (&RepairInvoiceClient{config: ri.config}).QuerySymptom(ri)
+}
+
+// QueryUser queries the user edge of the RepairInvoice.
+func (ri *RepairInvoice) QueryUser() *UserQuery {
+	return (&RepairInvoiceClient{config: ri.config}).QueryUser(ri)
+}
+
+// QueryReturninvoice queries the returninvoice edge of the RepairInvoice.
+func (ri *RepairInvoice) QueryReturninvoice() *ReturninvoiceQuery {
+	return (&RepairInvoiceClient{config: ri.config}).QueryReturninvoice(ri)
+}
+
+// Update returns a builder for updating this RepairInvoice.
+// Note that, you need to call RepairInvoice.Unwrap() before calling this method, if this RepairInvoice
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (r *Repairinvoice) Update() *RepairinvoiceUpdateOne {
-	return (&RepairinvoiceClient{config: r.config}).UpdateOne(r)
+func (ri *RepairInvoice) Update() *RepairInvoiceUpdateOne {
+	return (&RepairInvoiceClient{config: ri.config}).UpdateOne(ri)
 }
 
 // Unwrap unwraps the entity that was returned from a transaction after it was closed,
 // so that all next queries will be executed through the driver which created the transaction.
-func (r *Repairinvoice) Unwrap() *Repairinvoice {
-	tx, ok := r.config.driver.(*txDriver)
+func (ri *RepairInvoice) Unwrap() *RepairInvoice {
+	tx, ok := ri.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Repairinvoice is not a transactional entity")
+		panic("ent: RepairInvoice is not a transactional entity")
 	}
-	r.config.driver = tx.drv
-	return r
+	ri.config.driver = tx.drv
+	return ri
 }
 
 // String implements the fmt.Stringer.
-func (r *Repairinvoice) String() string {
+func (ri *RepairInvoice) String() string {
 	var builder strings.Builder
-	builder.WriteString("Repairinvoice(")
-	builder.WriteString(fmt.Sprintf("id=%v", r.ID))
-	builder.WriteString(", symptomid=")
-	builder.WriteString(fmt.Sprintf("%v", r.Symptomid))
-	builder.WriteString(", deviceid=")
-	builder.WriteString(fmt.Sprintf("%v", r.Deviceid))
-	builder.WriteString(", userid=")
-	builder.WriteString(fmt.Sprintf("%v", r.Userid))
-	builder.WriteString(", statusrepairid=")
-	builder.WriteString(fmt.Sprintf("%v", r.Statusrepairid))
+	builder.WriteString("RepairInvoice(")
+	builder.WriteString(fmt.Sprintf("id=%v", ri.ID))
+	builder.WriteString(", Rename=")
+	builder.WriteString(ri.Rename)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// Repairinvoices is a parsable slice of Repairinvoice.
-type Repairinvoices []*Repairinvoice
+// RepairInvoices is a parsable slice of RepairInvoice.
+type RepairInvoices []*RepairInvoice
 
-func (r Repairinvoices) config(cfg config) {
-	for _i := range r {
-		r[_i].config = cfg
+func (ri RepairInvoices) config(cfg config) {
+	for _i := range ri {
+		ri[_i].config = cfg
 	}
 }

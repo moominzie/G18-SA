@@ -19,7 +19,7 @@ import PersonIcon from '@material-ui/icons/Person';
 
 import { DefaultApi } from '../../api/apis';
 import { EntEmployee } from '../../api/models/EntEmployee'; // import interface Employee
-import { EntRepairinvoice } from '../../api/models/EntRepairinvoice'; // import interface Repairinvoice
+import { EntRepairInvoice } from '../../api/models/EntRepairInvoice'; // import interface Repairinvoice
 import { EntStatust } from '../../api/models/EntStatust'; // import interface Statust
 import { EntReturninvoice } from '../../api/models/EntReturninvoice'; // import interface Returninvoice
 
@@ -73,7 +73,7 @@ export default function RecordReturninvoice() {
  const [returninvoices, setReturninvoice] = React.useState<EntReturninvoice[]>([]);
 
  const [employees, setEmployees] = React.useState<EntEmployee[]>([]);
- const [repairinvoices, setRepairinvoices] = React.useState<EntRepairinvoice[]>([]);
+ const [repairinvoices, setRepairinvoices] = React.useState<EntRepairInvoice[]>([]);
  const [statusts, setStatusts] = React.useState<EntStatust[]>([]);
 
  const [status, setStatus] = useState(false);
@@ -96,7 +96,7 @@ export default function RecordReturninvoice() {
   getEmployees();
 
   const getRepairinvoices = async () => {
-    const res = await http.listRepairinvoice({ limit: 10, offset: 0 });
+    const res = await http.listRepairInvoice({ limit: 10, offset: 0 });
     setLoading(false);
     setRepairinvoices(res);
     console.log(res);
@@ -118,11 +118,6 @@ export default function RecordReturninvoice() {
 const getReturninvoice = async () => {
   const res = await http.listReturninvoice({ limit: 10, offset: 0 });
   setReturninvoice(res);
-};
-
- 
-const handleAddedtimeChange = (event: any) => {
-  setAddedtime(event.target.value as Date);
 };
 
 const EmployeehandleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -191,7 +186,7 @@ const CreateReturninvoice = async () => {
               >
                 <InputLabel className={classes.insideLabel}>NO.(Repairinvoice)</InputLabel>
 
-                {repairinvoices.map((item: EntRepairinvoice) => (
+                {repairinvoices.map((item: EntRepairInvoice) => (
                   <MenuItem value={item.id}>{item.id}</MenuItem>
                 ))}
               </Select>

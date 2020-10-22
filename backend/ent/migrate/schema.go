@@ -41,6 +41,18 @@ var (
 		PrimaryKey:  []*schema.Column{BuildingsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// DevicesColumns holds the columns for the "devices" table.
+	DevicesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "dname", Type: field.TypeString, Unique: true},
+	}
+	// DevicesTable holds the schema information for the "devices" table.
+	DevicesTable = &schema.Table{
+		Name:        "devices",
+		Columns:     DevicesColumns,
+		PrimaryKey:  []*schema.Column{DevicesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// EmployeesColumns holds the columns for the "employees" table.
 	EmployeesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -67,27 +79,57 @@ var (
 		PrimaryKey:  []*schema.Column{FacultiesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
-	// RepairinvoicesColumns holds the columns for the "repairinvoices" table.
-	RepairinvoicesColumns = []*schema.Column{
+	// RepairInvoicesColumns holds the columns for the "repair_invoices" table.
+	RepairInvoicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "symptomid", Type: field.TypeInt},
-		{Name: "deviceid", Type: field.TypeInt},
-		{Name: "userid", Type: field.TypeInt},
-		{Name: "statusrepairid", Type: field.TypeInt},
+		{Name: "rename", Type: field.TypeString, Unique: true},
+		{Name: "device_id", Type: field.TypeInt, Nullable: true},
+		{Name: "statusr_id", Type: field.TypeInt, Nullable: true},
+		{Name: "symptom_id", Type: field.TypeInt, Nullable: true},
+		{Name: "repairinvoice_id", Type: field.TypeInt, Nullable: true},
 	}
-	// RepairinvoicesTable holds the schema information for the "repairinvoices" table.
-	RepairinvoicesTable = &schema.Table{
-		Name:        "repairinvoices",
-		Columns:     RepairinvoicesColumns,
-		PrimaryKey:  []*schema.Column{RepairinvoicesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
+	// RepairInvoicesTable holds the schema information for the "repair_invoices" table.
+	RepairInvoicesTable = &schema.Table{
+		Name:       "repair_invoices",
+		Columns:    RepairInvoicesColumns,
+		PrimaryKey: []*schema.Column{RepairInvoicesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "repair_invoices_devices_repair_information",
+				Columns: []*schema.Column{RepairInvoicesColumns[2]},
+
+				RefColumns: []*schema.Column{DevicesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "repair_invoices_status_rs_repair_information",
+				Columns: []*schema.Column{RepairInvoicesColumns[3]},
+
+				RefColumns: []*schema.Column{StatusRsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "repair_invoices_symptoms_repair_information",
+				Columns: []*schema.Column{RepairInvoicesColumns[4]},
+
+				RefColumns: []*schema.Column{SymptomsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "repair_invoices_users_repairinvoice_informations",
+				Columns: []*schema.Column{RepairInvoicesColumns[5]},
+
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// ReturninvoicesColumns holds the columns for the "returninvoices" table.
 	ReturninvoicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "addedtime", Type: field.TypeTime},
 		{Name: "employee_id", Type: field.TypeInt, Nullable: true},
-		{Name: "reparinvoice_id", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "returninvoice_id", Type: field.TypeInt, Unique: true, Nullable: true},
 		{Name: "statust_id", Type: field.TypeInt, Nullable: true},
 	}
 	// ReturninvoicesTable holds the schema information for the "returninvoices" table.
@@ -104,10 +146,10 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:  "returninvoices_repairinvoices_repairinvoices",
+				Symbol:  "returninvoices_repair_invoices_returninvoice",
 				Columns: []*schema.Column{ReturninvoicesColumns[3]},
 
-				RefColumns: []*schema.Column{RepairinvoicesColumns[0]},
+				RefColumns: []*schema.Column{RepairInvoicesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
@@ -140,6 +182,18 @@ var (
 			},
 		},
 	}
+	// StatusRsColumns holds the columns for the "status_rs" table.
+	StatusRsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "sname", Type: field.TypeString, Unique: true},
+	}
+	// StatusRsTable holds the schema information for the "status_rs" table.
+	StatusRsTable = &schema.Table{
+		Name:        "status_rs",
+		Columns:     StatusRsColumns,
+		PrimaryKey:  []*schema.Column{StatusRsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// StatustsColumns holds the columns for the "statusts" table.
 	StatustsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -150,6 +204,18 @@ var (
 		Name:        "statusts",
 		Columns:     StatustsColumns,
 		PrimaryKey:  []*schema.Column{StatustsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// SymptomsColumns holds the columns for the "symptoms" table.
+	SymptomsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "syname", Type: field.TypeString, Unique: true},
+	}
+	// SymptomsTable holds the schema information for the "symptoms" table.
+	SymptomsTable = &schema.Table{
+		Name:        "symptoms",
+		Columns:     SymptomsColumns,
+		PrimaryKey:  []*schema.Column{SymptomsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
 	// UsersColumns holds the columns for the "users" table.
@@ -202,20 +268,27 @@ var (
 	Tables = []*schema.Table{
 		BranchesTable,
 		BuildingsTable,
+		DevicesTable,
 		EmployeesTable,
 		FacultiesTable,
-		RepairinvoicesTable,
+		RepairInvoicesTable,
 		ReturninvoicesTable,
 		RoomsTable,
+		StatusRsTable,
 		StatustsTable,
+		SymptomsTable,
 		UsersTable,
 	}
 )
 
 func init() {
 	BranchesTable.ForeignKeys[0].RefTable = FacultiesTable
+	RepairInvoicesTable.ForeignKeys[0].RefTable = DevicesTable
+	RepairInvoicesTable.ForeignKeys[1].RefTable = StatusRsTable
+	RepairInvoicesTable.ForeignKeys[2].RefTable = SymptomsTable
+	RepairInvoicesTable.ForeignKeys[3].RefTable = UsersTable
 	ReturninvoicesTable.ForeignKeys[0].RefTable = EmployeesTable
-	ReturninvoicesTable.ForeignKeys[1].RefTable = RepairinvoicesTable
+	ReturninvoicesTable.ForeignKeys[1].RefTable = RepairInvoicesTable
 	ReturninvoicesTable.ForeignKeys[2].RefTable = StatustsTable
 	RoomsTable.ForeignKeys[0].RefTable = BuildingsTable
 	UsersTable.ForeignKeys[0].RefTable = BranchesTable

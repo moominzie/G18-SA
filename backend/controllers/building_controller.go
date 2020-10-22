@@ -16,7 +16,8 @@ type BuildingController struct {
 }
 
 type Building struct {
-	Buname string
+	Buname     string
+	Buildingid int
 }
 
 // CreateBuilding handles POST requests for adding building entities

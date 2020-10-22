@@ -13,6 +13,7 @@ import (
 	"github.com/moominzie/user-record/ent/building"
 	"github.com/moominzie/user-record/ent/faculty"
 	"github.com/moominzie/user-record/ent/predicate"
+	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/room"
 	"github.com/moominzie/user-record/ent/user"
 )
@@ -119,6 +120,21 @@ func (uu *UserUpdate) SetRoom(r *Room) *UserUpdate {
 	return uu.SetRoomID(r.ID)
 }
 
+// AddRepairinvoiceInformationIDs adds the repairinvoice_informations edge to RepairInvoice by ids.
+func (uu *UserUpdate) AddRepairinvoiceInformationIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddRepairinvoiceInformationIDs(ids...)
+	return uu
+}
+
+// AddRepairinvoiceInformations adds the repairinvoice_informations edges to RepairInvoice.
+func (uu *UserUpdate) AddRepairinvoiceInformations(r ...*RepairInvoice) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.AddRepairinvoiceInformationIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -146,6 +162,21 @@ func (uu *UserUpdate) ClearBuilding() *UserUpdate {
 func (uu *UserUpdate) ClearRoom() *UserUpdate {
 	uu.mutation.ClearRoom()
 	return uu
+}
+
+// RemoveRepairinvoiceInformationIDs removes the repairinvoice_informations edge to RepairInvoice by ids.
+func (uu *UserUpdate) RemoveRepairinvoiceInformationIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveRepairinvoiceInformationIDs(ids...)
+	return uu
+}
+
+// RemoveRepairinvoiceInformations removes repairinvoice_informations edges to RepairInvoice.
+func (uu *UserUpdate) RemoveRepairinvoiceInformations(r ...*RepairInvoice) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.RemoveRepairinvoiceInformationIDs(ids...)
 }
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
@@ -372,6 +403,44 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if nodes := uu.mutation.RemovedRepairinvoiceInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RepairinvoiceInformationsTable,
+			Columns: []string{user.RepairinvoiceInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: repairinvoice.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RepairinvoiceInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RepairinvoiceInformationsTable,
+			Columns: []string{user.RepairinvoiceInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: repairinvoice.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -478,6 +547,21 @@ func (uuo *UserUpdateOne) SetRoom(r *Room) *UserUpdateOne {
 	return uuo.SetRoomID(r.ID)
 }
 
+// AddRepairinvoiceInformationIDs adds the repairinvoice_informations edge to RepairInvoice by ids.
+func (uuo *UserUpdateOne) AddRepairinvoiceInformationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddRepairinvoiceInformationIDs(ids...)
+	return uuo
+}
+
+// AddRepairinvoiceInformations adds the repairinvoice_informations edges to RepairInvoice.
+func (uuo *UserUpdateOne) AddRepairinvoiceInformations(r ...*RepairInvoice) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.AddRepairinvoiceInformationIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -505,6 +589,21 @@ func (uuo *UserUpdateOne) ClearBuilding() *UserUpdateOne {
 func (uuo *UserUpdateOne) ClearRoom() *UserUpdateOne {
 	uuo.mutation.ClearRoom()
 	return uuo
+}
+
+// RemoveRepairinvoiceInformationIDs removes the repairinvoice_informations edge to RepairInvoice by ids.
+func (uuo *UserUpdateOne) RemoveRepairinvoiceInformationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveRepairinvoiceInformationIDs(ids...)
+	return uuo
+}
+
+// RemoveRepairinvoiceInformations removes repairinvoice_informations edges to RepairInvoice.
+func (uuo *UserUpdateOne) RemoveRepairinvoiceInformations(r ...*RepairInvoice) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.RemoveRepairinvoiceInformationIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -721,6 +820,44 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: room.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nodes := uuo.mutation.RemovedRepairinvoiceInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RepairinvoiceInformationsTable,
+			Columns: []string{user.RepairinvoiceInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: repairinvoice.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RepairinvoiceInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RepairinvoiceInformationsTable,
+			Columns: []string{user.RepairinvoiceInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: repairinvoice.FieldID,
 				},
 			},
 		}

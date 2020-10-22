@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -15,6 +16,7 @@ import (
 	"github.com/moominzie/user-record/ent/building"
 	"github.com/moominzie/user-record/ent/faculty"
 	"github.com/moominzie/user-record/ent/predicate"
+	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/room"
 	"github.com/moominzie/user-record/ent/user"
 )
@@ -28,11 +30,12 @@ type UserQuery struct {
 	unique     []string
 	predicates []predicate.User
 	// eager-loading edges.
-	withFaculty  *FacultyQuery
-	withBranch   *BranchQuery
-	withBuilding *BuildingQuery
-	withRoom     *RoomQuery
-	withFKs      bool
+	withFaculty                   *FacultyQuery
+	withBranch                    *BranchQuery
+	withBuilding                  *BuildingQuery
+	withRoom                      *RoomQuery
+	withRepairinvoiceInformations *RepairInvoiceQuery
+	withFKs                       bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -127,6 +130,24 @@ func (uq *UserQuery) QueryRoom() *RoomQuery {
 			sqlgraph.From(user.Table, user.FieldID, uq.sqlQuery()),
 			sqlgraph.To(room.Table, room.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, user.RoomTable, user.RoomColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRepairinvoiceInformations chains the current query on the repairinvoice_informations edge.
+func (uq *UserQuery) QueryRepairinvoiceInformations() *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, uq.sqlQuery()),
+			sqlgraph.To(repairinvoice.Table, repairinvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.RepairinvoiceInformationsTable, user.RepairinvoiceInformationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -357,6 +378,17 @@ func (uq *UserQuery) WithRoom(opts ...func(*RoomQuery)) *UserQuery {
 	return uq
 }
 
+//  WithRepairinvoiceInformations tells the query-builder to eager-loads the nodes that are connected to
+// the "repairinvoice_informations" edge. The optional arguments used to configure the query builder of the edge.
+func (uq *UserQuery) WithRepairinvoiceInformations(opts ...func(*RepairInvoiceQuery)) *UserQuery {
+	query := &RepairInvoiceQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withRepairinvoiceInformations = query
+	return uq
+}
+
 // GroupBy used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -424,11 +456,12 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 		nodes       = []*User{}
 		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			uq.withFaculty != nil,
 			uq.withBranch != nil,
 			uq.withBuilding != nil,
 			uq.withRoom != nil,
+			uq.withRepairinvoiceInformations != nil,
 		}
 	)
 	if uq.withFaculty != nil || uq.withBranch != nil || uq.withBuilding != nil || uq.withRoom != nil {
@@ -558,6 +591,34 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			for i := range nodes {
 				nodes[i].Edges.Room = n
 			}
+		}
+	}
+
+	if query := uq.withRepairinvoiceInformations; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+		}
+		query.withFKs = true
+		query.Where(predicate.RepairInvoice(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.RepairinvoiceInformationsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.repairinvoice_id
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "repairinvoice_id" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "repairinvoice_id" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.RepairinvoiceInformations = append(node.Edges.RepairinvoiceInformations, n)
 		}
 	}
 

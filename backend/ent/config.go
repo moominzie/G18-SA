@@ -26,12 +26,15 @@ type config struct {
 type hooks struct {
 	Branch        []ent.Hook
 	Building      []ent.Hook
+	Device        []ent.Hook
 	Employee      []ent.Hook
 	Faculty       []ent.Hook
-	Repairinvoice []ent.Hook
+	RepairInvoice []ent.Hook
 	Returninvoice []ent.Hook
 	Room          []ent.Hook
+	StatusR       []ent.Hook
 	Statust       []ent.Hook
+	Symptom       []ent.Hook
 	User          []ent.Hook
 }
 

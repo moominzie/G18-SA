@@ -12,14 +12,17 @@ type Branch func(*sql.Selector)
 // Building is the predicate function for building builders.
 type Building func(*sql.Selector)
 
+// Device is the predicate function for device builders.
+type Device func(*sql.Selector)
+
 // Employee is the predicate function for employee builders.
 type Employee func(*sql.Selector)
 
 // Faculty is the predicate function for faculty builders.
 type Faculty func(*sql.Selector)
 
-// Repairinvoice is the predicate function for repairinvoice builders.
-type Repairinvoice func(*sql.Selector)
+// RepairInvoice is the predicate function for repairinvoice builders.
+type RepairInvoice func(*sql.Selector)
 
 // Returninvoice is the predicate function for returninvoice builders.
 type Returninvoice func(*sql.Selector)
@@ -27,8 +30,14 @@ type Returninvoice func(*sql.Selector)
 // Room is the predicate function for room builders.
 type Room func(*sql.Selector)
 
+// StatusR is the predicate function for statusr builders.
+type StatusR func(*sql.Selector)
+
 // Statust is the predicate function for statust builders.
 type Statust func(*sql.Selector)
+
+// Symptom is the predicate function for symptom builders.
+type Symptom func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

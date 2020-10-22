@@ -439,6 +439,34 @@ func HasRoomWith(preds ...predicate.Room) predicate.User {
 	})
 }
 
+// HasRepairinvoiceInformations applies the HasEdge predicate on the "repairinvoice_informations" edge.
+func HasRepairinvoiceInformations() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(RepairinvoiceInformationsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RepairinvoiceInformationsTable, RepairinvoiceInformationsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRepairinvoiceInformationsWith applies the HasEdge predicate on the "repairinvoice_informations" edge with a given conditions (other predicates).
+func HasRepairinvoiceInformationsWith(preds ...predicate.RepairInvoice) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(RepairinvoiceInformationsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RepairinvoiceInformationsTable, RepairinvoiceInformationsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups list of predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(func(s *sql.Selector) {

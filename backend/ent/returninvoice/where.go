@@ -189,7 +189,7 @@ func HasRepairinvoice() predicate.Returninvoice {
 }
 
 // HasRepairinvoiceWith applies the HasEdge predicate on the "Repairinvoice" edge with a given conditions (other predicates).
-func HasRepairinvoiceWith(preds ...predicate.Repairinvoice) predicate.Returninvoice {
+func HasRepairinvoiceWith(preds ...predicate.RepairInvoice) predicate.Returninvoice {
 	return predicate.Returninvoice(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),

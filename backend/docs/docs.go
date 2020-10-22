@@ -391,6 +391,185 @@ var doc = `{
                 }
             }
         },
+        "/device/{id}": {
+            "delete": {
+                "description": "get device by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a device entity by ID",
+                "operationId": "delete-device",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Device ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/devices": {
+            "get": {
+                "description": "list device entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List device entities",
+                "operationId": "list-device",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Device"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create device",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create device",
+                "operationId": "create-device",
+                "parameters": [
+                    {
+                        "description": "Device entity",
+                        "name": "device",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ent.Device"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Device"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/devices/{id}": {
+            "get": {
+                "description": "get device by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a device entity by ID",
+                "operationId": "get-device",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Device ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Device"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
         "/employee/{id}": {
             "delete": {
                 "description": "get employee by ID",
@@ -749,59 +928,14 @@ var doc = `{
                 }
             }
         },
-        "/repairinvoice/{id}": {
-            "delete": {
-                "description": "get repairinvoice by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Delete a repairinvoice entity by ID",
-                "operationId": "delete-repairinvoice",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Repairinvoice ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    }
-                }
-            }
-        },
         "/repairinvoices": {
             "get": {
-                "description": "list repairinvoice entities",
+                "description": "list repairInvoice entities",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "List repairinvoice entities",
-                "operationId": "list-repairinvoice",
+                "summary": "List repairInvoice entities",
+                "operationId": "list-repairInvoice",
                 "parameters": [
                     {
                         "type": "integer",
@@ -822,7 +956,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ent.Repairinvoice"
+                                "$ref": "#/definitions/ent.RepairInvoice"
                             }
                         }
                     },
@@ -841,23 +975,23 @@ var doc = `{
                 }
             },
             "post": {
-                "description": "Create repairinvoice",
+                "description": "Create repairInvoice",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Create repairinvoice",
-                "operationId": "create-repairinvoice",
+                "summary": "Create repairInvoice",
+                "operationId": "create-repairInvoice",
                 "parameters": [
                     {
-                        "description": "Repairinvoice entity",
-                        "name": "repairinvoice",
+                        "description": "RepairInvoice entity",
+                        "name": "repairInvoice",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ent.Repairinvoice"
+                            "$ref": "#/definitions/controllers.RepairInvoice"
                         }
                     }
                 ],
@@ -865,7 +999,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ent.Repairinvoice"
+                            "$ref": "#/definitions/controllers.RepairInvoice"
                         }
                     },
                     "400": {
@@ -884,17 +1018,17 @@ var doc = `{
             }
         },
         "/repairinvoices/{id}": {
-            "get": {
-                "description": "get repairinvoice by ID",
+            "delete": {
+                "description": "get repairInvoice by ID",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get a repairinvoice entity by ID",
-                "operationId": "get-repairinvoice",
+                "summary": "Delete a repairInvoice entity by ID",
+                "operationId": "delete-repairInvoice",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Repairinvoice ID",
+                        "description": "RepairInvoice ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -904,7 +1038,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ent.Repairinvoice"
+                            "$ref": "#/definitions/gin.H"
                         }
                     },
                     "400": {
@@ -1196,6 +1330,185 @@ var doc = `{
                 }
             }
         },
+        "/statusr/{id}": {
+            "delete": {
+                "description": "get statusr by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a statusr entity by ID",
+                "operationId": "delete-statusr",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "StatusR ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/statusrs": {
+            "get": {
+                "description": "list statusr entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List statusr entities",
+                "operationId": "list-statusr",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.StatusR"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create statusr",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create statusr",
+                "operationId": "create-statusr",
+                "parameters": [
+                    {
+                        "description": "StatusR entity",
+                        "name": "statusr",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ent.StatusR"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.StatusR"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/statusrs/{id}": {
+            "get": {
+                "description": "get statusr by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a statusr entity by ID",
+                "operationId": "get-statusr",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "StatusR ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.StatusR"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
         "/statust/{id}": {
             "delete": {
                 "description": "get statust by ID",
@@ -1375,6 +1688,185 @@ var doc = `{
                 }
             }
         },
+        "/symptom/{id}": {
+            "delete": {
+                "description": "get symptom by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a symptom entity by ID",
+                "operationId": "delete-symptom",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Symptom ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/symptoms": {
+            "get": {
+                "description": "list symptom entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List symptom entities",
+                "operationId": "list-symptom",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Symptom"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create symptom",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create symptom",
+                "operationId": "create-symptom",
+                "parameters": [
+                    {
+                        "description": "Symptom entity",
+                        "name": "symptom",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ent.Symptom"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Symptom"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/symptoms/{id}": {
+            "get": {
+                "description": "get symptom by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a symptom entity by ID",
+                "operationId": "get-symptom",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Symptom ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Symptom"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "list user entities",
@@ -1511,6 +2003,26 @@ var doc = `{
         }
     },
     "definitions": {
+        "controllers.RepairInvoice": {
+            "type": "object",
+            "properties": {
+                "device": {
+                    "type": "integer"
+                },
+                "rename": {
+                    "type": "string"
+                },
+                "statusR": {
+                    "type": "integer"
+                },
+                "symptom": {
+                    "type": "integer"
+                },
+                "user": {
+                    "type": "integer"
+                }
+            }
+        },
         "controllers.Returninvoice": {
             "type": "object",
             "properties": {
@@ -1623,6 +2135,36 @@ var doc = `{
                 }
             }
         },
+        "ent.Device": {
+            "type": "object",
+            "properties": {
+                "Dname": {
+                    "description": "Dname holds the value of the \"Dname\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the DeviceQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.DeviceEdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.DeviceEdges": {
+            "type": "object",
+            "properties": {
+                "repairInformation": {
+                    "description": "RepairInformation holds the value of the repair_information edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.RepairInvoice"
+                    }
+                }
+            }
+        },
         "ent.Employee": {
             "type": "object",
             "properties": {
@@ -1698,43 +2240,51 @@ var doc = `{
                 }
             }
         },
-        "ent.Repairinvoice": {
+        "ent.RepairInvoice": {
             "type": "object",
             "properties": {
-                "deviceid": {
-                    "description": "Deviceid holds the value of the \"deviceid\" field.",
-                    "type": "integer"
+                "Rename": {
+                    "description": "Rename holds the value of the \"Rename\" field.",
+                    "type": "string"
                 },
                 "edges": {
-                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the RepairinvoiceQuery when eager-loading is set.",
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the RepairInvoiceQuery when eager-loading is set.",
                     "type": "object",
-                    "$ref": "#/definitions/ent.RepairinvoiceEdges"
+                    "$ref": "#/definitions/ent.RepairInvoiceEdges"
                 },
                 "id": {
                     "description": "ID of the ent.",
                     "type": "integer"
-                },
-                "statusrepairid": {
-                    "description": "Statusrepairid holds the value of the \"statusrepairid\" field.",
-                    "type": "integer"
-                },
-                "symptomid": {
-                    "description": "Symptomid holds the value of the \"symptomid\" field.",
-                    "type": "integer"
-                },
-                "userid": {
-                    "description": "Userid holds the value of the \"userid\" field.",
-                    "type": "integer"
                 }
             }
         },
-        "ent.RepairinvoiceEdges": {
+        "ent.RepairInvoiceEdges": {
             "type": "object",
             "properties": {
-                "repairinvoices": {
-                    "description": "Repairinvoices holds the value of the repairinvoices edge.",
+                "device": {
+                    "description": "Device holds the value of the device edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Device"
+                },
+                "returninvoice": {
+                    "description": "Returninvoice holds the value of the returninvoice edge.",
                     "type": "object",
                     "$ref": "#/definitions/ent.Returninvoice"
+                },
+                "status": {
+                    "description": "Status holds the value of the status edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.StatusR"
+                },
+                "symptom": {
+                    "description": "Symptom holds the value of the symptom edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Symptom"
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.User"
                 }
             }
         },
@@ -1767,7 +2317,7 @@ var doc = `{
                 "repairinvoice": {
                     "description": "Repairinvoice holds the value of the Repairinvoice edge.",
                     "type": "object",
-                    "$ref": "#/definitions/ent.Repairinvoice"
+                    "$ref": "#/definitions/ent.RepairInvoice"
                 },
                 "statust": {
                     "description": "Statust holds the value of the Statust edge.",
@@ -1811,6 +2361,36 @@ var doc = `{
                 }
             }
         },
+        "ent.StatusR": {
+            "type": "object",
+            "properties": {
+                "Sname": {
+                    "description": "Sname holds the value of the \"Sname\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the StatusRQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.StatusREdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.StatusREdges": {
+            "type": "object",
+            "properties": {
+                "repairInformation": {
+                    "description": "RepairInformation holds the value of the repair_information edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.RepairInvoice"
+                    }
+                }
+            }
+        },
         "ent.Statust": {
             "type": "object",
             "properties": {
@@ -1837,6 +2417,36 @@ var doc = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.Returninvoice"
+                    }
+                }
+            }
+        },
+        "ent.Symptom": {
+            "type": "object",
+            "properties": {
+                "Syname": {
+                    "description": "Syname holds the value of the \"Syname\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the SymptomQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.SymptomEdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.SymptomEdges": {
+            "type": "object",
+            "properties": {
+                "repairInformation": {
+                    "description": "RepairInformation holds the value of the repair_information edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.RepairInvoice"
                     }
                 }
             }
@@ -1880,6 +2490,13 @@ var doc = `{
                     "description": "Faculty holds the value of the faculty edge.",
                     "type": "object",
                     "$ref": "#/definitions/ent.Faculty"
+                },
+                "repairinvoiceInformations": {
+                    "description": "RepairinvoiceInformations holds the value of the repairinvoice_informations edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.RepairInvoice"
+                    }
                 },
                 "room": {
                     "description": "Room holds the value of the room edge.",

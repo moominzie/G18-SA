@@ -1,5 +1,18 @@
 basePath: /api/v1
 definitions:
+  controllers.RepairInvoice:
+    properties:
+      device:
+        type: integer
+      rename:
+        type: string
+      statusR:
+        type: integer
+      symptom:
+        type: integer
+      user:
+        type: integer
+    type: object
   controllers.Returninvoice:
     properties:
       addedtime:
@@ -81,6 +94,29 @@ definitions:
           $ref: '#/definitions/ent.User'
         type: array
     type: object
+  ent.Device:
+    properties:
+      Dname:
+        description: Dname holds the value of the "Dname" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.DeviceEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the DeviceQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.DeviceEdges:
+    properties:
+      repairInformation:
+        description: RepairInformation holds the value of the repair_information edge.
+        items:
+          $ref: '#/definitions/ent.RepairInvoice'
+        type: array
+    type: object
   ent.Employee:
     properties:
       edges:
@@ -138,35 +174,42 @@ definitions:
           $ref: '#/definitions/ent.User'
         type: array
     type: object
-  ent.Repairinvoice:
+  ent.RepairInvoice:
     properties:
-      deviceid:
-        description: Deviceid holds the value of the "deviceid" field.
-        type: integer
+      Rename:
+        description: Rename holds the value of the "Rename" field.
+        type: string
       edges:
-        $ref: '#/definitions/ent.RepairinvoiceEdges'
+        $ref: '#/definitions/ent.RepairInvoiceEdges'
         description: |-
           Edges holds the relations/edges for other nodes in the graph.
-          The values are being populated by the RepairinvoiceQuery when eager-loading is set.
+          The values are being populated by the RepairInvoiceQuery when eager-loading is set.
         type: object
       id:
         description: ID of the ent.
         type: integer
-      statusrepairid:
-        description: Statusrepairid holds the value of the "statusrepairid" field.
-        type: integer
-      symptomid:
-        description: Symptomid holds the value of the "symptomid" field.
-        type: integer
-      userid:
-        description: Userid holds the value of the "userid" field.
-        type: integer
     type: object
-  ent.RepairinvoiceEdges:
+  ent.RepairInvoiceEdges:
     properties:
-      repairinvoices:
+      device:
+        $ref: '#/definitions/ent.Device'
+        description: Device holds the value of the device edge.
+        type: object
+      returninvoice:
         $ref: '#/definitions/ent.Returninvoice'
-        description: Repairinvoices holds the value of the repairinvoices edge.
+        description: Returninvoice holds the value of the returninvoice edge.
+        type: object
+      status:
+        $ref: '#/definitions/ent.StatusR'
+        description: Status holds the value of the status edge.
+        type: object
+      symptom:
+        $ref: '#/definitions/ent.Symptom'
+        description: Symptom holds the value of the symptom edge.
+        type: object
+      user:
+        $ref: '#/definitions/ent.User'
+        description: User holds the value of the user edge.
         type: object
     type: object
   ent.Returninvoice:
@@ -191,7 +234,7 @@ definitions:
         description: Employee holds the value of the Employee edge.
         type: object
       repairinvoice:
-        $ref: '#/definitions/ent.Repairinvoice'
+        $ref: '#/definitions/ent.RepairInvoice'
         description: Repairinvoice holds the value of the Repairinvoice edge.
         type: object
       statust:
@@ -226,6 +269,29 @@ definitions:
           $ref: '#/definitions/ent.User'
         type: array
     type: object
+  ent.StatusR:
+    properties:
+      Sname:
+        description: Sname holds the value of the "Sname" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.StatusREdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the StatusRQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.StatusREdges:
+    properties:
+      repairInformation:
+        description: RepairInformation holds the value of the repair_information edge.
+        items:
+          $ref: '#/definitions/ent.RepairInvoice'
+        type: array
+    type: object
   ent.Statust:
     properties:
       edges:
@@ -247,6 +313,29 @@ definitions:
         description: Statusts holds the value of the statusts edge.
         items:
           $ref: '#/definitions/ent.Returninvoice'
+        type: array
+    type: object
+  ent.Symptom:
+    properties:
+      Syname:
+        description: Syname holds the value of the "Syname" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.SymptomEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the SymptomQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.SymptomEdges:
+    properties:
+      repairInformation:
+        description: RepairInformation holds the value of the repair_information edge.
+        items:
+          $ref: '#/definitions/ent.RepairInvoice'
         type: array
     type: object
   ent.User:
@@ -281,6 +370,11 @@ definitions:
         $ref: '#/definitions/ent.Faculty'
         description: Faculty holds the value of the faculty edge.
         type: object
+      repairinvoiceInformations:
+        description: RepairinvoiceInformations holds the value of the repairinvoice_informations edge.
+        items:
+          $ref: '#/definitions/ent.RepairInvoice'
+        type: array
       room:
         $ref: '#/definitions/ent.Room'
         description: Room holds the value of the room edge.
@@ -541,6 +635,125 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Get a building entity by ID
+  /device/{id}:
+    delete:
+      description: get device by ID
+      operationId: delete-device
+      parameters:
+      - description: Device ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a device entity by ID
+  /devices:
+    get:
+      description: list device entities
+      operationId: list-device
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Device'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List device entities
+    post:
+      consumes:
+      - application/json
+      description: Create device
+      operationId: create-device
+      parameters:
+      - description: Device entity
+        in: body
+        name: device
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Device'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Device'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create device
+  /devices/{id}:
+    get:
+      description: get device by ID
+      operationId: get-device
+      parameters:
+      - description: Device ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Device'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a device entity by ID
   /employee/{id}:
     delete:
       description: get employee by ID
@@ -779,40 +992,10 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Get a faculty entity by ID
-  /repairinvoice/{id}:
-    delete:
-      description: get repairinvoice by ID
-      operationId: delete-repairinvoice
-      parameters:
-      - description: Repairinvoice ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/gin.H'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/gin.H'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/gin.H'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/gin.H'
-      summary: Delete a repairinvoice entity by ID
   /repairinvoices:
     get:
-      description: list repairinvoice entities
-      operationId: list-repairinvoice
+      description: list repairInvoice entities
+      operationId: list-repairInvoice
       parameters:
       - description: Limit
         in: query
@@ -829,7 +1012,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/ent.Repairinvoice'
+              $ref: '#/definitions/ent.RepairInvoice'
             type: array
         "400":
           description: Bad Request
@@ -839,26 +1022,26 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/gin.H'
-      summary: List repairinvoice entities
+      summary: List repairInvoice entities
     post:
       consumes:
       - application/json
-      description: Create repairinvoice
-      operationId: create-repairinvoice
+      description: Create repairInvoice
+      operationId: create-repairInvoice
       parameters:
-      - description: Repairinvoice entity
+      - description: RepairInvoice entity
         in: body
-        name: repairinvoice
+        name: repairInvoice
         required: true
         schema:
-          $ref: '#/definitions/ent.Repairinvoice'
+          $ref: '#/definitions/controllers.RepairInvoice'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ent.Repairinvoice'
+            $ref: '#/definitions/controllers.RepairInvoice'
         "400":
           description: Bad Request
           schema:
@@ -867,13 +1050,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/gin.H'
-      summary: Create repairinvoice
+      summary: Create repairInvoice
   /repairinvoices/{id}:
-    get:
-      description: get repairinvoice by ID
-      operationId: get-repairinvoice
+    delete:
+      description: get repairInvoice by ID
+      operationId: delete-repairInvoice
       parameters:
-      - description: Repairinvoice ID
+      - description: RepairInvoice ID
         in: path
         name: id
         required: true
@@ -884,7 +1067,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ent.Repairinvoice'
+            $ref: '#/definitions/gin.H'
         "400":
           description: Bad Request
           schema:
@@ -897,7 +1080,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/gin.H'
-      summary: Get a repairinvoice entity by ID
+      summary: Delete a repairInvoice entity by ID
   /returninvoices:
     get:
       description: list returninvoice entities
@@ -1076,6 +1259,125 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Get a room entity by ID
+  /statusr/{id}:
+    delete:
+      description: get statusr by ID
+      operationId: delete-statusr
+      parameters:
+      - description: StatusR ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a statusr entity by ID
+  /statusrs:
+    get:
+      description: list statusr entities
+      operationId: list-statusr
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.StatusR'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List statusr entities
+    post:
+      consumes:
+      - application/json
+      description: Create statusr
+      operationId: create-statusr
+      parameters:
+      - description: StatusR entity
+        in: body
+        name: statusr
+        required: true
+        schema:
+          $ref: '#/definitions/ent.StatusR'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.StatusR'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create statusr
+  /statusrs/{id}:
+    get:
+      description: get statusr by ID
+      operationId: get-statusr
+      parameters:
+      - description: StatusR ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.StatusR'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a statusr entity by ID
   /statust/{id}:
     delete:
       description: get statust by ID
@@ -1195,6 +1497,125 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Get a statust entity by ID
+  /symptom/{id}:
+    delete:
+      description: get symptom by ID
+      operationId: delete-symptom
+      parameters:
+      - description: Symptom ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a symptom entity by ID
+  /symptoms:
+    get:
+      description: list symptom entities
+      operationId: list-symptom
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Symptom'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List symptom entities
+    post:
+      consumes:
+      - application/json
+      description: Create symptom
+      operationId: create-symptom
+      parameters:
+      - description: Symptom entity
+        in: body
+        name: symptom
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Symptom'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Symptom'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create symptom
+  /symptoms/{id}:
+    get:
+      description: get symptom by ID
+      operationId: get-symptom
+      parameters:
+      - description: Symptom ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Symptom'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a symptom entity by ID
   /users:
     get:
       description: list user entities

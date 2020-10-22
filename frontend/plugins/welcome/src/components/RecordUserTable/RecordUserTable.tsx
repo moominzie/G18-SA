@@ -55,11 +55,6 @@ export default function RecordUserTable() {
     const res = await http.deleteUser({ id: id });
     setLoading(true);
   };
-
-    // clear input form
-    function clear() {
-      setUsers([]);
-    }
   
   // ui 
  return (

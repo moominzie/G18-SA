@@ -10,12 +10,15 @@ import (
 
 	"github.com/moominzie/user-record/ent/branch"
 	"github.com/moominzie/user-record/ent/building"
+	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/employee"
 	"github.com/moominzie/user-record/ent/faculty"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
 	"github.com/moominzie/user-record/ent/room"
+	"github.com/moominzie/user-record/ent/statusr"
 	"github.com/moominzie/user-record/ent/statust"
+	"github.com/moominzie/user-record/ent/symptom"
 	"github.com/moominzie/user-record/ent/user"
 
 	"github.com/facebookincubator/ent"
@@ -32,12 +35,15 @@ const (
 	// Node types.
 	TypeBranch        = "Branch"
 	TypeBuilding      = "Building"
+	TypeDevice        = "Device"
 	TypeEmployee      = "Employee"
 	TypeFaculty       = "Faculty"
-	TypeRepairinvoice = "Repairinvoice"
+	TypeRepairInvoice = "RepairInvoice"
 	TypeReturninvoice = "Returninvoice"
 	TypeRoom          = "Room"
+	TypeStatusR       = "StatusR"
 	TypeStatust       = "Statust"
+	TypeSymptom       = "Symptom"
 	TypeUser          = "User"
 )
 
@@ -899,6 +905,374 @@ func (m *BuildingMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Building edge %s", name)
+}
+
+// DeviceMutation represents an operation that mutate the Devices
+// nodes in the graph.
+type DeviceMutation struct {
+	config
+	op                        Op
+	typ                       string
+	id                        *int
+	_Dname                    *string
+	clearedFields             map[string]struct{}
+	repair_information        map[int]struct{}
+	removedrepair_information map[int]struct{}
+	done                      bool
+	oldValue                  func(context.Context) (*Device, error)
+}
+
+var _ ent.Mutation = (*DeviceMutation)(nil)
+
+// deviceOption allows to manage the mutation configuration using functional options.
+type deviceOption func(*DeviceMutation)
+
+// newDeviceMutation creates new mutation for $n.Name.
+func newDeviceMutation(c config, op Op, opts ...deviceOption) *DeviceMutation {
+	m := &DeviceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDevice,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDeviceID sets the id field of the mutation.
+func withDeviceID(id int) deviceOption {
+	return func(m *DeviceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Device
+		)
+		m.oldValue = func(ctx context.Context) (*Device, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Device.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDevice sets the old Device of the mutation.
+func withDevice(node *Device) deviceOption {
+	return func(m *DeviceMutation) {
+		m.oldValue = func(context.Context) (*Device, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DeviceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DeviceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *DeviceMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetDname sets the Dname field.
+func (m *DeviceMutation) SetDname(s string) {
+	m._Dname = &s
+}
+
+// Dname returns the Dname value in the mutation.
+func (m *DeviceMutation) Dname() (r string, exists bool) {
+	v := m._Dname
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDname returns the old Dname value of the Device.
+// If the Device object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *DeviceMutation) OldDname(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDname is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDname requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDname: %w", err)
+	}
+	return oldValue.Dname, nil
+}
+
+// ResetDname reset all changes of the "Dname" field.
+func (m *DeviceMutation) ResetDname() {
+	m._Dname = nil
+}
+
+// AddRepairInformationIDs adds the repair_information edge to RepairInvoice by ids.
+func (m *DeviceMutation) AddRepairInformationIDs(ids ...int) {
+	if m.repair_information == nil {
+		m.repair_information = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.repair_information[ids[i]] = struct{}{}
+	}
+}
+
+// RemoveRepairInformationIDs removes the repair_information edge to RepairInvoice by ids.
+func (m *DeviceMutation) RemoveRepairInformationIDs(ids ...int) {
+	if m.removedrepair_information == nil {
+		m.removedrepair_information = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedrepair_information[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRepairInformation returns the removed ids of repair_information.
+func (m *DeviceMutation) RemovedRepairInformationIDs() (ids []int) {
+	for id := range m.removedrepair_information {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RepairInformationIDs returns the repair_information ids in the mutation.
+func (m *DeviceMutation) RepairInformationIDs() (ids []int) {
+	for id := range m.repair_information {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRepairInformation reset all changes of the "repair_information" edge.
+func (m *DeviceMutation) ResetRepairInformation() {
+	m.repair_information = nil
+	m.removedrepair_information = nil
+}
+
+// Op returns the operation name.
+func (m *DeviceMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Device).
+func (m *DeviceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *DeviceMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m._Dname != nil {
+		fields = append(fields, device.FieldDname)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *DeviceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case device.FieldDname:
+		return m.Dname()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *DeviceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case device.FieldDname:
+		return m.OldDname(ctx)
+	}
+	return nil, fmt.Errorf("unknown Device field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *DeviceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case device.FieldDname:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDname(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Device field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *DeviceMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *DeviceMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *DeviceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Device numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *DeviceMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *DeviceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DeviceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Device nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *DeviceMutation) ResetField(name string) error {
+	switch name {
+	case device.FieldDname:
+		m.ResetDname()
+		return nil
+	}
+	return fmt.Errorf("unknown Device field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *DeviceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.repair_information != nil {
+		edges = append(edges, device.EdgeRepairInformation)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *DeviceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case device.EdgeRepairInformation:
+		ids := make([]ent.Value, 0, len(m.repair_information))
+		for id := range m.repair_information {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *DeviceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedrepair_information != nil {
+		edges = append(edges, device.EdgeRepairInformation)
+	}
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *DeviceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case device.EdgeRepairInformation:
+		ids := make([]ent.Value, 0, len(m.removedrepair_information))
+		for id := range m.removedrepair_information {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *DeviceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *DeviceMutation) EdgeCleared(name string) bool {
+	switch name {
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *DeviceMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Device unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *DeviceMutation) ResetEdge(name string) error {
+	switch name {
+	case device.EdgeRepairInformation:
+		m.ResetRepairInformation()
+		return nil
+	}
+	return fmt.Errorf("unknown Device edge %s", name)
 }
 
 // EmployeeMutation represents an operation that mutate the Employees
@@ -1812,39 +2186,40 @@ func (m *FacultyMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Faculty edge %s", name)
 }
 
-// RepairinvoiceMutation represents an operation that mutate the Repairinvoices
+// RepairInvoiceMutation represents an operation that mutate the RepairInvoices
 // nodes in the graph.
-type RepairinvoiceMutation struct {
+type RepairInvoiceMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *int
-	symptomid             *int
-	addsymptomid          *int
-	deviceid              *int
-	adddeviceid           *int
-	userid                *int
-	adduserid             *int
-	statusrepairid        *int
-	addstatusrepairid     *int
-	clearedFields         map[string]struct{}
-	repairinvoices        *int
-	clearedrepairinvoices bool
-	done                  bool
-	oldValue              func(context.Context) (*Repairinvoice, error)
+	op                   Op
+	typ                  string
+	id                   *int
+	_Rename              *string
+	clearedFields        map[string]struct{}
+	device               *int
+	cleareddevice        bool
+	status               *int
+	clearedstatus        bool
+	symptom              *int
+	clearedsymptom       bool
+	user                 *int
+	cleareduser          bool
+	returninvoice        *int
+	clearedreturninvoice bool
+	done                 bool
+	oldValue             func(context.Context) (*RepairInvoice, error)
 }
 
-var _ ent.Mutation = (*RepairinvoiceMutation)(nil)
+var _ ent.Mutation = (*RepairInvoiceMutation)(nil)
 
 // repairinvoiceOption allows to manage the mutation configuration using functional options.
-type repairinvoiceOption func(*RepairinvoiceMutation)
+type repairinvoiceOption func(*RepairInvoiceMutation)
 
-// newRepairinvoiceMutation creates new mutation for $n.Name.
-func newRepairinvoiceMutation(c config, op Op, opts ...repairinvoiceOption) *RepairinvoiceMutation {
-	m := &RepairinvoiceMutation{
+// newRepairInvoiceMutation creates new mutation for $n.Name.
+func newRepairInvoiceMutation(c config, op Op, opts ...repairinvoiceOption) *RepairInvoiceMutation {
+	m := &RepairInvoiceMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeRepairinvoice,
+		typ:           TypeRepairInvoice,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -1853,20 +2228,20 @@ func newRepairinvoiceMutation(c config, op Op, opts ...repairinvoiceOption) *Rep
 	return m
 }
 
-// withRepairinvoiceID sets the id field of the mutation.
-func withRepairinvoiceID(id int) repairinvoiceOption {
-	return func(m *RepairinvoiceMutation) {
+// withRepairInvoiceID sets the id field of the mutation.
+func withRepairInvoiceID(id int) repairinvoiceOption {
+	return func(m *RepairInvoiceMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Repairinvoice
+			value *RepairInvoice
 		)
-		m.oldValue = func(ctx context.Context) (*Repairinvoice, error) {
+		m.oldValue = func(ctx context.Context) (*RepairInvoice, error) {
 			once.Do(func() {
 				if m.done {
 					err = fmt.Errorf("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Repairinvoice.Get(ctx, id)
+					value, err = m.Client().RepairInvoice.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -1875,10 +2250,10 @@ func withRepairinvoiceID(id int) repairinvoiceOption {
 	}
 }
 
-// withRepairinvoice sets the old Repairinvoice of the mutation.
-func withRepairinvoice(node *Repairinvoice) repairinvoiceOption {
-	return func(m *RepairinvoiceMutation) {
-		m.oldValue = func(context.Context) (*Repairinvoice, error) {
+// withRepairInvoice sets the old RepairInvoice of the mutation.
+func withRepairInvoice(node *RepairInvoice) repairinvoiceOption {
+	return func(m *RepairInvoiceMutation) {
+		m.oldValue = func(context.Context) (*RepairInvoice, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -1887,7 +2262,7 @@ func withRepairinvoice(node *Repairinvoice) repairinvoiceOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m RepairinvoiceMutation) Client() *Client {
+func (m RepairInvoiceMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -1895,7 +2270,7 @@ func (m RepairinvoiceMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m RepairinvoiceMutation) Tx() (*Tx, error) {
+func (m RepairInvoiceMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
 	}
@@ -1906,306 +2281,262 @@ func (m RepairinvoiceMutation) Tx() (*Tx, error) {
 
 // ID returns the id value in the mutation. Note that, the id
 // is available only if it was provided to the builder.
-func (m *RepairinvoiceMutation) ID() (id int, exists bool) {
+func (m *RepairInvoiceMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
 	return *m.id, true
 }
 
-// SetSymptomid sets the symptomid field.
-func (m *RepairinvoiceMutation) SetSymptomid(i int) {
-	m.symptomid = &i
-	m.addsymptomid = nil
+// SetRename sets the Rename field.
+func (m *RepairInvoiceMutation) SetRename(s string) {
+	m._Rename = &s
 }
 
-// Symptomid returns the symptomid value in the mutation.
-func (m *RepairinvoiceMutation) Symptomid() (r int, exists bool) {
-	v := m.symptomid
+// Rename returns the Rename value in the mutation.
+func (m *RepairInvoiceMutation) Rename() (r string, exists bool) {
+	v := m._Rename
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSymptomid returns the old symptomid value of the Repairinvoice.
-// If the Repairinvoice object wasn't provided to the builder, the object is fetched
+// OldRename returns the old Rename value of the RepairInvoice.
+// If the RepairInvoice object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *RepairinvoiceMutation) OldSymptomid(ctx context.Context) (v int, err error) {
+func (m *RepairInvoiceMutation) OldRename(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldSymptomid is allowed only on UpdateOne operations")
+		return v, fmt.Errorf("OldRename is allowed only on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldSymptomid requires an ID field in the mutation")
+		return v, fmt.Errorf("OldRename requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSymptomid: %w", err)
+		return v, fmt.Errorf("querying old value for OldRename: %w", err)
 	}
-	return oldValue.Symptomid, nil
+	return oldValue.Rename, nil
 }
 
-// AddSymptomid adds i to symptomid.
-func (m *RepairinvoiceMutation) AddSymptomid(i int) {
-	if m.addsymptomid != nil {
-		*m.addsymptomid += i
-	} else {
-		m.addsymptomid = &i
-	}
+// ResetRename reset all changes of the "Rename" field.
+func (m *RepairInvoiceMutation) ResetRename() {
+	m._Rename = nil
 }
 
-// AddedSymptomid returns the value that was added to the symptomid field in this mutation.
-func (m *RepairinvoiceMutation) AddedSymptomid() (r int, exists bool) {
-	v := m.addsymptomid
-	if v == nil {
-		return
-	}
-	return *v, true
+// SetDeviceID sets the device edge to Device by id.
+func (m *RepairInvoiceMutation) SetDeviceID(id int) {
+	m.device = &id
 }
 
-// ResetSymptomid reset all changes of the "symptomid" field.
-func (m *RepairinvoiceMutation) ResetSymptomid() {
-	m.symptomid = nil
-	m.addsymptomid = nil
+// ClearDevice clears the device edge to Device.
+func (m *RepairInvoiceMutation) ClearDevice() {
+	m.cleareddevice = true
 }
 
-// SetDeviceid sets the deviceid field.
-func (m *RepairinvoiceMutation) SetDeviceid(i int) {
-	m.deviceid = &i
-	m.adddeviceid = nil
+// DeviceCleared returns if the edge device was cleared.
+func (m *RepairInvoiceMutation) DeviceCleared() bool {
+	return m.cleareddevice
 }
 
-// Deviceid returns the deviceid value in the mutation.
-func (m *RepairinvoiceMutation) Deviceid() (r int, exists bool) {
-	v := m.deviceid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeviceid returns the old deviceid value of the Repairinvoice.
-// If the Repairinvoice object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *RepairinvoiceMutation) OldDeviceid(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldDeviceid is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldDeviceid requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeviceid: %w", err)
-	}
-	return oldValue.Deviceid, nil
-}
-
-// AddDeviceid adds i to deviceid.
-func (m *RepairinvoiceMutation) AddDeviceid(i int) {
-	if m.adddeviceid != nil {
-		*m.adddeviceid += i
-	} else {
-		m.adddeviceid = &i
-	}
-}
-
-// AddedDeviceid returns the value that was added to the deviceid field in this mutation.
-func (m *RepairinvoiceMutation) AddedDeviceid() (r int, exists bool) {
-	v := m.adddeviceid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetDeviceid reset all changes of the "deviceid" field.
-func (m *RepairinvoiceMutation) ResetDeviceid() {
-	m.deviceid = nil
-	m.adddeviceid = nil
-}
-
-// SetUserid sets the userid field.
-func (m *RepairinvoiceMutation) SetUserid(i int) {
-	m.userid = &i
-	m.adduserid = nil
-}
-
-// Userid returns the userid value in the mutation.
-func (m *RepairinvoiceMutation) Userid() (r int, exists bool) {
-	v := m.userid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUserid returns the old userid value of the Repairinvoice.
-// If the Repairinvoice object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *RepairinvoiceMutation) OldUserid(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldUserid is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldUserid requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserid: %w", err)
-	}
-	return oldValue.Userid, nil
-}
-
-// AddUserid adds i to userid.
-func (m *RepairinvoiceMutation) AddUserid(i int) {
-	if m.adduserid != nil {
-		*m.adduserid += i
-	} else {
-		m.adduserid = &i
-	}
-}
-
-// AddedUserid returns the value that was added to the userid field in this mutation.
-func (m *RepairinvoiceMutation) AddedUserid() (r int, exists bool) {
-	v := m.adduserid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUserid reset all changes of the "userid" field.
-func (m *RepairinvoiceMutation) ResetUserid() {
-	m.userid = nil
-	m.adduserid = nil
-}
-
-// SetStatusrepairid sets the statusrepairid field.
-func (m *RepairinvoiceMutation) SetStatusrepairid(i int) {
-	m.statusrepairid = &i
-	m.addstatusrepairid = nil
-}
-
-// Statusrepairid returns the statusrepairid value in the mutation.
-func (m *RepairinvoiceMutation) Statusrepairid() (r int, exists bool) {
-	v := m.statusrepairid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStatusrepairid returns the old statusrepairid value of the Repairinvoice.
-// If the Repairinvoice object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *RepairinvoiceMutation) OldStatusrepairid(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldStatusrepairid is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldStatusrepairid requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatusrepairid: %w", err)
-	}
-	return oldValue.Statusrepairid, nil
-}
-
-// AddStatusrepairid adds i to statusrepairid.
-func (m *RepairinvoiceMutation) AddStatusrepairid(i int) {
-	if m.addstatusrepairid != nil {
-		*m.addstatusrepairid += i
-	} else {
-		m.addstatusrepairid = &i
-	}
-}
-
-// AddedStatusrepairid returns the value that was added to the statusrepairid field in this mutation.
-func (m *RepairinvoiceMutation) AddedStatusrepairid() (r int, exists bool) {
-	v := m.addstatusrepairid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetStatusrepairid reset all changes of the "statusrepairid" field.
-func (m *RepairinvoiceMutation) ResetStatusrepairid() {
-	m.statusrepairid = nil
-	m.addstatusrepairid = nil
-}
-
-// SetRepairinvoicesID sets the repairinvoices edge to Returninvoice by id.
-func (m *RepairinvoiceMutation) SetRepairinvoicesID(id int) {
-	m.repairinvoices = &id
-}
-
-// ClearRepairinvoices clears the repairinvoices edge to Returninvoice.
-func (m *RepairinvoiceMutation) ClearRepairinvoices() {
-	m.clearedrepairinvoices = true
-}
-
-// RepairinvoicesCleared returns if the edge repairinvoices was cleared.
-func (m *RepairinvoiceMutation) RepairinvoicesCleared() bool {
-	return m.clearedrepairinvoices
-}
-
-// RepairinvoicesID returns the repairinvoices id in the mutation.
-func (m *RepairinvoiceMutation) RepairinvoicesID() (id int, exists bool) {
-	if m.repairinvoices != nil {
-		return *m.repairinvoices, true
+// DeviceID returns the device id in the mutation.
+func (m *RepairInvoiceMutation) DeviceID() (id int, exists bool) {
+	if m.device != nil {
+		return *m.device, true
 	}
 	return
 }
 
-// RepairinvoicesIDs returns the repairinvoices ids in the mutation.
+// DeviceIDs returns the device ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
-// RepairinvoicesID instead. It exists only for internal usage by the builders.
-func (m *RepairinvoiceMutation) RepairinvoicesIDs() (ids []int) {
-	if id := m.repairinvoices; id != nil {
+// DeviceID instead. It exists only for internal usage by the builders.
+func (m *RepairInvoiceMutation) DeviceIDs() (ids []int) {
+	if id := m.device; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetRepairinvoices reset all changes of the "repairinvoices" edge.
-func (m *RepairinvoiceMutation) ResetRepairinvoices() {
-	m.repairinvoices = nil
-	m.clearedrepairinvoices = false
+// ResetDevice reset all changes of the "device" edge.
+func (m *RepairInvoiceMutation) ResetDevice() {
+	m.device = nil
+	m.cleareddevice = false
+}
+
+// SetStatusID sets the status edge to StatusR by id.
+func (m *RepairInvoiceMutation) SetStatusID(id int) {
+	m.status = &id
+}
+
+// ClearStatus clears the status edge to StatusR.
+func (m *RepairInvoiceMutation) ClearStatus() {
+	m.clearedstatus = true
+}
+
+// StatusCleared returns if the edge status was cleared.
+func (m *RepairInvoiceMutation) StatusCleared() bool {
+	return m.clearedstatus
+}
+
+// StatusID returns the status id in the mutation.
+func (m *RepairInvoiceMutation) StatusID() (id int, exists bool) {
+	if m.status != nil {
+		return *m.status, true
+	}
+	return
+}
+
+// StatusIDs returns the status ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// StatusID instead. It exists only for internal usage by the builders.
+func (m *RepairInvoiceMutation) StatusIDs() (ids []int) {
+	if id := m.status; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStatus reset all changes of the "status" edge.
+func (m *RepairInvoiceMutation) ResetStatus() {
+	m.status = nil
+	m.clearedstatus = false
+}
+
+// SetSymptomID sets the symptom edge to Symptom by id.
+func (m *RepairInvoiceMutation) SetSymptomID(id int) {
+	m.symptom = &id
+}
+
+// ClearSymptom clears the symptom edge to Symptom.
+func (m *RepairInvoiceMutation) ClearSymptom() {
+	m.clearedsymptom = true
+}
+
+// SymptomCleared returns if the edge symptom was cleared.
+func (m *RepairInvoiceMutation) SymptomCleared() bool {
+	return m.clearedsymptom
+}
+
+// SymptomID returns the symptom id in the mutation.
+func (m *RepairInvoiceMutation) SymptomID() (id int, exists bool) {
+	if m.symptom != nil {
+		return *m.symptom, true
+	}
+	return
+}
+
+// SymptomIDs returns the symptom ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// SymptomID instead. It exists only for internal usage by the builders.
+func (m *RepairInvoiceMutation) SymptomIDs() (ids []int) {
+	if id := m.symptom; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSymptom reset all changes of the "symptom" edge.
+func (m *RepairInvoiceMutation) ResetSymptom() {
+	m.symptom = nil
+	m.clearedsymptom = false
+}
+
+// SetUserID sets the user edge to User by id.
+func (m *RepairInvoiceMutation) SetUserID(id int) {
+	m.user = &id
+}
+
+// ClearUser clears the user edge to User.
+func (m *RepairInvoiceMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared returns if the edge user was cleared.
+func (m *RepairInvoiceMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the user id in the mutation.
+func (m *RepairInvoiceMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the user ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *RepairInvoiceMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser reset all changes of the "user" edge.
+func (m *RepairInvoiceMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// SetReturninvoiceID sets the returninvoice edge to Returninvoice by id.
+func (m *RepairInvoiceMutation) SetReturninvoiceID(id int) {
+	m.returninvoice = &id
+}
+
+// ClearReturninvoice clears the returninvoice edge to Returninvoice.
+func (m *RepairInvoiceMutation) ClearReturninvoice() {
+	m.clearedreturninvoice = true
+}
+
+// ReturninvoiceCleared returns if the edge returninvoice was cleared.
+func (m *RepairInvoiceMutation) ReturninvoiceCleared() bool {
+	return m.clearedreturninvoice
+}
+
+// ReturninvoiceID returns the returninvoice id in the mutation.
+func (m *RepairInvoiceMutation) ReturninvoiceID() (id int, exists bool) {
+	if m.returninvoice != nil {
+		return *m.returninvoice, true
+	}
+	return
+}
+
+// ReturninvoiceIDs returns the returninvoice ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// ReturninvoiceID instead. It exists only for internal usage by the builders.
+func (m *RepairInvoiceMutation) ReturninvoiceIDs() (ids []int) {
+	if id := m.returninvoice; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetReturninvoice reset all changes of the "returninvoice" edge.
+func (m *RepairInvoiceMutation) ResetReturninvoice() {
+	m.returninvoice = nil
+	m.clearedreturninvoice = false
 }
 
 // Op returns the operation name.
-func (m *RepairinvoiceMutation) Op() Op {
+func (m *RepairInvoiceMutation) Op() Op {
 	return m.op
 }
 
-// Type returns the node type of this mutation (Repairinvoice).
-func (m *RepairinvoiceMutation) Type() string {
+// Type returns the node type of this mutation (RepairInvoice).
+func (m *RepairInvoiceMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
-func (m *RepairinvoiceMutation) Fields() []string {
-	fields := make([]string, 0, 4)
-	if m.symptomid != nil {
-		fields = append(fields, repairinvoice.FieldSymptomid)
-	}
-	if m.deviceid != nil {
-		fields = append(fields, repairinvoice.FieldDeviceid)
-	}
-	if m.userid != nil {
-		fields = append(fields, repairinvoice.FieldUserid)
-	}
-	if m.statusrepairid != nil {
-		fields = append(fields, repairinvoice.FieldStatusrepairid)
+func (m *RepairInvoiceMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m._Rename != nil {
+		fields = append(fields, repairinvoice.FieldRename)
 	}
 	return fields
 }
@@ -2213,16 +2544,10 @@ func (m *RepairinvoiceMutation) Fields() []string {
 // Field returns the value of a field with the given name.
 // The second boolean value indicates that this field was
 // not set, or was not define in the schema.
-func (m *RepairinvoiceMutation) Field(name string) (ent.Value, bool) {
+func (m *RepairInvoiceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case repairinvoice.FieldSymptomid:
-		return m.Symptomid()
-	case repairinvoice.FieldDeviceid:
-		return m.Deviceid()
-	case repairinvoice.FieldUserid:
-		return m.Userid()
-	case repairinvoice.FieldStatusrepairid:
-		return m.Statusrepairid()
+	case repairinvoice.FieldRename:
+		return m.Rename()
 	}
 	return nil, false
 }
@@ -2230,186 +2555,127 @@ func (m *RepairinvoiceMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database.
 // An error is returned if the mutation operation is not UpdateOne,
 // or the query to the database was failed.
-func (m *RepairinvoiceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *RepairInvoiceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case repairinvoice.FieldSymptomid:
-		return m.OldSymptomid(ctx)
-	case repairinvoice.FieldDeviceid:
-		return m.OldDeviceid(ctx)
-	case repairinvoice.FieldUserid:
-		return m.OldUserid(ctx)
-	case repairinvoice.FieldStatusrepairid:
-		return m.OldStatusrepairid(ctx)
+	case repairinvoice.FieldRename:
+		return m.OldRename(ctx)
 	}
-	return nil, fmt.Errorf("unknown Repairinvoice field %s", name)
+	return nil, fmt.Errorf("unknown RepairInvoice field %s", name)
 }
 
 // SetField sets the value for the given name. It returns an
 // error if the field is not defined in the schema, or if the
 // type mismatch the field type.
-func (m *RepairinvoiceMutation) SetField(name string, value ent.Value) error {
+func (m *RepairInvoiceMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case repairinvoice.FieldSymptomid:
-		v, ok := value.(int)
+	case repairinvoice.FieldRename:
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSymptomid(v)
-		return nil
-	case repairinvoice.FieldDeviceid:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeviceid(v)
-		return nil
-	case repairinvoice.FieldUserid:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserid(v)
-		return nil
-	case repairinvoice.FieldStatusrepairid:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStatusrepairid(v)
+		m.SetRename(v)
 		return nil
 	}
-	return fmt.Errorf("unknown Repairinvoice field %s", name)
+	return fmt.Errorf("unknown RepairInvoice field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented
 // or decremented during this mutation.
-func (m *RepairinvoiceMutation) AddedFields() []string {
-	var fields []string
-	if m.addsymptomid != nil {
-		fields = append(fields, repairinvoice.FieldSymptomid)
-	}
-	if m.adddeviceid != nil {
-		fields = append(fields, repairinvoice.FieldDeviceid)
-	}
-	if m.adduserid != nil {
-		fields = append(fields, repairinvoice.FieldUserid)
-	}
-	if m.addstatusrepairid != nil {
-		fields = append(fields, repairinvoice.FieldStatusrepairid)
-	}
-	return fields
+func (m *RepairInvoiceMutation) AddedFields() []string {
+	return nil
 }
 
 // AddedField returns the numeric value that was in/decremented
 // from a field with the given name. The second value indicates
 // that this field was not set, or was not define in the schema.
-func (m *RepairinvoiceMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case repairinvoice.FieldSymptomid:
-		return m.AddedSymptomid()
-	case repairinvoice.FieldDeviceid:
-		return m.AddedDeviceid()
-	case repairinvoice.FieldUserid:
-		return m.AddedUserid()
-	case repairinvoice.FieldStatusrepairid:
-		return m.AddedStatusrepairid()
-	}
+func (m *RepairInvoiceMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value for the given name. It returns an
 // error if the field is not defined in the schema, or if the
 // type mismatch the field type.
-func (m *RepairinvoiceMutation) AddField(name string, value ent.Value) error {
+func (m *RepairInvoiceMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case repairinvoice.FieldSymptomid:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddSymptomid(v)
-		return nil
-	case repairinvoice.FieldDeviceid:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeviceid(v)
-		return nil
-	case repairinvoice.FieldUserid:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUserid(v)
-		return nil
-	case repairinvoice.FieldStatusrepairid:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddStatusrepairid(v)
-		return nil
 	}
-	return fmt.Errorf("unknown Repairinvoice numeric field %s", name)
+	return fmt.Errorf("unknown RepairInvoice numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared
 // during this mutation.
-func (m *RepairinvoiceMutation) ClearedFields() []string {
+func (m *RepairInvoiceMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicates if this field was
 // cleared in this mutation.
-func (m *RepairinvoiceMutation) FieldCleared(name string) bool {
+func (m *RepairInvoiceMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value for the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *RepairinvoiceMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Repairinvoice nullable field %s", name)
+func (m *RepairInvoiceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown RepairInvoice nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation regarding the
 // given field name. It returns an error if the field is not
 // defined in the schema.
-func (m *RepairinvoiceMutation) ResetField(name string) error {
+func (m *RepairInvoiceMutation) ResetField(name string) error {
 	switch name {
-	case repairinvoice.FieldSymptomid:
-		m.ResetSymptomid()
-		return nil
-	case repairinvoice.FieldDeviceid:
-		m.ResetDeviceid()
-		return nil
-	case repairinvoice.FieldUserid:
-		m.ResetUserid()
-		return nil
-	case repairinvoice.FieldStatusrepairid:
-		m.ResetStatusrepairid()
+	case repairinvoice.FieldRename:
+		m.ResetRename()
 		return nil
 	}
-	return fmt.Errorf("unknown Repairinvoice field %s", name)
+	return fmt.Errorf("unknown RepairInvoice field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
-func (m *RepairinvoiceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.repairinvoices != nil {
-		edges = append(edges, repairinvoice.EdgeRepairinvoices)
+func (m *RepairInvoiceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 5)
+	if m.device != nil {
+		edges = append(edges, repairinvoice.EdgeDevice)
+	}
+	if m.status != nil {
+		edges = append(edges, repairinvoice.EdgeStatus)
+	}
+	if m.symptom != nil {
+		edges = append(edges, repairinvoice.EdgeSymptom)
+	}
+	if m.user != nil {
+		edges = append(edges, repairinvoice.EdgeUser)
+	}
+	if m.returninvoice != nil {
+		edges = append(edges, repairinvoice.EdgeReturninvoice)
 	}
 	return edges
 }
 
 // AddedIDs returns all ids (to other nodes) that were added for
 // the given edge name.
-func (m *RepairinvoiceMutation) AddedIDs(name string) []ent.Value {
+func (m *RepairInvoiceMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case repairinvoice.EdgeRepairinvoices:
-		if id := m.repairinvoices; id != nil {
+	case repairinvoice.EdgeDevice:
+		if id := m.device; id != nil {
+			return []ent.Value{*id}
+		}
+	case repairinvoice.EdgeStatus:
+		if id := m.status; id != nil {
+			return []ent.Value{*id}
+		}
+	case repairinvoice.EdgeSymptom:
+		if id := m.symptom; id != nil {
+			return []ent.Value{*id}
+		}
+	case repairinvoice.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	case repairinvoice.EdgeReturninvoice:
+		if id := m.returninvoice; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -2418,14 +2684,14 @@ func (m *RepairinvoiceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
-func (m *RepairinvoiceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+func (m *RepairInvoiceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 5)
 	return edges
 }
 
 // RemovedIDs returns all ids (to other nodes) that were removed for
 // the given edge name.
-func (m *RepairinvoiceMutation) RemovedIDs(name string) []ent.Value {
+func (m *RepairInvoiceMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
 	}
 	return nil
@@ -2433,45 +2699,89 @@ func (m *RepairinvoiceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
-func (m *RepairinvoiceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedrepairinvoices {
-		edges = append(edges, repairinvoice.EdgeRepairinvoices)
+func (m *RepairInvoiceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 5)
+	if m.cleareddevice {
+		edges = append(edges, repairinvoice.EdgeDevice)
+	}
+	if m.clearedstatus {
+		edges = append(edges, repairinvoice.EdgeStatus)
+	}
+	if m.clearedsymptom {
+		edges = append(edges, repairinvoice.EdgeSymptom)
+	}
+	if m.cleareduser {
+		edges = append(edges, repairinvoice.EdgeUser)
+	}
+	if m.clearedreturninvoice {
+		edges = append(edges, repairinvoice.EdgeReturninvoice)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean indicates if this edge was
 // cleared in this mutation.
-func (m *RepairinvoiceMutation) EdgeCleared(name string) bool {
+func (m *RepairInvoiceMutation) EdgeCleared(name string) bool {
 	switch name {
-	case repairinvoice.EdgeRepairinvoices:
-		return m.clearedrepairinvoices
+	case repairinvoice.EdgeDevice:
+		return m.cleareddevice
+	case repairinvoice.EdgeStatus:
+		return m.clearedstatus
+	case repairinvoice.EdgeSymptom:
+		return m.clearedsymptom
+	case repairinvoice.EdgeUser:
+		return m.cleareduser
+	case repairinvoice.EdgeReturninvoice:
+		return m.clearedreturninvoice
 	}
 	return false
 }
 
 // ClearEdge clears the value for the given name. It returns an
 // error if the edge name is not defined in the schema.
-func (m *RepairinvoiceMutation) ClearEdge(name string) error {
+func (m *RepairInvoiceMutation) ClearEdge(name string) error {
 	switch name {
-	case repairinvoice.EdgeRepairinvoices:
-		m.ClearRepairinvoices()
+	case repairinvoice.EdgeDevice:
+		m.ClearDevice()
+		return nil
+	case repairinvoice.EdgeStatus:
+		m.ClearStatus()
+		return nil
+	case repairinvoice.EdgeSymptom:
+		m.ClearSymptom()
+		return nil
+	case repairinvoice.EdgeUser:
+		m.ClearUser()
+		return nil
+	case repairinvoice.EdgeReturninvoice:
+		m.ClearReturninvoice()
 		return nil
 	}
-	return fmt.Errorf("unknown Repairinvoice unique edge %s", name)
+	return fmt.Errorf("unknown RepairInvoice unique edge %s", name)
 }
 
 // ResetEdge resets all changes in the mutation regarding the
 // given edge name. It returns an error if the edge is not
 // defined in the schema.
-func (m *RepairinvoiceMutation) ResetEdge(name string) error {
+func (m *RepairInvoiceMutation) ResetEdge(name string) error {
 	switch name {
-	case repairinvoice.EdgeRepairinvoices:
-		m.ResetRepairinvoices()
+	case repairinvoice.EdgeDevice:
+		m.ResetDevice()
+		return nil
+	case repairinvoice.EdgeStatus:
+		m.ResetStatus()
+		return nil
+	case repairinvoice.EdgeSymptom:
+		m.ResetSymptom()
+		return nil
+	case repairinvoice.EdgeUser:
+		m.ResetUser()
+		return nil
+	case repairinvoice.EdgeReturninvoice:
+		m.ResetReturninvoice()
 		return nil
 	}
-	return fmt.Errorf("unknown Repairinvoice edge %s", name)
+	return fmt.Errorf("unknown RepairInvoice edge %s", name)
 }
 
 // ReturninvoiceMutation represents an operation that mutate the Returninvoices
@@ -2609,12 +2919,12 @@ func (m *ReturninvoiceMutation) ResetAddedtime() {
 	m.addedtime = nil
 }
 
-// SetRepairinvoiceID sets the Repairinvoice edge to Repairinvoice by id.
+// SetRepairinvoiceID sets the Repairinvoice edge to RepairInvoice by id.
 func (m *ReturninvoiceMutation) SetRepairinvoiceID(id int) {
 	m._Repairinvoice = &id
 }
 
-// ClearRepairinvoice clears the Repairinvoice edge to Repairinvoice.
+// ClearRepairinvoice clears the Repairinvoice edge to RepairInvoice.
 func (m *ReturninvoiceMutation) ClearRepairinvoice() {
 	m.cleared_Repairinvoice = true
 }
@@ -3381,6 +3691,374 @@ func (m *RoomMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Room edge %s", name)
 }
 
+// StatusRMutation represents an operation that mutate the StatusRs
+// nodes in the graph.
+type StatusRMutation struct {
+	config
+	op                        Op
+	typ                       string
+	id                        *int
+	_Sname                    *string
+	clearedFields             map[string]struct{}
+	repair_information        map[int]struct{}
+	removedrepair_information map[int]struct{}
+	done                      bool
+	oldValue                  func(context.Context) (*StatusR, error)
+}
+
+var _ ent.Mutation = (*StatusRMutation)(nil)
+
+// statusrOption allows to manage the mutation configuration using functional options.
+type statusrOption func(*StatusRMutation)
+
+// newStatusRMutation creates new mutation for $n.Name.
+func newStatusRMutation(c config, op Op, opts ...statusrOption) *StatusRMutation {
+	m := &StatusRMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeStatusR,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withStatusRID sets the id field of the mutation.
+func withStatusRID(id int) statusrOption {
+	return func(m *StatusRMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *StatusR
+		)
+		m.oldValue = func(ctx context.Context) (*StatusR, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().StatusR.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withStatusR sets the old StatusR of the mutation.
+func withStatusR(node *StatusR) statusrOption {
+	return func(m *StatusRMutation) {
+		m.oldValue = func(context.Context) (*StatusR, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m StatusRMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m StatusRMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *StatusRMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetSname sets the Sname field.
+func (m *StatusRMutation) SetSname(s string) {
+	m._Sname = &s
+}
+
+// Sname returns the Sname value in the mutation.
+func (m *StatusRMutation) Sname() (r string, exists bool) {
+	v := m._Sname
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSname returns the old Sname value of the StatusR.
+// If the StatusR object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *StatusRMutation) OldSname(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSname is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSname requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSname: %w", err)
+	}
+	return oldValue.Sname, nil
+}
+
+// ResetSname reset all changes of the "Sname" field.
+func (m *StatusRMutation) ResetSname() {
+	m._Sname = nil
+}
+
+// AddRepairInformationIDs adds the repair_information edge to RepairInvoice by ids.
+func (m *StatusRMutation) AddRepairInformationIDs(ids ...int) {
+	if m.repair_information == nil {
+		m.repair_information = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.repair_information[ids[i]] = struct{}{}
+	}
+}
+
+// RemoveRepairInformationIDs removes the repair_information edge to RepairInvoice by ids.
+func (m *StatusRMutation) RemoveRepairInformationIDs(ids ...int) {
+	if m.removedrepair_information == nil {
+		m.removedrepair_information = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedrepair_information[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRepairInformation returns the removed ids of repair_information.
+func (m *StatusRMutation) RemovedRepairInformationIDs() (ids []int) {
+	for id := range m.removedrepair_information {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RepairInformationIDs returns the repair_information ids in the mutation.
+func (m *StatusRMutation) RepairInformationIDs() (ids []int) {
+	for id := range m.repair_information {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRepairInformation reset all changes of the "repair_information" edge.
+func (m *StatusRMutation) ResetRepairInformation() {
+	m.repair_information = nil
+	m.removedrepair_information = nil
+}
+
+// Op returns the operation name.
+func (m *StatusRMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (StatusR).
+func (m *StatusRMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *StatusRMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m._Sname != nil {
+		fields = append(fields, statusr.FieldSname)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *StatusRMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case statusr.FieldSname:
+		return m.Sname()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *StatusRMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case statusr.FieldSname:
+		return m.OldSname(ctx)
+	}
+	return nil, fmt.Errorf("unknown StatusR field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *StatusRMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case statusr.FieldSname:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSname(v)
+		return nil
+	}
+	return fmt.Errorf("unknown StatusR field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *StatusRMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *StatusRMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *StatusRMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown StatusR numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *StatusRMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *StatusRMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *StatusRMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown StatusR nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *StatusRMutation) ResetField(name string) error {
+	switch name {
+	case statusr.FieldSname:
+		m.ResetSname()
+		return nil
+	}
+	return fmt.Errorf("unknown StatusR field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *StatusRMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.repair_information != nil {
+		edges = append(edges, statusr.EdgeRepairInformation)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *StatusRMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case statusr.EdgeRepairInformation:
+		ids := make([]ent.Value, 0, len(m.repair_information))
+		for id := range m.repair_information {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *StatusRMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedrepair_information != nil {
+		edges = append(edges, statusr.EdgeRepairInformation)
+	}
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *StatusRMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case statusr.EdgeRepairInformation:
+		ids := make([]ent.Value, 0, len(m.removedrepair_information))
+		for id := range m.removedrepair_information {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *StatusRMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *StatusRMutation) EdgeCleared(name string) bool {
+	switch name {
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *StatusRMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown StatusR unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *StatusRMutation) ResetEdge(name string) error {
+	switch name {
+	case statusr.EdgeRepairInformation:
+		m.ResetRepairInformation()
+		return nil
+	}
+	return fmt.Errorf("unknown StatusR edge %s", name)
+}
+
 // StatustMutation represents an operation that mutate the Statusts
 // nodes in the graph.
 type StatustMutation struct {
@@ -3749,26 +4427,396 @@ func (m *StatustMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Statust edge %s", name)
 }
 
+// SymptomMutation represents an operation that mutate the Symptoms
+// nodes in the graph.
+type SymptomMutation struct {
+	config
+	op                        Op
+	typ                       string
+	id                        *int
+	_Syname                   *string
+	clearedFields             map[string]struct{}
+	repair_information        map[int]struct{}
+	removedrepair_information map[int]struct{}
+	done                      bool
+	oldValue                  func(context.Context) (*Symptom, error)
+}
+
+var _ ent.Mutation = (*SymptomMutation)(nil)
+
+// symptomOption allows to manage the mutation configuration using functional options.
+type symptomOption func(*SymptomMutation)
+
+// newSymptomMutation creates new mutation for $n.Name.
+func newSymptomMutation(c config, op Op, opts ...symptomOption) *SymptomMutation {
+	m := &SymptomMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSymptom,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSymptomID sets the id field of the mutation.
+func withSymptomID(id int) symptomOption {
+	return func(m *SymptomMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Symptom
+		)
+		m.oldValue = func(ctx context.Context) (*Symptom, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Symptom.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSymptom sets the old Symptom of the mutation.
+func withSymptom(node *Symptom) symptomOption {
+	return func(m *SymptomMutation) {
+		m.oldValue = func(context.Context) (*Symptom, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SymptomMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SymptomMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *SymptomMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetSyname sets the Syname field.
+func (m *SymptomMutation) SetSyname(s string) {
+	m._Syname = &s
+}
+
+// Syname returns the Syname value in the mutation.
+func (m *SymptomMutation) Syname() (r string, exists bool) {
+	v := m._Syname
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSyname returns the old Syname value of the Symptom.
+// If the Symptom object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *SymptomMutation) OldSyname(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSyname is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSyname requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSyname: %w", err)
+	}
+	return oldValue.Syname, nil
+}
+
+// ResetSyname reset all changes of the "Syname" field.
+func (m *SymptomMutation) ResetSyname() {
+	m._Syname = nil
+}
+
+// AddRepairInformationIDs adds the repair_information edge to RepairInvoice by ids.
+func (m *SymptomMutation) AddRepairInformationIDs(ids ...int) {
+	if m.repair_information == nil {
+		m.repair_information = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.repair_information[ids[i]] = struct{}{}
+	}
+}
+
+// RemoveRepairInformationIDs removes the repair_information edge to RepairInvoice by ids.
+func (m *SymptomMutation) RemoveRepairInformationIDs(ids ...int) {
+	if m.removedrepair_information == nil {
+		m.removedrepair_information = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedrepair_information[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRepairInformation returns the removed ids of repair_information.
+func (m *SymptomMutation) RemovedRepairInformationIDs() (ids []int) {
+	for id := range m.removedrepair_information {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RepairInformationIDs returns the repair_information ids in the mutation.
+func (m *SymptomMutation) RepairInformationIDs() (ids []int) {
+	for id := range m.repair_information {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRepairInformation reset all changes of the "repair_information" edge.
+func (m *SymptomMutation) ResetRepairInformation() {
+	m.repair_information = nil
+	m.removedrepair_information = nil
+}
+
+// Op returns the operation name.
+func (m *SymptomMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Symptom).
+func (m *SymptomMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *SymptomMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m._Syname != nil {
+		fields = append(fields, symptom.FieldSyname)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *SymptomMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case symptom.FieldSyname:
+		return m.Syname()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *SymptomMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case symptom.FieldSyname:
+		return m.OldSyname(ctx)
+	}
+	return nil, fmt.Errorf("unknown Symptom field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *SymptomMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case symptom.FieldSyname:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSyname(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Symptom field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *SymptomMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *SymptomMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *SymptomMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Symptom numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *SymptomMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *SymptomMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SymptomMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Symptom nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *SymptomMutation) ResetField(name string) error {
+	switch name {
+	case symptom.FieldSyname:
+		m.ResetSyname()
+		return nil
+	}
+	return fmt.Errorf("unknown Symptom field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *SymptomMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.repair_information != nil {
+		edges = append(edges, symptom.EdgeRepairInformation)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *SymptomMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case symptom.EdgeRepairInformation:
+		ids := make([]ent.Value, 0, len(m.repair_information))
+		for id := range m.repair_information {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *SymptomMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedrepair_information != nil {
+		edges = append(edges, symptom.EdgeRepairInformation)
+	}
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *SymptomMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case symptom.EdgeRepairInformation:
+		ids := make([]ent.Value, 0, len(m.removedrepair_information))
+		for id := range m.removedrepair_information {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *SymptomMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *SymptomMutation) EdgeCleared(name string) bool {
+	switch name {
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *SymptomMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Symptom unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *SymptomMutation) ResetEdge(name string) error {
+	switch name {
+	case symptom.EdgeRepairInformation:
+		m.ResetRepairInformation()
+		return nil
+	}
+	return fmt.Errorf("unknown Symptom edge %s", name)
+}
+
 // UserMutation represents an operation that mutate the Users
 // nodes in the graph.
 type UserMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	personalID      *string
-	personalName    *string
-	clearedFields   map[string]struct{}
-	faculty         *int
-	clearedfaculty  bool
-	branch          *int
-	clearedbranch   bool
-	building        *int
-	clearedbuilding bool
-	room            *int
-	clearedroom     bool
-	done            bool
-	oldValue        func(context.Context) (*User, error)
+	op                                Op
+	typ                               string
+	id                                *int
+	personalID                        *string
+	personalName                      *string
+	clearedFields                     map[string]struct{}
+	faculty                           *int
+	clearedfaculty                    bool
+	branch                            *int
+	clearedbranch                     bool
+	building                          *int
+	clearedbuilding                   bool
+	room                              *int
+	clearedroom                       bool
+	repairinvoice_informations        map[int]struct{}
+	removedrepairinvoice_informations map[int]struct{}
+	done                              bool
+	oldValue                          func(context.Context) (*User, error)
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -4080,6 +5128,48 @@ func (m *UserMutation) ResetRoom() {
 	m.clearedroom = false
 }
 
+// AddRepairinvoiceInformationIDs adds the repairinvoice_informations edge to RepairInvoice by ids.
+func (m *UserMutation) AddRepairinvoiceInformationIDs(ids ...int) {
+	if m.repairinvoice_informations == nil {
+		m.repairinvoice_informations = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.repairinvoice_informations[ids[i]] = struct{}{}
+	}
+}
+
+// RemoveRepairinvoiceInformationIDs removes the repairinvoice_informations edge to RepairInvoice by ids.
+func (m *UserMutation) RemoveRepairinvoiceInformationIDs(ids ...int) {
+	if m.removedrepairinvoice_informations == nil {
+		m.removedrepairinvoice_informations = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedrepairinvoice_informations[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRepairinvoiceInformations returns the removed ids of repairinvoice_informations.
+func (m *UserMutation) RemovedRepairinvoiceInformationsIDs() (ids []int) {
+	for id := range m.removedrepairinvoice_informations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RepairinvoiceInformationsIDs returns the repairinvoice_informations ids in the mutation.
+func (m *UserMutation) RepairinvoiceInformationsIDs() (ids []int) {
+	for id := range m.repairinvoice_informations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRepairinvoiceInformations reset all changes of the "repairinvoice_informations" edge.
+func (m *UserMutation) ResetRepairinvoiceInformations() {
+	m.repairinvoice_informations = nil
+	m.removedrepairinvoice_informations = nil
+}
+
 // Op returns the operation name.
 func (m *UserMutation) Op() Op {
 	return m.op
@@ -4212,7 +5302,7 @@ func (m *UserMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.faculty != nil {
 		edges = append(edges, user.EdgeFaculty)
 	}
@@ -4224,6 +5314,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.room != nil {
 		edges = append(edges, user.EdgeRoom)
+	}
+	if m.repairinvoice_informations != nil {
+		edges = append(edges, user.EdgeRepairinvoiceInformations)
 	}
 	return edges
 }
@@ -4248,6 +5341,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 		if id := m.room; id != nil {
 			return []ent.Value{*id}
 		}
+	case user.EdgeRepairinvoiceInformations:
+		ids := make([]ent.Value, 0, len(m.repairinvoice_informations))
+		for id := range m.repairinvoice_informations {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -4255,7 +5354,10 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
+	if m.removedrepairinvoice_informations != nil {
+		edges = append(edges, user.EdgeRepairinvoiceInformations)
+	}
 	return edges
 }
 
@@ -4263,6 +5365,12 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case user.EdgeRepairinvoiceInformations:
+		ids := make([]ent.Value, 0, len(m.removedrepairinvoice_informations))
+		for id := range m.removedrepairinvoice_informations {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -4270,7 +5378,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedfaculty {
 		edges = append(edges, user.EdgeFaculty)
 	}
@@ -4338,6 +5446,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeRoom:
 		m.ResetRoom()
+		return nil
+	case user.EdgeRepairinvoiceInformations:
+		m.ResetRepairinvoiceInformations()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

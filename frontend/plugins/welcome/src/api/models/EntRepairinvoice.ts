@@ -14,76 +14,55 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    EntRepairinvoiceEdges,
-    EntRepairinvoiceEdgesFromJSON,
-    EntRepairinvoiceEdgesFromJSONTyped,
-    EntRepairinvoiceEdgesToJSON,
+    EntRepairInvoiceEdges,
+    EntRepairInvoiceEdgesFromJSON,
+    EntRepairInvoiceEdgesFromJSONTyped,
+    EntRepairInvoiceEdgesToJSON,
 } from './';
 
 /**
  * 
  * @export
- * @interface EntRepairinvoice
+ * @interface EntRepairInvoice
  */
-export interface EntRepairinvoice {
+export interface EntRepairInvoice {
     /**
-     * Deviceid holds the value of the "deviceid" field.
-     * @type {number}
-     * @memberof EntRepairinvoice
+     * Rename holds the value of the "Rename" field.
+     * @type {string}
+     * @memberof EntRepairInvoice
      */
-    deviceid?: number;
+    rename?: string;
     /**
      * 
-     * @type {EntRepairinvoiceEdges}
-     * @memberof EntRepairinvoice
+     * @type {EntRepairInvoiceEdges}
+     * @memberof EntRepairInvoice
      */
-    edges?: EntRepairinvoiceEdges;
+    edges?: EntRepairInvoiceEdges;
     /**
      * ID of the ent.
      * @type {number}
-     * @memberof EntRepairinvoice
+     * @memberof EntRepairInvoice
      */
     id?: number;
-    /**
-     * Statusrepairid holds the value of the "statusrepairid" field.
-     * @type {number}
-     * @memberof EntRepairinvoice
-     */
-    statusrepairid?: number;
-    /**
-     * Symptomid holds the value of the "symptomid" field.
-     * @type {number}
-     * @memberof EntRepairinvoice
-     */
-    symptomid?: number;
-    /**
-     * Userid holds the value of the "userid" field.
-     * @type {number}
-     * @memberof EntRepairinvoice
-     */
-    userid?: number;
 }
 
-export function EntRepairinvoiceFromJSON(json: any): EntRepairinvoice {
-    return EntRepairinvoiceFromJSONTyped(json, false);
+export function EntRepairInvoiceFromJSON(json: any): EntRepairInvoice {
+    return EntRepairInvoiceFromJSONTyped(json, false);
 }
 
-export function EntRepairinvoiceFromJSONTyped(json: any, ignoreDiscriminator: boolean): EntRepairinvoice {
+export function EntRepairInvoiceFromJSONTyped(json: any, ignoreDiscriminator: boolean): EntRepairInvoice {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'deviceid': !exists(json, 'deviceid') ? undefined : json['deviceid'],
-        'edges': !exists(json, 'edges') ? undefined : EntRepairinvoiceEdgesFromJSON(json['edges']),
+        'rename': !exists(json, 'Rename') ? undefined : json['Rename'],
+        'edges': !exists(json, 'edges') ? undefined : EntRepairInvoiceEdgesFromJSON(json['edges']),
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'statusrepairid': !exists(json, 'statusrepairid') ? undefined : json['statusrepairid'],
-        'symptomid': !exists(json, 'symptomid') ? undefined : json['symptomid'],
-        'userid': !exists(json, 'userid') ? undefined : json['userid'],
     };
 }
 
-export function EntRepairinvoiceToJSON(value?: EntRepairinvoice | null): any {
+export function EntRepairInvoiceToJSON(value?: EntRepairInvoice | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -92,12 +71,9 @@ export function EntRepairinvoiceToJSON(value?: EntRepairinvoice | null): any {
     }
     return {
         
-        'deviceid': value.deviceid,
-        'edges': EntRepairinvoiceEdgesToJSON(value.edges),
+        'Rename': value.rename,
+        'edges': EntRepairInvoiceEdgesToJSON(value.edges),
         'id': value.id,
-        'statusrepairid': value.statusrepairid,
-        'symptomid': value.symptomid,
-        'userid': value.userid,
     };
 }
 

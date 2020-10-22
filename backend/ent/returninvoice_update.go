@@ -38,14 +38,14 @@ func (ru *ReturninvoiceUpdate) SetAddedtime(t time.Time) *ReturninvoiceUpdate {
 	return ru
 }
 
-// SetRepairinvoiceID sets the Repairinvoice edge to Repairinvoice by id.
+// SetRepairinvoiceID sets the Repairinvoice edge to RepairInvoice by id.
 func (ru *ReturninvoiceUpdate) SetRepairinvoiceID(id int) *ReturninvoiceUpdate {
 	ru.mutation.SetRepairinvoiceID(id)
 	return ru
 }
 
-// SetRepairinvoice sets the Repairinvoice edge to Repairinvoice.
-func (ru *ReturninvoiceUpdate) SetRepairinvoice(r *Repairinvoice) *ReturninvoiceUpdate {
+// SetRepairinvoice sets the Repairinvoice edge to RepairInvoice.
+func (ru *ReturninvoiceUpdate) SetRepairinvoice(r *RepairInvoice) *ReturninvoiceUpdate {
 	return ru.SetRepairinvoiceID(r.ID)
 }
 
@@ -92,7 +92,7 @@ func (ru *ReturninvoiceUpdate) Mutation() *ReturninvoiceMutation {
 	return ru.mutation
 }
 
-// ClearRepairinvoice clears the Repairinvoice edge to Repairinvoice.
+// ClearRepairinvoice clears the Repairinvoice edge to RepairInvoice.
 func (ru *ReturninvoiceUpdate) ClearRepairinvoice() *ReturninvoiceUpdate {
 	ru.mutation.ClearRepairinvoice()
 	return ru
@@ -320,14 +320,14 @@ func (ruo *ReturninvoiceUpdateOne) SetAddedtime(t time.Time) *ReturninvoiceUpdat
 	return ruo
 }
 
-// SetRepairinvoiceID sets the Repairinvoice edge to Repairinvoice by id.
+// SetRepairinvoiceID sets the Repairinvoice edge to RepairInvoice by id.
 func (ruo *ReturninvoiceUpdateOne) SetRepairinvoiceID(id int) *ReturninvoiceUpdateOne {
 	ruo.mutation.SetRepairinvoiceID(id)
 	return ruo
 }
 
-// SetRepairinvoice sets the Repairinvoice edge to Repairinvoice.
-func (ruo *ReturninvoiceUpdateOne) SetRepairinvoice(r *Repairinvoice) *ReturninvoiceUpdateOne {
+// SetRepairinvoice sets the Repairinvoice edge to RepairInvoice.
+func (ruo *ReturninvoiceUpdateOne) SetRepairinvoice(r *RepairInvoice) *ReturninvoiceUpdateOne {
 	return ruo.SetRepairinvoiceID(r.ID)
 }
 
@@ -374,7 +374,7 @@ func (ruo *ReturninvoiceUpdateOne) Mutation() *ReturninvoiceMutation {
 	return ruo.mutation
 }
 
-// ClearRepairinvoice clears the Repairinvoice edge to Repairinvoice.
+// ClearRepairinvoice clears the Repairinvoice edge to RepairInvoice.
 func (ruo *ReturninvoiceUpdateOne) ClearRepairinvoice() *ReturninvoiceUpdateOne {
 	ruo.mutation.ClearRepairinvoice()
 	return ruo

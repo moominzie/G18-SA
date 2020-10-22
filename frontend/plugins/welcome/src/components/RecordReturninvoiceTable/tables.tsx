@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import { DefaultApi } from '../../api/apis';
-import DeleteIcon from '@material-ui/icons/Delete';
 import {
   Content,
   Header,
@@ -18,7 +17,7 @@ import {
 } from '@backstage/core';
 import PersonAddRoundedIcon from '@material-ui/icons/PersonAddRounded';
 import HomeRoundedIcon from '@material-ui/icons/HomeRounded';
-import { ControllersReturninvoice, EntReturninvoice } from '../../api';
+import { EntReturninvoice, EntRepairInvoice, EntUser } from '../../api';
  
 const useStyles = makeStyles({
  table: {
@@ -30,6 +29,8 @@ export default function ComponentsRecordReturninvoiceTable() {
   const classes = useStyles();
   const http = new DefaultApi();
   const [returninvoices, setReturninvoices] = useState<EntReturninvoice[]>([]);
+  const [repairinvoice, setRepairinvoices] = useState<EntRepairInvoice[]>([]);
+  const [user, setUsers] = useState<EntUser[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -40,6 +41,23 @@ export default function ComponentsRecordReturninvoiceTable() {
       console.log(res);
     };
     getReturninvoices();
+
+
+    const getRepairinvoices = async () => {
+      const res = await http.listRepairInvoice({ limit: 10, offset: 0 });
+      setLoading(false);
+      setRepairinvoices(res);
+      console.log(res);
+    };
+    getRepairinvoices();
+
+    const getUsers = async () => {
+      const res = await http.listUser({ limit: 10, offset: 0 });
+      setLoading(false);
+      setUsers(res);
+      console.log(res);
+    };
+    getUsers();
   }, [loading]);
   
  
@@ -70,9 +88,15 @@ export default function ComponentsRecordReturninvoiceTable() {
          {returninvoices.map((item:any) => (
            <TableRow key={item.id}>
              <TableCell align="center">{item.id}</TableCell>
-             <TableCell align="center">{item.edges?.repairinvoice?.userid}</TableCell>
-             <TableCell align="center">{item.edges?.repairinvoice?.deviceid}</TableCell>
-             <TableCell align="center">{item.edges?.repairinvoice?.userid}</TableCell>
+             {repairinvoice.filter((setfilterid:any) => setfilterid.id === item.edges?.repairinvoice?.id).map((item2:any) => (
+                  <TableCell align="center">{item2.edges?.user?.personalName}</TableCell>
+              ))}
+             {repairinvoice.filter((setfilterid:any) => setfilterid.id === item.edges?.repairinvoice?.id).map((item2:any) => (
+                  <TableCell align="center">{item2.edges?.device?.dname}</TableCell>
+              ))}
+            {user.filter((setfilterid:any) => setfilterid.id === item.id).map((item2:EntUser) => (
+                  <TableCell align="center">{item2.edges?.room?.rname}</TableCell>
+              ))}
              <TableCell align="center">{item.edges?.employee?.employeename}</TableCell>
              <TableCell align="center">{item.edges?.statust?.statustname}</TableCell>
            </TableRow>

@@ -11,12 +11,15 @@ import (
 
 	"github.com/moominzie/user-record/ent/branch"
 	"github.com/moominzie/user-record/ent/building"
+	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/employee"
 	"github.com/moominzie/user-record/ent/faculty"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
 	"github.com/moominzie/user-record/ent/room"
+	"github.com/moominzie/user-record/ent/statusr"
 	"github.com/moominzie/user-record/ent/statust"
+	"github.com/moominzie/user-record/ent/symptom"
 	"github.com/moominzie/user-record/ent/user"
 
 	"github.com/facebookincubator/ent/dialect"
@@ -33,18 +36,24 @@ type Client struct {
 	Branch *BranchClient
 	// Building is the client for interacting with the Building builders.
 	Building *BuildingClient
+	// Device is the client for interacting with the Device builders.
+	Device *DeviceClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
 	// Faculty is the client for interacting with the Faculty builders.
 	Faculty *FacultyClient
-	// Repairinvoice is the client for interacting with the Repairinvoice builders.
-	Repairinvoice *RepairinvoiceClient
+	// RepairInvoice is the client for interacting with the RepairInvoice builders.
+	RepairInvoice *RepairInvoiceClient
 	// Returninvoice is the client for interacting with the Returninvoice builders.
 	Returninvoice *ReturninvoiceClient
 	// Room is the client for interacting with the Room builders.
 	Room *RoomClient
+	// StatusR is the client for interacting with the StatusR builders.
+	StatusR *StatusRClient
 	// Statust is the client for interacting with the Statust builders.
 	Statust *StatustClient
+	// Symptom is the client for interacting with the Symptom builders.
+	Symptom *SymptomClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -62,12 +71,15 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Branch = NewBranchClient(c.config)
 	c.Building = NewBuildingClient(c.config)
+	c.Device = NewDeviceClient(c.config)
 	c.Employee = NewEmployeeClient(c.config)
 	c.Faculty = NewFacultyClient(c.config)
-	c.Repairinvoice = NewRepairinvoiceClient(c.config)
+	c.RepairInvoice = NewRepairInvoiceClient(c.config)
 	c.Returninvoice = NewReturninvoiceClient(c.config)
 	c.Room = NewRoomClient(c.config)
+	c.StatusR = NewStatusRClient(c.config)
 	c.Statust = NewStatustClient(c.config)
+	c.Symptom = NewSymptomClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -103,12 +115,15 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:        cfg,
 		Branch:        NewBranchClient(cfg),
 		Building:      NewBuildingClient(cfg),
+		Device:        NewDeviceClient(cfg),
 		Employee:      NewEmployeeClient(cfg),
 		Faculty:       NewFacultyClient(cfg),
-		Repairinvoice: NewRepairinvoiceClient(cfg),
+		RepairInvoice: NewRepairInvoiceClient(cfg),
 		Returninvoice: NewReturninvoiceClient(cfg),
 		Room:          NewRoomClient(cfg),
+		StatusR:       NewStatusRClient(cfg),
 		Statust:       NewStatustClient(cfg),
+		Symptom:       NewSymptomClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
 }
@@ -127,12 +142,15 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:        cfg,
 		Branch:        NewBranchClient(cfg),
 		Building:      NewBuildingClient(cfg),
+		Device:        NewDeviceClient(cfg),
 		Employee:      NewEmployeeClient(cfg),
 		Faculty:       NewFacultyClient(cfg),
-		Repairinvoice: NewRepairinvoiceClient(cfg),
+		RepairInvoice: NewRepairInvoiceClient(cfg),
 		Returninvoice: NewReturninvoiceClient(cfg),
 		Room:          NewRoomClient(cfg),
+		StatusR:       NewStatusRClient(cfg),
 		Statust:       NewStatustClient(cfg),
+		Symptom:       NewSymptomClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
 }
@@ -164,12 +182,15 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Branch.Use(hooks...)
 	c.Building.Use(hooks...)
+	c.Device.Use(hooks...)
 	c.Employee.Use(hooks...)
 	c.Faculty.Use(hooks...)
-	c.Repairinvoice.Use(hooks...)
+	c.RepairInvoice.Use(hooks...)
 	c.Returninvoice.Use(hooks...)
 	c.Room.Use(hooks...)
+	c.StatusR.Use(hooks...)
 	c.Statust.Use(hooks...)
+	c.Symptom.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -403,6 +424,105 @@ func (c *BuildingClient) Hooks() []Hook {
 	return c.hooks.Building
 }
 
+// DeviceClient is a client for the Device schema.
+type DeviceClient struct {
+	config
+}
+
+// NewDeviceClient returns a client for the Device from the given config.
+func NewDeviceClient(c config) *DeviceClient {
+	return &DeviceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `device.Hooks(f(g(h())))`.
+func (c *DeviceClient) Use(hooks ...Hook) {
+	c.hooks.Device = append(c.hooks.Device, hooks...)
+}
+
+// Create returns a create builder for Device.
+func (c *DeviceClient) Create() *DeviceCreate {
+	mutation := newDeviceMutation(c.config, OpCreate)
+	return &DeviceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for Device.
+func (c *DeviceClient) Update() *DeviceUpdate {
+	mutation := newDeviceMutation(c.config, OpUpdate)
+	return &DeviceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DeviceClient) UpdateOne(d *Device) *DeviceUpdateOne {
+	mutation := newDeviceMutation(c.config, OpUpdateOne, withDevice(d))
+	return &DeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DeviceClient) UpdateOneID(id int) *DeviceUpdateOne {
+	mutation := newDeviceMutation(c.config, OpUpdateOne, withDeviceID(id))
+	return &DeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Device.
+func (c *DeviceClient) Delete() *DeviceDelete {
+	mutation := newDeviceMutation(c.config, OpDelete)
+	return &DeviceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *DeviceClient) DeleteOne(d *Device) *DeviceDeleteOne {
+	return c.DeleteOneID(d.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *DeviceClient) DeleteOneID(id int) *DeviceDeleteOne {
+	builder := c.Delete().Where(device.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DeviceDeleteOne{builder}
+}
+
+// Create returns a query builder for Device.
+func (c *DeviceClient) Query() *DeviceQuery {
+	return &DeviceQuery{config: c.config}
+}
+
+// Get returns a Device entity by its id.
+func (c *DeviceClient) Get(ctx context.Context, id int) (*Device, error) {
+	return c.Query().Where(device.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DeviceClient) GetX(ctx context.Context, id int) *Device {
+	d, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return d
+}
+
+// QueryRepairInformation queries the repair_information edge of a Device.
+func (c *DeviceClient) QueryRepairInformation(d *Device) *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, id),
+			sqlgraph.To(repairinvoice.Table, repairinvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.RepairInformationTable, device.RepairInformationColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DeviceClient) Hooks() []Hook {
+	return c.hooks.Device
+}
+
 // EmployeeClient is a client for the Employee schema.
 type EmployeeClient struct {
 	config
@@ -617,103 +737,167 @@ func (c *FacultyClient) Hooks() []Hook {
 	return c.hooks.Faculty
 }
 
-// RepairinvoiceClient is a client for the Repairinvoice schema.
-type RepairinvoiceClient struct {
+// RepairInvoiceClient is a client for the RepairInvoice schema.
+type RepairInvoiceClient struct {
 	config
 }
 
-// NewRepairinvoiceClient returns a client for the Repairinvoice from the given config.
-func NewRepairinvoiceClient(c config) *RepairinvoiceClient {
-	return &RepairinvoiceClient{config: c}
+// NewRepairInvoiceClient returns a client for the RepairInvoice from the given config.
+func NewRepairInvoiceClient(c config) *RepairInvoiceClient {
+	return &RepairInvoiceClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
 // A call to `Use(f, g, h)` equals to `repairinvoice.Hooks(f(g(h())))`.
-func (c *RepairinvoiceClient) Use(hooks ...Hook) {
-	c.hooks.Repairinvoice = append(c.hooks.Repairinvoice, hooks...)
+func (c *RepairInvoiceClient) Use(hooks ...Hook) {
+	c.hooks.RepairInvoice = append(c.hooks.RepairInvoice, hooks...)
 }
 
-// Create returns a create builder for Repairinvoice.
-func (c *RepairinvoiceClient) Create() *RepairinvoiceCreate {
-	mutation := newRepairinvoiceMutation(c.config, OpCreate)
-	return &RepairinvoiceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a create builder for RepairInvoice.
+func (c *RepairInvoiceClient) Create() *RepairInvoiceCreate {
+	mutation := newRepairInvoiceMutation(c.config, OpCreate)
+	return &RepairInvoiceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Update returns an update builder for Repairinvoice.
-func (c *RepairinvoiceClient) Update() *RepairinvoiceUpdate {
-	mutation := newRepairinvoiceMutation(c.config, OpUpdate)
-	return &RepairinvoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for RepairInvoice.
+func (c *RepairInvoiceClient) Update() *RepairInvoiceUpdate {
+	mutation := newRepairInvoiceMutation(c.config, OpUpdate)
+	return &RepairInvoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *RepairinvoiceClient) UpdateOne(r *Repairinvoice) *RepairinvoiceUpdateOne {
-	mutation := newRepairinvoiceMutation(c.config, OpUpdateOne, withRepairinvoice(r))
-	return &RepairinvoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *RepairInvoiceClient) UpdateOne(ri *RepairInvoice) *RepairInvoiceUpdateOne {
+	mutation := newRepairInvoiceMutation(c.config, OpUpdateOne, withRepairInvoice(ri))
+	return &RepairInvoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *RepairinvoiceClient) UpdateOneID(id int) *RepairinvoiceUpdateOne {
-	mutation := newRepairinvoiceMutation(c.config, OpUpdateOne, withRepairinvoiceID(id))
-	return &RepairinvoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *RepairInvoiceClient) UpdateOneID(id int) *RepairInvoiceUpdateOne {
+	mutation := newRepairInvoiceMutation(c.config, OpUpdateOne, withRepairInvoiceID(id))
+	return &RepairInvoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Repairinvoice.
-func (c *RepairinvoiceClient) Delete() *RepairinvoiceDelete {
-	mutation := newRepairinvoiceMutation(c.config, OpDelete)
-	return &RepairinvoiceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for RepairInvoice.
+func (c *RepairInvoiceClient) Delete() *RepairInvoiceDelete {
+	mutation := newRepairInvoiceMutation(c.config, OpDelete)
+	return &RepairInvoiceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a delete builder for the given entity.
-func (c *RepairinvoiceClient) DeleteOne(r *Repairinvoice) *RepairinvoiceDeleteOne {
-	return c.DeleteOneID(r.ID)
+func (c *RepairInvoiceClient) DeleteOne(ri *RepairInvoice) *RepairInvoiceDeleteOne {
+	return c.DeleteOneID(ri.ID)
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *RepairinvoiceClient) DeleteOneID(id int) *RepairinvoiceDeleteOne {
+func (c *RepairInvoiceClient) DeleteOneID(id int) *RepairInvoiceDeleteOne {
 	builder := c.Delete().Where(repairinvoice.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &RepairinvoiceDeleteOne{builder}
+	return &RepairInvoiceDeleteOne{builder}
 }
 
-// Create returns a query builder for Repairinvoice.
-func (c *RepairinvoiceClient) Query() *RepairinvoiceQuery {
-	return &RepairinvoiceQuery{config: c.config}
+// Create returns a query builder for RepairInvoice.
+func (c *RepairInvoiceClient) Query() *RepairInvoiceQuery {
+	return &RepairInvoiceQuery{config: c.config}
 }
 
-// Get returns a Repairinvoice entity by its id.
-func (c *RepairinvoiceClient) Get(ctx context.Context, id int) (*Repairinvoice, error) {
+// Get returns a RepairInvoice entity by its id.
+func (c *RepairInvoiceClient) Get(ctx context.Context, id int) (*RepairInvoice, error) {
 	return c.Query().Where(repairinvoice.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *RepairinvoiceClient) GetX(ctx context.Context, id int) *Repairinvoice {
-	r, err := c.Get(ctx, id)
+func (c *RepairInvoiceClient) GetX(ctx context.Context, id int) *RepairInvoice {
+	ri, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
-	return r
+	return ri
 }
 
-// QueryRepairinvoices queries the repairinvoices edge of a Repairinvoice.
-func (c *RepairinvoiceClient) QueryRepairinvoices(r *Repairinvoice) *ReturninvoiceQuery {
+// QueryDevice queries the device edge of a RepairInvoice.
+func (c *RepairInvoiceClient) QueryDevice(ri *RepairInvoice) *DeviceQuery {
+	query := &DeviceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ri.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.DeviceTable, repairinvoice.DeviceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStatus queries the status edge of a RepairInvoice.
+func (c *RepairInvoiceClient) QueryStatus(ri *RepairInvoice) *StatusRQuery {
+	query := &StatusRQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ri.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
+			sqlgraph.To(statusr.Table, statusr.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.StatusTable, repairinvoice.StatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySymptom queries the symptom edge of a RepairInvoice.
+func (c *RepairInvoiceClient) QuerySymptom(ri *RepairInvoice) *SymptomQuery {
+	query := &SymptomQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ri.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
+			sqlgraph.To(symptom.Table, symptom.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.SymptomTable, repairinvoice.SymptomColumn),
+		)
+		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a RepairInvoice.
+func (c *RepairInvoiceClient) QueryUser(ri *RepairInvoice) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ri.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.UserTable, repairinvoice.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReturninvoice queries the returninvoice edge of a RepairInvoice.
+func (c *RepairInvoiceClient) QueryReturninvoice(ri *RepairInvoice) *ReturninvoiceQuery {
 	query := &ReturninvoiceQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
+		id := ri.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
 			sqlgraph.To(returninvoice.Table, returninvoice.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.RepairinvoicesTable, repairinvoice.RepairinvoicesColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.ReturninvoiceTable, repairinvoice.ReturninvoiceColumn),
 		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *RepairinvoiceClient) Hooks() []Hook {
-	return c.hooks.Repairinvoice
+func (c *RepairInvoiceClient) Hooks() []Hook {
+	return c.hooks.RepairInvoice
 }
 
 // ReturninvoiceClient is a client for the Returninvoice schema.
@@ -795,8 +979,8 @@ func (c *ReturninvoiceClient) GetX(ctx context.Context, id int) *Returninvoice {
 }
 
 // QueryRepairinvoice queries the Repairinvoice edge of a Returninvoice.
-func (c *ReturninvoiceClient) QueryRepairinvoice(r *Returninvoice) *RepairinvoiceQuery {
-	query := &RepairinvoiceQuery{config: c.config}
+func (c *ReturninvoiceClient) QueryRepairinvoice(r *Returninvoice) *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
@@ -962,6 +1146,105 @@ func (c *RoomClient) Hooks() []Hook {
 	return c.hooks.Room
 }
 
+// StatusRClient is a client for the StatusR schema.
+type StatusRClient struct {
+	config
+}
+
+// NewStatusRClient returns a client for the StatusR from the given config.
+func NewStatusRClient(c config) *StatusRClient {
+	return &StatusRClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `statusr.Hooks(f(g(h())))`.
+func (c *StatusRClient) Use(hooks ...Hook) {
+	c.hooks.StatusR = append(c.hooks.StatusR, hooks...)
+}
+
+// Create returns a create builder for StatusR.
+func (c *StatusRClient) Create() *StatusRCreate {
+	mutation := newStatusRMutation(c.config, OpCreate)
+	return &StatusRCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for StatusR.
+func (c *StatusRClient) Update() *StatusRUpdate {
+	mutation := newStatusRMutation(c.config, OpUpdate)
+	return &StatusRUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *StatusRClient) UpdateOne(s *StatusR) *StatusRUpdateOne {
+	mutation := newStatusRMutation(c.config, OpUpdateOne, withStatusR(s))
+	return &StatusRUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *StatusRClient) UpdateOneID(id int) *StatusRUpdateOne {
+	mutation := newStatusRMutation(c.config, OpUpdateOne, withStatusRID(id))
+	return &StatusRUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for StatusR.
+func (c *StatusRClient) Delete() *StatusRDelete {
+	mutation := newStatusRMutation(c.config, OpDelete)
+	return &StatusRDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *StatusRClient) DeleteOne(s *StatusR) *StatusRDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *StatusRClient) DeleteOneID(id int) *StatusRDeleteOne {
+	builder := c.Delete().Where(statusr.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &StatusRDeleteOne{builder}
+}
+
+// Create returns a query builder for StatusR.
+func (c *StatusRClient) Query() *StatusRQuery {
+	return &StatusRQuery{config: c.config}
+}
+
+// Get returns a StatusR entity by its id.
+func (c *StatusRClient) Get(ctx context.Context, id int) (*StatusR, error) {
+	return c.Query().Where(statusr.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *StatusRClient) GetX(ctx context.Context, id int) *StatusR {
+	s, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+// QueryRepairInformation queries the repair_information edge of a StatusR.
+func (c *StatusRClient) QueryRepairInformation(s *StatusR) *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(statusr.Table, statusr.FieldID, id),
+			sqlgraph.To(repairinvoice.Table, repairinvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, statusr.RepairInformationTable, statusr.RepairInformationColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *StatusRClient) Hooks() []Hook {
+	return c.hooks.StatusR
+}
+
 // StatustClient is a client for the Statust schema.
 type StatustClient struct {
 	config
@@ -1059,6 +1342,105 @@ func (c *StatustClient) QueryStatusts(s *Statust) *ReturninvoiceQuery {
 // Hooks returns the client hooks.
 func (c *StatustClient) Hooks() []Hook {
 	return c.hooks.Statust
+}
+
+// SymptomClient is a client for the Symptom schema.
+type SymptomClient struct {
+	config
+}
+
+// NewSymptomClient returns a client for the Symptom from the given config.
+func NewSymptomClient(c config) *SymptomClient {
+	return &SymptomClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `symptom.Hooks(f(g(h())))`.
+func (c *SymptomClient) Use(hooks ...Hook) {
+	c.hooks.Symptom = append(c.hooks.Symptom, hooks...)
+}
+
+// Create returns a create builder for Symptom.
+func (c *SymptomClient) Create() *SymptomCreate {
+	mutation := newSymptomMutation(c.config, OpCreate)
+	return &SymptomCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for Symptom.
+func (c *SymptomClient) Update() *SymptomUpdate {
+	mutation := newSymptomMutation(c.config, OpUpdate)
+	return &SymptomUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SymptomClient) UpdateOne(s *Symptom) *SymptomUpdateOne {
+	mutation := newSymptomMutation(c.config, OpUpdateOne, withSymptom(s))
+	return &SymptomUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SymptomClient) UpdateOneID(id int) *SymptomUpdateOne {
+	mutation := newSymptomMutation(c.config, OpUpdateOne, withSymptomID(id))
+	return &SymptomUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Symptom.
+func (c *SymptomClient) Delete() *SymptomDelete {
+	mutation := newSymptomMutation(c.config, OpDelete)
+	return &SymptomDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *SymptomClient) DeleteOne(s *Symptom) *SymptomDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *SymptomClient) DeleteOneID(id int) *SymptomDeleteOne {
+	builder := c.Delete().Where(symptom.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SymptomDeleteOne{builder}
+}
+
+// Create returns a query builder for Symptom.
+func (c *SymptomClient) Query() *SymptomQuery {
+	return &SymptomQuery{config: c.config}
+}
+
+// Get returns a Symptom entity by its id.
+func (c *SymptomClient) Get(ctx context.Context, id int) (*Symptom, error) {
+	return c.Query().Where(symptom.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SymptomClient) GetX(ctx context.Context, id int) *Symptom {
+	s, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+// QueryRepairInformation queries the repair_information edge of a Symptom.
+func (c *SymptomClient) QueryRepairInformation(s *Symptom) *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(symptom.Table, symptom.FieldID, id),
+			sqlgraph.To(repairinvoice.Table, repairinvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, symptom.RepairInformationTable, symptom.RepairInformationColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SymptomClient) Hooks() []Hook {
+	return c.hooks.Symptom
 }
 
 // UserClient is a client for the User schema.
@@ -1196,6 +1578,22 @@ func (c *UserClient) QueryRoom(u *User) *RoomQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(room.Table, room.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, user.RoomTable, user.RoomColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRepairinvoiceInformations queries the repairinvoice_informations edge of a User.
+func (c *UserClient) QueryRepairinvoiceInformations(u *User) *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(repairinvoice.Table, repairinvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.RepairinvoiceInformationsTable, user.RepairinvoiceInformationsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

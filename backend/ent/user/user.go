@@ -20,6 +20,8 @@ const (
 	EdgeBuilding = "building"
 	// EdgeRoom holds the string denoting the room edge name in mutations.
 	EdgeRoom = "room"
+	// EdgeRepairinvoiceInformations holds the string denoting the repairinvoice_informations edge name in mutations.
+	EdgeRepairinvoiceInformations = "repairinvoice_informations"
 
 	// Table holds the table name of the user in the database.
 	Table = "users"
@@ -51,6 +53,13 @@ const (
 	RoomInverseTable = "rooms"
 	// RoomColumn is the table column denoting the room relation/edge.
 	RoomColumn = "room_id"
+	// RepairinvoiceInformationsTable is the table the holds the repairinvoice_informations relation/edge.
+	RepairinvoiceInformationsTable = "repair_invoices"
+	// RepairinvoiceInformationsInverseTable is the table name for the RepairInvoice entity.
+	// It exists in this package in order to avoid circular dependency with the "repairinvoice" package.
+	RepairinvoiceInformationsInverseTable = "repair_invoices"
+	// RepairinvoiceInformationsColumn is the table column denoting the repairinvoice_informations relation/edge.
+	RepairinvoiceInformationsColumn = "repairinvoice_id"
 )
 
 // Columns holds all SQL columns for user fields.

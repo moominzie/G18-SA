@@ -26,6 +26,10 @@ import {
     EntFacultyFromJSON,
     EntFacultyFromJSONTyped,
     EntFacultyToJSON,
+    EntRepairInvoice,
+    EntRepairInvoiceFromJSON,
+    EntRepairInvoiceFromJSONTyped,
+    EntRepairInvoiceToJSON,
     EntRoom,
     EntRoomFromJSON,
     EntRoomFromJSONTyped,
@@ -57,6 +61,12 @@ export interface EntUserEdges {
      */
     faculty?: EntFaculty;
     /**
+     * RepairinvoiceInformations holds the value of the repairinvoice_informations edge.
+     * @type {Array<EntRepairInvoice>}
+     * @memberof EntUserEdges
+     */
+    repairinvoiceInformations?: Array<EntRepairInvoice>;
+    /**
      * 
      * @type {EntRoom}
      * @memberof EntUserEdges
@@ -74,10 +84,11 @@ export function EntUserEdgesFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'branch': !exists(json, 'branch') ? undefined : EntBranchFromJSON(json['branch']),
-        'building': !exists(json, 'building') ? undefined : EntBuildingFromJSON(json['building']),
-        'faculty': !exists(json, 'faculty') ? undefined : EntFacultyFromJSON(json['faculty']),
-        'room': !exists(json, 'room') ? undefined : EntRoomFromJSON(json['room']),
+        'branch': !exists(json, 'Branch') ? undefined : EntBranchFromJSON(json['Branch']),
+        'building': !exists(json, 'Building') ? undefined : EntBuildingFromJSON(json['Building']),
+        'faculty': !exists(json, 'Faculty') ? undefined : EntFacultyFromJSON(json['Faculty']),
+        'repairinvoiceInformations': !exists(json, 'repairinvoiceInformations') ? undefined : ((json['repairinvoiceInformations'] as Array<any>).map(EntRepairInvoiceFromJSON)),
+        'room': !exists(json, 'Room') ? undefined : EntRoomFromJSON(json['Room']),
     };
 }
 
@@ -93,6 +104,7 @@ export function EntUserEdgesToJSON(value?: EntUserEdges | null): any {
         'branch': EntBranchToJSON(value.branch),
         'building': EntBuildingToJSON(value.building),
         'faculty': EntFacultyToJSON(value.faculty),
+        'repairinvoiceInformations': value.repairinvoiceInformations === undefined ? undefined : ((value.repairinvoiceInformations as Array<any>).map(EntRepairInvoiceToJSON)),
         'room': EntRoomToJSON(value.room),
     };
 }

@@ -13,43 +13,43 @@ import (
 	"github.com/moominzie/user-record/ent/repairinvoice"
 )
 
-// RepairinvoiceDelete is the builder for deleting a Repairinvoice entity.
-type RepairinvoiceDelete struct {
+// RepairInvoiceDelete is the builder for deleting a RepairInvoice entity.
+type RepairInvoiceDelete struct {
 	config
 	hooks      []Hook
-	mutation   *RepairinvoiceMutation
-	predicates []predicate.Repairinvoice
+	mutation   *RepairInvoiceMutation
+	predicates []predicate.RepairInvoice
 }
 
 // Where adds a new predicate to the delete builder.
-func (rd *RepairinvoiceDelete) Where(ps ...predicate.Repairinvoice) *RepairinvoiceDelete {
-	rd.predicates = append(rd.predicates, ps...)
-	return rd
+func (rid *RepairInvoiceDelete) Where(ps ...predicate.RepairInvoice) *RepairInvoiceDelete {
+	rid.predicates = append(rid.predicates, ps...)
+	return rid
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (rd *RepairinvoiceDelete) Exec(ctx context.Context) (int, error) {
+func (rid *RepairInvoiceDelete) Exec(ctx context.Context) (int, error) {
 	var (
 		err      error
 		affected int
 	)
-	if len(rd.hooks) == 0 {
-		affected, err = rd.sqlExec(ctx)
+	if len(rid.hooks) == 0 {
+		affected, err = rid.sqlExec(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*RepairinvoiceMutation)
+			mutation, ok := m.(*RepairInvoiceMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
 			}
-			rd.mutation = mutation
-			affected, err = rd.sqlExec(ctx)
+			rid.mutation = mutation
+			affected, err = rid.sqlExec(ctx)
 			mutation.done = true
 			return affected, err
 		})
-		for i := len(rd.hooks) - 1; i >= 0; i-- {
-			mut = rd.hooks[i](mut)
+		for i := len(rid.hooks) - 1; i >= 0; i-- {
+			mut = rid.hooks[i](mut)
 		}
-		if _, err := mut.Mutate(ctx, rd.mutation); err != nil {
+		if _, err := mut.Mutate(ctx, rid.mutation); err != nil {
 			return 0, err
 		}
 	}
@@ -57,15 +57,15 @@ func (rd *RepairinvoiceDelete) Exec(ctx context.Context) (int, error) {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (rd *RepairinvoiceDelete) ExecX(ctx context.Context) int {
-	n, err := rd.Exec(ctx)
+func (rid *RepairInvoiceDelete) ExecX(ctx context.Context) int {
+	n, err := rid.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (rd *RepairinvoiceDelete) sqlExec(ctx context.Context) (int, error) {
+func (rid *RepairInvoiceDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := &sqlgraph.DeleteSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table: repairinvoice.Table,
@@ -75,24 +75,24 @@ func (rd *RepairinvoiceDelete) sqlExec(ctx context.Context) (int, error) {
 			},
 		},
 	}
-	if ps := rd.predicates; len(ps) > 0 {
+	if ps := rid.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	return sqlgraph.DeleteNodes(ctx, rd.driver, _spec)
+	return sqlgraph.DeleteNodes(ctx, rid.driver, _spec)
 }
 
-// RepairinvoiceDeleteOne is the builder for deleting a single Repairinvoice entity.
-type RepairinvoiceDeleteOne struct {
-	rd *RepairinvoiceDelete
+// RepairInvoiceDeleteOne is the builder for deleting a single RepairInvoice entity.
+type RepairInvoiceDeleteOne struct {
+	rid *RepairInvoiceDelete
 }
 
 // Exec executes the deletion query.
-func (rdo *RepairinvoiceDeleteOne) Exec(ctx context.Context) error {
-	n, err := rdo.rd.Exec(ctx)
+func (rido *RepairInvoiceDeleteOne) Exec(ctx context.Context) error {
+	n, err := rido.rid.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -104,6 +104,6 @@ func (rdo *RepairinvoiceDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (rdo *RepairinvoiceDeleteOne) ExecX(ctx context.Context) {
-	rdo.rd.ExecX(ctx)
+func (rido *RepairInvoiceDeleteOne) ExecX(ctx context.Context) {
+	rido.rid.ExecX(ctx)
 }

@@ -16,18 +16,24 @@ type Tx struct {
 	Branch *BranchClient
 	// Building is the client for interacting with the Building builders.
 	Building *BuildingClient
+	// Device is the client for interacting with the Device builders.
+	Device *DeviceClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
 	// Faculty is the client for interacting with the Faculty builders.
 	Faculty *FacultyClient
-	// Repairinvoice is the client for interacting with the Repairinvoice builders.
-	Repairinvoice *RepairinvoiceClient
+	// RepairInvoice is the client for interacting with the RepairInvoice builders.
+	RepairInvoice *RepairInvoiceClient
 	// Returninvoice is the client for interacting with the Returninvoice builders.
 	Returninvoice *ReturninvoiceClient
 	// Room is the client for interacting with the Room builders.
 	Room *RoomClient
+	// StatusR is the client for interacting with the StatusR builders.
+	StatusR *StatusRClient
 	// Statust is the client for interacting with the Statust builders.
 	Statust *StatustClient
+	// Symptom is the client for interacting with the Symptom builders.
+	Symptom *SymptomClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -167,12 +173,15 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Branch = NewBranchClient(tx.config)
 	tx.Building = NewBuildingClient(tx.config)
+	tx.Device = NewDeviceClient(tx.config)
 	tx.Employee = NewEmployeeClient(tx.config)
 	tx.Faculty = NewFacultyClient(tx.config)
-	tx.Repairinvoice = NewRepairinvoiceClient(tx.config)
+	tx.RepairInvoice = NewRepairInvoiceClient(tx.config)
 	tx.Returninvoice = NewReturninvoiceClient(tx.config)
 	tx.Room = NewRoomClient(tx.config)
+	tx.StatusR = NewStatusRClient(tx.config)
 	tx.Statust = NewStatustClient(tx.config)
+	tx.Symptom = NewSymptomClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

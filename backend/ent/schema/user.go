@@ -26,5 +26,7 @@ func (User) Edges() []ent.Edge {
 		edge.From("branch", Branch.Type).Ref("user_informations").Unique(),
 		edge.From("building", Building.Type).Ref("user_informations").Unique(),
 		edge.From("room", Room.Type).Ref("user_informations").Unique(),
+
+		edge.To("repairinvoice_informations", RepairInvoice.Type).StorageKey(edge.Column("repairinvoice_id")),
 	}
 }

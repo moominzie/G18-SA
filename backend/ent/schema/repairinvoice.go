@@ -1,30 +1,32 @@
 package schema
 
 import (
-   "github.com/facebookincubator/ent"
-   "github.com/facebookincubator/ent/schema/field"
-   "github.com/facebookincubator/ent/schema/edge"
+	"github.com/facebookincubator/ent"
+	"github.com/facebookincubator/ent/schema/edge"
+	"github.com/facebookincubator/ent/schema/field"
 )
 
-// Repairinvoice holds the schema definition for the Repairinvoice entity.
-type Repairinvoice struct {
+// RepairInvoice holds the schema definition for the RepairInvoice entity.
+type RepairInvoice struct {
 	ent.Schema
 }
 
-// Fields of the Repairinvoice.
-func (Repairinvoice) Fields() []ent.Field {
+// Fields of the RepairInvoice.
+func (RepairInvoice) Fields() []ent.Field {
 	return []ent.Field{
-	   field.Int("symptomid"),
-       field.Int("deviceid"),
-	   field.Int("userid"),
-	   field.Int("statusrepairid"),
-   }
+		field.String("Rename").Unique(),
+	}
 }
 
-// Edges of the Repairinvoice.
-func (Repairinvoice) Edges() []ent.Edge {
+// Edges of the RepairInvoice.
+func (RepairInvoice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("repairinvoices", Returninvoice.Type).
-			Unique().StorageKey(edge.Column("reparinvoice_id")),
+		edge.From("device", Device.Type).Ref("repair_information").Unique(),
+		edge.From("status", StatusR.Type).Ref("repair_information").Unique(),
+		edge.From("symptom", Symptom.Type).Ref("repair_information").Unique(),
+
+		edge.From("user", User.Type).Ref("repairinvoice_informations").Unique(),
+		edge.To("returninvoice", Returninvoice.Type).
+			Unique().StorageKey(edge.Column("returninvoice_id")),
 	}
 }

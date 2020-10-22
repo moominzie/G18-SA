@@ -29,14 +29,14 @@ func (rc *ReturninvoiceCreate) SetAddedtime(t time.Time) *ReturninvoiceCreate {
 	return rc
 }
 
-// SetRepairinvoiceID sets the Repairinvoice edge to Repairinvoice by id.
+// SetRepairinvoiceID sets the Repairinvoice edge to RepairInvoice by id.
 func (rc *ReturninvoiceCreate) SetRepairinvoiceID(id int) *ReturninvoiceCreate {
 	rc.mutation.SetRepairinvoiceID(id)
 	return rc
 }
 
-// SetRepairinvoice sets the Repairinvoice edge to Repairinvoice.
-func (rc *ReturninvoiceCreate) SetRepairinvoice(r *Repairinvoice) *ReturninvoiceCreate {
+// SetRepairinvoice sets the Repairinvoice edge to RepairInvoice.
+func (rc *ReturninvoiceCreate) SetRepairinvoice(r *RepairInvoice) *ReturninvoiceCreate {
 	return rc.SetRepairinvoiceID(r.ID)
 }
 

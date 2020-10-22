@@ -4,37 +4,72 @@ package repairinvoice
 
 const (
 	// Label holds the string label denoting the repairinvoice type in the database.
-	Label = "repairinvoice"
+	Label = "repair_invoice"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldSymptomid holds the string denoting the symptomid field in the database.
-	FieldSymptomid = "symptomid"
-	// FieldDeviceid holds the string denoting the deviceid field in the database.
-	FieldDeviceid = "deviceid"
-	// FieldUserid holds the string denoting the userid field in the database.
-	FieldUserid = "userid"
-	// FieldStatusrepairid holds the string denoting the statusrepairid field in the database.
-	FieldStatusrepairid = "statusrepairid"
+	// FieldRename holds the string denoting the rename field in the database.
+	FieldRename = "rename"
 
-	// EdgeRepairinvoices holds the string denoting the repairinvoices edge name in mutations.
-	EdgeRepairinvoices = "repairinvoices"
+	// EdgeDevice holds the string denoting the device edge name in mutations.
+	EdgeDevice = "device"
+	// EdgeStatus holds the string denoting the status edge name in mutations.
+	EdgeStatus = "status"
+	// EdgeSymptom holds the string denoting the symptom edge name in mutations.
+	EdgeSymptom = "symptom"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
+	// EdgeReturninvoice holds the string denoting the returninvoice edge name in mutations.
+	EdgeReturninvoice = "returninvoice"
 
 	// Table holds the table name of the repairinvoice in the database.
-	Table = "repairinvoices"
-	// RepairinvoicesTable is the table the holds the repairinvoices relation/edge.
-	RepairinvoicesTable = "returninvoices"
-	// RepairinvoicesInverseTable is the table name for the Returninvoice entity.
+	Table = "repair_invoices"
+	// DeviceTable is the table the holds the device relation/edge.
+	DeviceTable = "repair_invoices"
+	// DeviceInverseTable is the table name for the Device entity.
+	// It exists in this package in order to avoid circular dependency with the "device" package.
+	DeviceInverseTable = "devices"
+	// DeviceColumn is the table column denoting the device relation/edge.
+	DeviceColumn = "device_id"
+	// StatusTable is the table the holds the status relation/edge.
+	StatusTable = "repair_invoices"
+	// StatusInverseTable is the table name for the StatusR entity.
+	// It exists in this package in order to avoid circular dependency with the "statusr" package.
+	StatusInverseTable = "status_rs"
+	// StatusColumn is the table column denoting the status relation/edge.
+	StatusColumn = "statusr_id"
+	// SymptomTable is the table the holds the symptom relation/edge.
+	SymptomTable = "repair_invoices"
+	// SymptomInverseTable is the table name for the Symptom entity.
+	// It exists in this package in order to avoid circular dependency with the "symptom" package.
+	SymptomInverseTable = "symptoms"
+	// SymptomColumn is the table column denoting the symptom relation/edge.
+	SymptomColumn = "symptom_id"
+	// UserTable is the table the holds the user relation/edge.
+	UserTable = "repair_invoices"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "repairinvoice_id"
+	// ReturninvoiceTable is the table the holds the returninvoice relation/edge.
+	ReturninvoiceTable = "returninvoices"
+	// ReturninvoiceInverseTable is the table name for the Returninvoice entity.
 	// It exists in this package in order to avoid circular dependency with the "returninvoice" package.
-	RepairinvoicesInverseTable = "returninvoices"
-	// RepairinvoicesColumn is the table column denoting the repairinvoices relation/edge.
-	RepairinvoicesColumn = "reparinvoice_id"
+	ReturninvoiceInverseTable = "returninvoices"
+	// ReturninvoiceColumn is the table column denoting the returninvoice relation/edge.
+	ReturninvoiceColumn = "returninvoice_id"
 )
 
 // Columns holds all SQL columns for repairinvoice fields.
 var Columns = []string{
 	FieldID,
-	FieldSymptomid,
-	FieldDeviceid,
-	FieldUserid,
-	FieldStatusrepairid,
+	FieldRename,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the RepairInvoice type.
+var ForeignKeys = []string{
+	"device_id",
+	"statusr_id",
+	"symptom_id",
+	"repairinvoice_id",
 }

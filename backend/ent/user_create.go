@@ -12,6 +12,7 @@ import (
 	"github.com/moominzie/user-record/ent/branch"
 	"github.com/moominzie/user-record/ent/building"
 	"github.com/moominzie/user-record/ent/faculty"
+	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/room"
 	"github.com/moominzie/user-record/ent/user"
 )
@@ -109,6 +110,21 @@ func (uc *UserCreate) SetNillableRoomID(id *int) *UserCreate {
 // SetRoom sets the room edge to Room.
 func (uc *UserCreate) SetRoom(r *Room) *UserCreate {
 	return uc.SetRoomID(r.ID)
+}
+
+// AddRepairinvoiceInformationIDs adds the repairinvoice_informations edge to RepairInvoice by ids.
+func (uc *UserCreate) AddRepairinvoiceInformationIDs(ids ...int) *UserCreate {
+	uc.mutation.AddRepairinvoiceInformationIDs(ids...)
+	return uc
+}
+
+// AddRepairinvoiceInformations adds the repairinvoice_informations edges to RepairInvoice.
+func (uc *UserCreate) AddRepairinvoiceInformations(r ...*RepairInvoice) *UserCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uc.AddRepairinvoiceInformationIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -268,6 +284,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: room.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.RepairinvoiceInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RepairinvoiceInformationsTable,
+			Columns: []string{user.RepairinvoiceInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: repairinvoice.FieldID,
 				},
 			},
 		}

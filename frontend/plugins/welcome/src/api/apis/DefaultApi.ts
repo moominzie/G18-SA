@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    ControllersRepairInvoice,
+    ControllersRepairInvoiceFromJSON,
+    ControllersRepairInvoiceToJSON,
     ControllersReturninvoice,
     ControllersReturninvoiceFromJSON,
     ControllersReturninvoiceToJSON,
@@ -27,24 +30,33 @@ import {
     EntBuilding,
     EntBuildingFromJSON,
     EntBuildingToJSON,
+    EntDevice,
+    EntDeviceFromJSON,
+    EntDeviceToJSON,
     EntEmployee,
     EntEmployeeFromJSON,
     EntEmployeeToJSON,
     EntFaculty,
     EntFacultyFromJSON,
     EntFacultyToJSON,
-    EntRepairinvoice,
-    EntRepairinvoiceFromJSON,
-    EntRepairinvoiceToJSON,
+    EntRepairInvoice,
+    EntRepairInvoiceFromJSON,
+    EntRepairInvoiceToJSON,
     EntReturninvoice,
     EntReturninvoiceFromJSON,
     EntReturninvoiceToJSON,
     EntRoom,
     EntRoomFromJSON,
     EntRoomToJSON,
+    EntStatusR,
+    EntStatusRFromJSON,
+    EntStatusRToJSON,
     EntStatust,
     EntStatustFromJSON,
     EntStatustToJSON,
+    EntSymptom,
+    EntSymptomFromJSON,
+    EntSymptomToJSON,
     EntUser,
     EntUserFromJSON,
     EntUserToJSON,
@@ -58,6 +70,10 @@ export interface CreateBuildingRequest {
     building: EntBuilding;
 }
 
+export interface CreateDeviceRequest {
+    device: EntDevice;
+}
+
 export interface CreateEmployeeRequest {
     employee: EntEmployee;
 }
@@ -66,8 +82,8 @@ export interface CreateFacultyRequest {
     faculty: EntFaculty;
 }
 
-export interface CreateRepairinvoiceRequest {
-    repairinvoice: EntRepairinvoice;
+export interface CreateRepairInvoiceRequest {
+    repairInvoice: ControllersRepairInvoice;
 }
 
 export interface CreateReturninvoiceRequest {
@@ -78,8 +94,16 @@ export interface CreateRoomRequest {
     room: EntRoom;
 }
 
+export interface CreateStatusrRequest {
+    statusr: EntStatusR;
+}
+
 export interface CreateStatustRequest {
     statust: EntStatust;
+}
+
+export interface CreateSymptomRequest {
+    symptom: EntSymptom;
 }
 
 export interface CreateUserRequest {
@@ -94,6 +118,10 @@ export interface DeleteBuildingRequest {
     id: number;
 }
 
+export interface DeleteDeviceRequest {
+    id: number;
+}
+
 export interface DeleteEmployeeRequest {
     id: number;
 }
@@ -102,7 +130,7 @@ export interface DeleteFacultyRequest {
     id: number;
 }
 
-export interface DeleteRepairinvoiceRequest {
+export interface DeleteRepairInvoiceRequest {
     id: number;
 }
 
@@ -110,7 +138,15 @@ export interface DeleteRoomRequest {
     id: number;
 }
 
+export interface DeleteStatusrRequest {
+    id: number;
+}
+
 export interface DeleteStatustRequest {
+    id: number;
+}
+
+export interface DeleteSymptomRequest {
     id: number;
 }
 
@@ -126,6 +162,10 @@ export interface GetBuildingRequest {
     id: number;
 }
 
+export interface GetDeviceRequest {
+    id: number;
+}
+
 export interface GetEmployeeRequest {
     id: number;
 }
@@ -134,15 +174,19 @@ export interface GetFacultyRequest {
     id: number;
 }
 
-export interface GetRepairinvoiceRequest {
-    id: number;
-}
-
 export interface GetRoomRequest {
     id: number;
 }
 
+export interface GetStatusrRequest {
+    id: number;
+}
+
 export interface GetStatustRequest {
+    id: number;
+}
+
+export interface GetSymptomRequest {
     id: number;
 }
 
@@ -152,6 +196,11 @@ export interface ListBranchRequest {
 }
 
 export interface ListBuildingRequest {
+    limit?: number;
+    offset?: number;
+}
+
+export interface ListDeviceRequest {
     limit?: number;
     offset?: number;
 }
@@ -166,7 +215,7 @@ export interface ListFacultyRequest {
     offset?: number;
 }
 
-export interface ListRepairinvoiceRequest {
+export interface ListRepairInvoiceRequest {
     limit?: number;
     offset?: number;
 }
@@ -181,7 +230,17 @@ export interface ListRoomRequest {
     offset?: number;
 }
 
+export interface ListStatusrRequest {
+    limit?: number;
+    offset?: number;
+}
+
 export interface ListStatustRequest {
+    limit?: number;
+    offset?: number;
+}
+
+export interface ListSymptomRequest {
     limit?: number;
     offset?: number;
 }
@@ -267,6 +326,41 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Create device
+     * Create device
+     */
+    async createDeviceRaw(requestParameters: CreateDeviceRequest): Promise<runtime.ApiResponse<EntDevice>> {
+        if (requestParameters.device === null || requestParameters.device === undefined) {
+            throw new runtime.RequiredError('device','Required parameter requestParameters.device was null or undefined when calling createDevice.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/devices`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EntDeviceToJSON(requestParameters.device),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntDeviceFromJSON(jsonValue));
+    }
+
+    /**
+     * Create device
+     * Create device
+     */
+    async createDevice(requestParameters: CreateDeviceRequest): Promise<EntDevice> {
+        const response = await this.createDeviceRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * Create employee
      * Create employee
      */
@@ -337,12 +431,12 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create repairinvoice
-     * Create repairinvoice
+     * Create repairInvoice
+     * Create repairInvoice
      */
-    async createRepairinvoiceRaw(requestParameters: CreateRepairinvoiceRequest): Promise<runtime.ApiResponse<EntRepairinvoice>> {
-        if (requestParameters.repairinvoice === null || requestParameters.repairinvoice === undefined) {
-            throw new runtime.RequiredError('repairinvoice','Required parameter requestParameters.repairinvoice was null or undefined when calling createRepairinvoice.');
+    async createRepairInvoiceRaw(requestParameters: CreateRepairInvoiceRequest): Promise<runtime.ApiResponse<ControllersRepairInvoice>> {
+        if (requestParameters.repairInvoice === null || requestParameters.repairInvoice === undefined) {
+            throw new runtime.RequiredError('repairInvoice','Required parameter requestParameters.repairInvoice was null or undefined when calling createRepairInvoice.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -356,18 +450,18 @@ export class DefaultApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: EntRepairinvoiceToJSON(requestParameters.repairinvoice),
+            body: ControllersRepairInvoiceToJSON(requestParameters.repairInvoice),
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => EntRepairinvoiceFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ControllersRepairInvoiceFromJSON(jsonValue));
     }
 
     /**
-     * Create repairinvoice
-     * Create repairinvoice
+     * Create repairInvoice
+     * Create repairInvoice
      */
-    async createRepairinvoice(requestParameters: CreateRepairinvoiceRequest): Promise<EntRepairinvoice> {
-        const response = await this.createRepairinvoiceRaw(requestParameters);
+    async createRepairInvoice(requestParameters: CreateRepairInvoiceRequest): Promise<ControllersRepairInvoice> {
+        const response = await this.createRepairInvoiceRaw(requestParameters);
         return await response.value();
     }
 
@@ -442,6 +536,41 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Create statusr
+     * Create statusr
+     */
+    async createStatusrRaw(requestParameters: CreateStatusrRequest): Promise<runtime.ApiResponse<EntStatusR>> {
+        if (requestParameters.statusr === null || requestParameters.statusr === undefined) {
+            throw new runtime.RequiredError('statusr','Required parameter requestParameters.statusr was null or undefined when calling createStatusr.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/statusrs`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EntStatusRToJSON(requestParameters.statusr),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntStatusRFromJSON(jsonValue));
+    }
+
+    /**
+     * Create statusr
+     * Create statusr
+     */
+    async createStatusr(requestParameters: CreateStatusrRequest): Promise<EntStatusR> {
+        const response = await this.createStatusrRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * Create statust
      * Create statust
      */
@@ -473,6 +602,41 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async createStatust(requestParameters: CreateStatustRequest): Promise<EntStatust> {
         const response = await this.createStatustRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Create symptom
+     * Create symptom
+     */
+    async createSymptomRaw(requestParameters: CreateSymptomRequest): Promise<runtime.ApiResponse<EntSymptom>> {
+        if (requestParameters.symptom === null || requestParameters.symptom === undefined) {
+            throw new runtime.RequiredError('symptom','Required parameter requestParameters.symptom was null or undefined when calling createSymptom.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/symptoms`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EntSymptomToJSON(requestParameters.symptom),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntSymptomFromJSON(jsonValue));
+    }
+
+    /**
+     * Create symptom
+     * Create symptom
+     */
+    async createSymptom(requestParameters: CreateSymptomRequest): Promise<EntSymptom> {
+        const response = await this.createSymptomRaw(requestParameters);
         return await response.value();
     }
 
@@ -576,6 +740,38 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get device by ID
+     * Delete a device entity by ID
+     */
+    async deleteDeviceRaw(requestParameters: DeleteDeviceRequest): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteDevice.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/device/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * get device by ID
+     * Delete a device entity by ID
+     */
+    async deleteDevice(requestParameters: DeleteDeviceRequest): Promise<object> {
+        const response = await this.deleteDeviceRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get employee by ID
      * Delete a employee entity by ID
      */
@@ -640,12 +836,12 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * get repairinvoice by ID
-     * Delete a repairinvoice entity by ID
+     * get repairInvoice by ID
+     * Delete a repairInvoice entity by ID
      */
-    async deleteRepairinvoiceRaw(requestParameters: DeleteRepairinvoiceRequest): Promise<runtime.ApiResponse<object>> {
+    async deleteRepairInvoiceRaw(requestParameters: DeleteRepairInvoiceRequest): Promise<runtime.ApiResponse<object>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteRepairinvoice.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteRepairInvoice.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -653,7 +849,7 @@ export class DefaultApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/repairinvoice/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/repairinvoices/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -663,11 +859,11 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * get repairinvoice by ID
-     * Delete a repairinvoice entity by ID
+     * get repairInvoice by ID
+     * Delete a repairInvoice entity by ID
      */
-    async deleteRepairinvoice(requestParameters: DeleteRepairinvoiceRequest): Promise<object> {
-        const response = await this.deleteRepairinvoiceRaw(requestParameters);
+    async deleteRepairInvoice(requestParameters: DeleteRepairInvoiceRequest): Promise<object> {
+        const response = await this.deleteRepairInvoiceRaw(requestParameters);
         return await response.value();
     }
 
@@ -704,6 +900,38 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get statusr by ID
+     * Delete a statusr entity by ID
+     */
+    async deleteStatusrRaw(requestParameters: DeleteStatusrRequest): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteStatusr.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/statusr/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * get statusr by ID
+     * Delete a statusr entity by ID
+     */
+    async deleteStatusr(requestParameters: DeleteStatusrRequest): Promise<object> {
+        const response = await this.deleteStatusrRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get statust by ID
      * Delete a statust entity by ID
      */
@@ -732,6 +960,38 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async deleteStatust(requestParameters: DeleteStatustRequest): Promise<object> {
         const response = await this.deleteStatustRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * get symptom by ID
+     * Delete a symptom entity by ID
+     */
+    async deleteSymptomRaw(requestParameters: DeleteSymptomRequest): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteSymptom.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/symptom/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * get symptom by ID
+     * Delete a symptom entity by ID
+     */
+    async deleteSymptom(requestParameters: DeleteSymptomRequest): Promise<object> {
+        const response = await this.deleteSymptomRaw(requestParameters);
         return await response.value();
     }
 
@@ -832,6 +1092,38 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get device by ID
+     * Get a device entity by ID
+     */
+    async getDeviceRaw(requestParameters: GetDeviceRequest): Promise<runtime.ApiResponse<EntDevice>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getDevice.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/devices/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntDeviceFromJSON(jsonValue));
+    }
+
+    /**
+     * get device by ID
+     * Get a device entity by ID
+     */
+    async getDevice(requestParameters: GetDeviceRequest): Promise<EntDevice> {
+        const response = await this.getDeviceRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get employee by ID
      * Get a employee entity by ID
      */
@@ -896,38 +1188,6 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * get repairinvoice by ID
-     * Get a repairinvoice entity by ID
-     */
-    async getRepairinvoiceRaw(requestParameters: GetRepairinvoiceRequest): Promise<runtime.ApiResponse<EntRepairinvoice>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getRepairinvoice.');
-        }
-
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/repairinvoices/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => EntRepairinvoiceFromJSON(jsonValue));
-    }
-
-    /**
-     * get repairinvoice by ID
-     * Get a repairinvoice entity by ID
-     */
-    async getRepairinvoice(requestParameters: GetRepairinvoiceRequest): Promise<EntRepairinvoice> {
-        const response = await this.getRepairinvoiceRaw(requestParameters);
-        return await response.value();
-    }
-
-    /**
      * get room by ID
      * Get a room entity by ID
      */
@@ -960,6 +1220,38 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get statusr by ID
+     * Get a statusr entity by ID
+     */
+    async getStatusrRaw(requestParameters: GetStatusrRequest): Promise<runtime.ApiResponse<EntStatusR>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getStatusr.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/statusrs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntStatusRFromJSON(jsonValue));
+    }
+
+    /**
+     * get statusr by ID
+     * Get a statusr entity by ID
+     */
+    async getStatusr(requestParameters: GetStatusrRequest): Promise<EntStatusR> {
+        const response = await this.getStatusrRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get statust by ID
      * Get a statust entity by ID
      */
@@ -988,6 +1280,38 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async getStatust(requestParameters: GetStatustRequest): Promise<EntStatust> {
         const response = await this.getStatustRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * get symptom by ID
+     * Get a symptom entity by ID
+     */
+    async getSymptomRaw(requestParameters: GetSymptomRequest): Promise<runtime.ApiResponse<EntSymptom>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getSymptom.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/symptoms/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntSymptomFromJSON(jsonValue));
+    }
+
+    /**
+     * get symptom by ID
+     * Get a symptom entity by ID
+     */
+    async getSymptom(requestParameters: GetSymptomRequest): Promise<EntSymptom> {
+        const response = await this.getSymptomRaw(requestParameters);
         return await response.value();
     }
 
@@ -1064,6 +1388,42 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * list device entities
+     * List device entities
+     */
+    async listDeviceRaw(requestParameters: ListDeviceRequest): Promise<runtime.ApiResponse<Array<EntDevice>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/devices`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntDeviceFromJSON));
+    }
+
+    /**
+     * list device entities
+     * List device entities
+     */
+    async listDevice(requestParameters: ListDeviceRequest): Promise<Array<EntDevice>> {
+        const response = await this.listDeviceRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * list employee entities
      * List employee entities
      */
@@ -1136,10 +1496,10 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * list repairinvoice entities
-     * List repairinvoice entities
+     * list repairInvoice entities
+     * List repairInvoice entities
      */
-    async listRepairinvoiceRaw(requestParameters: ListRepairinvoiceRequest): Promise<runtime.ApiResponse<Array<EntRepairinvoice>>> {
+    async listRepairInvoiceRaw(requestParameters: ListRepairInvoiceRequest): Promise<runtime.ApiResponse<Array<EntRepairInvoice>>> {
         const queryParameters: runtime.HTTPQuery = {};
 
         if (requestParameters.limit !== undefined) {
@@ -1159,15 +1519,15 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntRepairinvoiceFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntRepairInvoiceFromJSON));
     }
 
     /**
-     * list repairinvoice entities
-     * List repairinvoice entities
+     * list repairInvoice entities
+     * List repairInvoice entities
      */
-    async listRepairinvoice(requestParameters: ListRepairinvoiceRequest): Promise<Array<EntRepairinvoice>> {
-        const response = await this.listRepairinvoiceRaw(requestParameters);
+    async listRepairInvoice(requestParameters: ListRepairInvoiceRequest): Promise<Array<EntRepairInvoice>> {
+        const response = await this.listRepairInvoiceRaw(requestParameters);
         return await response.value();
     }
 
@@ -1244,6 +1604,42 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * list statusr entities
+     * List statusr entities
+     */
+    async listStatusrRaw(requestParameters: ListStatusrRequest): Promise<runtime.ApiResponse<Array<EntStatusR>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/statusrs`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntStatusRFromJSON));
+    }
+
+    /**
+     * list statusr entities
+     * List statusr entities
+     */
+    async listStatusr(requestParameters: ListStatusrRequest): Promise<Array<EntStatusR>> {
+        const response = await this.listStatusrRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * list statust entities
      * List statust entities
      */
@@ -1276,6 +1672,42 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async listStatust(requestParameters: ListStatustRequest): Promise<Array<EntStatust>> {
         const response = await this.listStatustRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * list symptom entities
+     * List symptom entities
+     */
+    async listSymptomRaw(requestParameters: ListSymptomRequest): Promise<runtime.ApiResponse<Array<EntSymptom>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/symptoms`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntSymptomFromJSON));
+    }
+
+    /**
+     * list symptom entities
+     * List symptom entities
+     */
+    async listSymptom(requestParameters: ListSymptomRequest): Promise<Array<EntSymptom>> {
+        const response = await this.listSymptomRaw(requestParameters);
         return await response.value();
     }
 

@@ -9,131 +9,189 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
+	"github.com/moominzie/user-record/ent/statusr"
+	"github.com/moominzie/user-record/ent/symptom"
+	"github.com/moominzie/user-record/ent/user"
 )
 
-// RepairinvoiceUpdate is the builder for updating Repairinvoice entities.
-type RepairinvoiceUpdate struct {
+// RepairInvoiceUpdate is the builder for updating RepairInvoice entities.
+type RepairInvoiceUpdate struct {
 	config
 	hooks      []Hook
-	mutation   *RepairinvoiceMutation
-	predicates []predicate.Repairinvoice
+	mutation   *RepairInvoiceMutation
+	predicates []predicate.RepairInvoice
 }
 
 // Where adds a new predicate for the builder.
-func (ru *RepairinvoiceUpdate) Where(ps ...predicate.Repairinvoice) *RepairinvoiceUpdate {
-	ru.predicates = append(ru.predicates, ps...)
-	return ru
+func (riu *RepairInvoiceUpdate) Where(ps ...predicate.RepairInvoice) *RepairInvoiceUpdate {
+	riu.predicates = append(riu.predicates, ps...)
+	return riu
 }
 
-// SetSymptomid sets the symptomid field.
-func (ru *RepairinvoiceUpdate) SetSymptomid(i int) *RepairinvoiceUpdate {
-	ru.mutation.ResetSymptomid()
-	ru.mutation.SetSymptomid(i)
-	return ru
+// SetRename sets the Rename field.
+func (riu *RepairInvoiceUpdate) SetRename(s string) *RepairInvoiceUpdate {
+	riu.mutation.SetRename(s)
+	return riu
 }
 
-// AddSymptomid adds i to symptomid.
-func (ru *RepairinvoiceUpdate) AddSymptomid(i int) *RepairinvoiceUpdate {
-	ru.mutation.AddSymptomid(i)
-	return ru
+// SetDeviceID sets the device edge to Device by id.
+func (riu *RepairInvoiceUpdate) SetDeviceID(id int) *RepairInvoiceUpdate {
+	riu.mutation.SetDeviceID(id)
+	return riu
 }
 
-// SetDeviceid sets the deviceid field.
-func (ru *RepairinvoiceUpdate) SetDeviceid(i int) *RepairinvoiceUpdate {
-	ru.mutation.ResetDeviceid()
-	ru.mutation.SetDeviceid(i)
-	return ru
-}
-
-// AddDeviceid adds i to deviceid.
-func (ru *RepairinvoiceUpdate) AddDeviceid(i int) *RepairinvoiceUpdate {
-	ru.mutation.AddDeviceid(i)
-	return ru
-}
-
-// SetUserid sets the userid field.
-func (ru *RepairinvoiceUpdate) SetUserid(i int) *RepairinvoiceUpdate {
-	ru.mutation.ResetUserid()
-	ru.mutation.SetUserid(i)
-	return ru
-}
-
-// AddUserid adds i to userid.
-func (ru *RepairinvoiceUpdate) AddUserid(i int) *RepairinvoiceUpdate {
-	ru.mutation.AddUserid(i)
-	return ru
-}
-
-// SetStatusrepairid sets the statusrepairid field.
-func (ru *RepairinvoiceUpdate) SetStatusrepairid(i int) *RepairinvoiceUpdate {
-	ru.mutation.ResetStatusrepairid()
-	ru.mutation.SetStatusrepairid(i)
-	return ru
-}
-
-// AddStatusrepairid adds i to statusrepairid.
-func (ru *RepairinvoiceUpdate) AddStatusrepairid(i int) *RepairinvoiceUpdate {
-	ru.mutation.AddStatusrepairid(i)
-	return ru
-}
-
-// SetRepairinvoicesID sets the repairinvoices edge to Returninvoice by id.
-func (ru *RepairinvoiceUpdate) SetRepairinvoicesID(id int) *RepairinvoiceUpdate {
-	ru.mutation.SetRepairinvoicesID(id)
-	return ru
-}
-
-// SetNillableRepairinvoicesID sets the repairinvoices edge to Returninvoice by id if the given value is not nil.
-func (ru *RepairinvoiceUpdate) SetNillableRepairinvoicesID(id *int) *RepairinvoiceUpdate {
+// SetNillableDeviceID sets the device edge to Device by id if the given value is not nil.
+func (riu *RepairInvoiceUpdate) SetNillableDeviceID(id *int) *RepairInvoiceUpdate {
 	if id != nil {
-		ru = ru.SetRepairinvoicesID(*id)
+		riu = riu.SetDeviceID(*id)
 	}
-	return ru
+	return riu
 }
 
-// SetRepairinvoices sets the repairinvoices edge to Returninvoice.
-func (ru *RepairinvoiceUpdate) SetRepairinvoices(r *Returninvoice) *RepairinvoiceUpdate {
-	return ru.SetRepairinvoicesID(r.ID)
+// SetDevice sets the device edge to Device.
+func (riu *RepairInvoiceUpdate) SetDevice(d *Device) *RepairInvoiceUpdate {
+	return riu.SetDeviceID(d.ID)
 }
 
-// Mutation returns the RepairinvoiceMutation object of the builder.
-func (ru *RepairinvoiceUpdate) Mutation() *RepairinvoiceMutation {
-	return ru.mutation
+// SetStatusID sets the status edge to StatusR by id.
+func (riu *RepairInvoiceUpdate) SetStatusID(id int) *RepairInvoiceUpdate {
+	riu.mutation.SetStatusID(id)
+	return riu
 }
 
-// ClearRepairinvoices clears the repairinvoices edge to Returninvoice.
-func (ru *RepairinvoiceUpdate) ClearRepairinvoices() *RepairinvoiceUpdate {
-	ru.mutation.ClearRepairinvoices()
-	return ru
+// SetNillableStatusID sets the status edge to StatusR by id if the given value is not nil.
+func (riu *RepairInvoiceUpdate) SetNillableStatusID(id *int) *RepairInvoiceUpdate {
+	if id != nil {
+		riu = riu.SetStatusID(*id)
+	}
+	return riu
+}
+
+// SetStatus sets the status edge to StatusR.
+func (riu *RepairInvoiceUpdate) SetStatus(s *StatusR) *RepairInvoiceUpdate {
+	return riu.SetStatusID(s.ID)
+}
+
+// SetSymptomID sets the symptom edge to Symptom by id.
+func (riu *RepairInvoiceUpdate) SetSymptomID(id int) *RepairInvoiceUpdate {
+	riu.mutation.SetSymptomID(id)
+	return riu
+}
+
+// SetNillableSymptomID sets the symptom edge to Symptom by id if the given value is not nil.
+func (riu *RepairInvoiceUpdate) SetNillableSymptomID(id *int) *RepairInvoiceUpdate {
+	if id != nil {
+		riu = riu.SetSymptomID(*id)
+	}
+	return riu
+}
+
+// SetSymptom sets the symptom edge to Symptom.
+func (riu *RepairInvoiceUpdate) SetSymptom(s *Symptom) *RepairInvoiceUpdate {
+	return riu.SetSymptomID(s.ID)
+}
+
+// SetUserID sets the user edge to User by id.
+func (riu *RepairInvoiceUpdate) SetUserID(id int) *RepairInvoiceUpdate {
+	riu.mutation.SetUserID(id)
+	return riu
+}
+
+// SetNillableUserID sets the user edge to User by id if the given value is not nil.
+func (riu *RepairInvoiceUpdate) SetNillableUserID(id *int) *RepairInvoiceUpdate {
+	if id != nil {
+		riu = riu.SetUserID(*id)
+	}
+	return riu
+}
+
+// SetUser sets the user edge to User.
+func (riu *RepairInvoiceUpdate) SetUser(u *User) *RepairInvoiceUpdate {
+	return riu.SetUserID(u.ID)
+}
+
+// SetReturninvoiceID sets the returninvoice edge to Returninvoice by id.
+func (riu *RepairInvoiceUpdate) SetReturninvoiceID(id int) *RepairInvoiceUpdate {
+	riu.mutation.SetReturninvoiceID(id)
+	return riu
+}
+
+// SetNillableReturninvoiceID sets the returninvoice edge to Returninvoice by id if the given value is not nil.
+func (riu *RepairInvoiceUpdate) SetNillableReturninvoiceID(id *int) *RepairInvoiceUpdate {
+	if id != nil {
+		riu = riu.SetReturninvoiceID(*id)
+	}
+	return riu
+}
+
+// SetReturninvoice sets the returninvoice edge to Returninvoice.
+func (riu *RepairInvoiceUpdate) SetReturninvoice(r *Returninvoice) *RepairInvoiceUpdate {
+	return riu.SetReturninvoiceID(r.ID)
+}
+
+// Mutation returns the RepairInvoiceMutation object of the builder.
+func (riu *RepairInvoiceUpdate) Mutation() *RepairInvoiceMutation {
+	return riu.mutation
+}
+
+// ClearDevice clears the device edge to Device.
+func (riu *RepairInvoiceUpdate) ClearDevice() *RepairInvoiceUpdate {
+	riu.mutation.ClearDevice()
+	return riu
+}
+
+// ClearStatus clears the status edge to StatusR.
+func (riu *RepairInvoiceUpdate) ClearStatus() *RepairInvoiceUpdate {
+	riu.mutation.ClearStatus()
+	return riu
+}
+
+// ClearSymptom clears the symptom edge to Symptom.
+func (riu *RepairInvoiceUpdate) ClearSymptom() *RepairInvoiceUpdate {
+	riu.mutation.ClearSymptom()
+	return riu
+}
+
+// ClearUser clears the user edge to User.
+func (riu *RepairInvoiceUpdate) ClearUser() *RepairInvoiceUpdate {
+	riu.mutation.ClearUser()
+	return riu
+}
+
+// ClearReturninvoice clears the returninvoice edge to Returninvoice.
+func (riu *RepairInvoiceUpdate) ClearReturninvoice() *RepairInvoiceUpdate {
+	riu.mutation.ClearReturninvoice()
+	return riu
 }
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
-func (ru *RepairinvoiceUpdate) Save(ctx context.Context) (int, error) {
+func (riu *RepairInvoiceUpdate) Save(ctx context.Context) (int, error) {
 
 	var (
 		err      error
 		affected int
 	)
-	if len(ru.hooks) == 0 {
-		affected, err = ru.sqlSave(ctx)
+	if len(riu.hooks) == 0 {
+		affected, err = riu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*RepairinvoiceMutation)
+			mutation, ok := m.(*RepairInvoiceMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
 			}
-			ru.mutation = mutation
-			affected, err = ru.sqlSave(ctx)
+			riu.mutation = mutation
+			affected, err = riu.sqlSave(ctx)
 			mutation.done = true
 			return affected, err
 		})
-		for i := len(ru.hooks) - 1; i >= 0; i-- {
-			mut = ru.hooks[i](mut)
+		for i := len(riu.hooks) - 1; i >= 0; i-- {
+			mut = riu.hooks[i](mut)
 		}
-		if _, err := mut.Mutate(ctx, ru.mutation); err != nil {
+		if _, err := mut.Mutate(ctx, riu.mutation); err != nil {
 			return 0, err
 		}
 	}
@@ -141,8 +199,8 @@ func (ru *RepairinvoiceUpdate) Save(ctx context.Context) (int, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ru *RepairinvoiceUpdate) SaveX(ctx context.Context) int {
-	affected, err := ru.Save(ctx)
+func (riu *RepairInvoiceUpdate) SaveX(ctx context.Context) int {
+	affected, err := riu.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -150,19 +208,19 @@ func (ru *RepairinvoiceUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (ru *RepairinvoiceUpdate) Exec(ctx context.Context) error {
-	_, err := ru.Save(ctx)
+func (riu *RepairInvoiceUpdate) Exec(ctx context.Context) error {
+	_, err := riu.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ru *RepairinvoiceUpdate) ExecX(ctx context.Context) {
-	if err := ru.Exec(ctx); err != nil {
+func (riu *RepairInvoiceUpdate) ExecX(ctx context.Context) {
+	if err := riu.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (ru *RepairinvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (riu *RepairInvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   repairinvoice.Table,
@@ -173,75 +231,166 @@ func (ru *RepairinvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		},
 	}
-	if ps := ru.predicates; len(ps) > 0 {
+	if ps := riu.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := ru.mutation.Symptomid(); ok {
+	if value, ok := riu.mutation.Rename(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: repairinvoice.FieldSymptomid,
+			Column: repairinvoice.FieldRename,
 		})
 	}
-	if value, ok := ru.mutation.AddedSymptomid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldSymptomid,
-		})
+	if riu.mutation.DeviceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.DeviceTable,
+			Columns: []string{repairinvoice.DeviceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: device.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := ru.mutation.Deviceid(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldDeviceid,
-		})
+	if nodes := riu.mutation.DeviceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.DeviceTable,
+			Columns: []string{repairinvoice.DeviceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: device.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := ru.mutation.AddedDeviceid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldDeviceid,
-		})
+	if riu.mutation.StatusCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.StatusTable,
+			Columns: []string{repairinvoice.StatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: statusr.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := ru.mutation.Userid(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldUserid,
-		})
+	if nodes := riu.mutation.StatusIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.StatusTable,
+			Columns: []string{repairinvoice.StatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: statusr.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := ru.mutation.AddedUserid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldUserid,
-		})
+	if riu.mutation.SymptomCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.SymptomTable,
+			Columns: []string{repairinvoice.SymptomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: symptom.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := ru.mutation.Statusrepairid(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldStatusrepairid,
-		})
+	if nodes := riu.mutation.SymptomIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.SymptomTable,
+			Columns: []string{repairinvoice.SymptomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: symptom.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := ru.mutation.AddedStatusrepairid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldStatusrepairid,
-		})
+	if riu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.UserTable,
+			Columns: []string{repairinvoice.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if ru.mutation.RepairinvoicesCleared() {
+	if nodes := riu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.UserTable,
+			Columns: []string{repairinvoice.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if riu.mutation.ReturninvoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   repairinvoice.RepairinvoicesTable,
-			Columns: []string{repairinvoice.RepairinvoicesColumn},
+			Table:   repairinvoice.ReturninvoiceTable,
+			Columns: []string{repairinvoice.ReturninvoiceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -252,12 +401,12 @@ func (ru *RepairinvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.RepairinvoicesIDs(); len(nodes) > 0 {
+	if nodes := riu.mutation.ReturninvoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   repairinvoice.RepairinvoicesTable,
-			Columns: []string{repairinvoice.RepairinvoicesColumn},
+			Table:   repairinvoice.ReturninvoiceTable,
+			Columns: []string{repairinvoice.ReturninvoiceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -271,7 +420,7 @@ func (ru *RepairinvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
+	if n, err = sqlgraph.UpdateNodes(ctx, riu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{repairinvoice.Label}
 		} else if cerr, ok := isSQLConstraintError(err); ok {
@@ -282,119 +431,173 @@ func (ru *RepairinvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// RepairinvoiceUpdateOne is the builder for updating a single Repairinvoice entity.
-type RepairinvoiceUpdateOne struct {
+// RepairInvoiceUpdateOne is the builder for updating a single RepairInvoice entity.
+type RepairInvoiceUpdateOne struct {
 	config
 	hooks    []Hook
-	mutation *RepairinvoiceMutation
+	mutation *RepairInvoiceMutation
 }
 
-// SetSymptomid sets the symptomid field.
-func (ruo *RepairinvoiceUpdateOne) SetSymptomid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.ResetSymptomid()
-	ruo.mutation.SetSymptomid(i)
-	return ruo
+// SetRename sets the Rename field.
+func (riuo *RepairInvoiceUpdateOne) SetRename(s string) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetRename(s)
+	return riuo
 }
 
-// AddSymptomid adds i to symptomid.
-func (ruo *RepairinvoiceUpdateOne) AddSymptomid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.AddSymptomid(i)
-	return ruo
+// SetDeviceID sets the device edge to Device by id.
+func (riuo *RepairInvoiceUpdateOne) SetDeviceID(id int) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetDeviceID(id)
+	return riuo
 }
 
-// SetDeviceid sets the deviceid field.
-func (ruo *RepairinvoiceUpdateOne) SetDeviceid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.ResetDeviceid()
-	ruo.mutation.SetDeviceid(i)
-	return ruo
-}
-
-// AddDeviceid adds i to deviceid.
-func (ruo *RepairinvoiceUpdateOne) AddDeviceid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.AddDeviceid(i)
-	return ruo
-}
-
-// SetUserid sets the userid field.
-func (ruo *RepairinvoiceUpdateOne) SetUserid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.ResetUserid()
-	ruo.mutation.SetUserid(i)
-	return ruo
-}
-
-// AddUserid adds i to userid.
-func (ruo *RepairinvoiceUpdateOne) AddUserid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.AddUserid(i)
-	return ruo
-}
-
-// SetStatusrepairid sets the statusrepairid field.
-func (ruo *RepairinvoiceUpdateOne) SetStatusrepairid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.ResetStatusrepairid()
-	ruo.mutation.SetStatusrepairid(i)
-	return ruo
-}
-
-// AddStatusrepairid adds i to statusrepairid.
-func (ruo *RepairinvoiceUpdateOne) AddStatusrepairid(i int) *RepairinvoiceUpdateOne {
-	ruo.mutation.AddStatusrepairid(i)
-	return ruo
-}
-
-// SetRepairinvoicesID sets the repairinvoices edge to Returninvoice by id.
-func (ruo *RepairinvoiceUpdateOne) SetRepairinvoicesID(id int) *RepairinvoiceUpdateOne {
-	ruo.mutation.SetRepairinvoicesID(id)
-	return ruo
-}
-
-// SetNillableRepairinvoicesID sets the repairinvoices edge to Returninvoice by id if the given value is not nil.
-func (ruo *RepairinvoiceUpdateOne) SetNillableRepairinvoicesID(id *int) *RepairinvoiceUpdateOne {
+// SetNillableDeviceID sets the device edge to Device by id if the given value is not nil.
+func (riuo *RepairInvoiceUpdateOne) SetNillableDeviceID(id *int) *RepairInvoiceUpdateOne {
 	if id != nil {
-		ruo = ruo.SetRepairinvoicesID(*id)
+		riuo = riuo.SetDeviceID(*id)
 	}
-	return ruo
+	return riuo
 }
 
-// SetRepairinvoices sets the repairinvoices edge to Returninvoice.
-func (ruo *RepairinvoiceUpdateOne) SetRepairinvoices(r *Returninvoice) *RepairinvoiceUpdateOne {
-	return ruo.SetRepairinvoicesID(r.ID)
+// SetDevice sets the device edge to Device.
+func (riuo *RepairInvoiceUpdateOne) SetDevice(d *Device) *RepairInvoiceUpdateOne {
+	return riuo.SetDeviceID(d.ID)
 }
 
-// Mutation returns the RepairinvoiceMutation object of the builder.
-func (ruo *RepairinvoiceUpdateOne) Mutation() *RepairinvoiceMutation {
-	return ruo.mutation
+// SetStatusID sets the status edge to StatusR by id.
+func (riuo *RepairInvoiceUpdateOne) SetStatusID(id int) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetStatusID(id)
+	return riuo
 }
 
-// ClearRepairinvoices clears the repairinvoices edge to Returninvoice.
-func (ruo *RepairinvoiceUpdateOne) ClearRepairinvoices() *RepairinvoiceUpdateOne {
-	ruo.mutation.ClearRepairinvoices()
-	return ruo
+// SetNillableStatusID sets the status edge to StatusR by id if the given value is not nil.
+func (riuo *RepairInvoiceUpdateOne) SetNillableStatusID(id *int) *RepairInvoiceUpdateOne {
+	if id != nil {
+		riuo = riuo.SetStatusID(*id)
+	}
+	return riuo
+}
+
+// SetStatus sets the status edge to StatusR.
+func (riuo *RepairInvoiceUpdateOne) SetStatus(s *StatusR) *RepairInvoiceUpdateOne {
+	return riuo.SetStatusID(s.ID)
+}
+
+// SetSymptomID sets the symptom edge to Symptom by id.
+func (riuo *RepairInvoiceUpdateOne) SetSymptomID(id int) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetSymptomID(id)
+	return riuo
+}
+
+// SetNillableSymptomID sets the symptom edge to Symptom by id if the given value is not nil.
+func (riuo *RepairInvoiceUpdateOne) SetNillableSymptomID(id *int) *RepairInvoiceUpdateOne {
+	if id != nil {
+		riuo = riuo.SetSymptomID(*id)
+	}
+	return riuo
+}
+
+// SetSymptom sets the symptom edge to Symptom.
+func (riuo *RepairInvoiceUpdateOne) SetSymptom(s *Symptom) *RepairInvoiceUpdateOne {
+	return riuo.SetSymptomID(s.ID)
+}
+
+// SetUserID sets the user edge to User by id.
+func (riuo *RepairInvoiceUpdateOne) SetUserID(id int) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetUserID(id)
+	return riuo
+}
+
+// SetNillableUserID sets the user edge to User by id if the given value is not nil.
+func (riuo *RepairInvoiceUpdateOne) SetNillableUserID(id *int) *RepairInvoiceUpdateOne {
+	if id != nil {
+		riuo = riuo.SetUserID(*id)
+	}
+	return riuo
+}
+
+// SetUser sets the user edge to User.
+func (riuo *RepairInvoiceUpdateOne) SetUser(u *User) *RepairInvoiceUpdateOne {
+	return riuo.SetUserID(u.ID)
+}
+
+// SetReturninvoiceID sets the returninvoice edge to Returninvoice by id.
+func (riuo *RepairInvoiceUpdateOne) SetReturninvoiceID(id int) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetReturninvoiceID(id)
+	return riuo
+}
+
+// SetNillableReturninvoiceID sets the returninvoice edge to Returninvoice by id if the given value is not nil.
+func (riuo *RepairInvoiceUpdateOne) SetNillableReturninvoiceID(id *int) *RepairInvoiceUpdateOne {
+	if id != nil {
+		riuo = riuo.SetReturninvoiceID(*id)
+	}
+	return riuo
+}
+
+// SetReturninvoice sets the returninvoice edge to Returninvoice.
+func (riuo *RepairInvoiceUpdateOne) SetReturninvoice(r *Returninvoice) *RepairInvoiceUpdateOne {
+	return riuo.SetReturninvoiceID(r.ID)
+}
+
+// Mutation returns the RepairInvoiceMutation object of the builder.
+func (riuo *RepairInvoiceUpdateOne) Mutation() *RepairInvoiceMutation {
+	return riuo.mutation
+}
+
+// ClearDevice clears the device edge to Device.
+func (riuo *RepairInvoiceUpdateOne) ClearDevice() *RepairInvoiceUpdateOne {
+	riuo.mutation.ClearDevice()
+	return riuo
+}
+
+// ClearStatus clears the status edge to StatusR.
+func (riuo *RepairInvoiceUpdateOne) ClearStatus() *RepairInvoiceUpdateOne {
+	riuo.mutation.ClearStatus()
+	return riuo
+}
+
+// ClearSymptom clears the symptom edge to Symptom.
+func (riuo *RepairInvoiceUpdateOne) ClearSymptom() *RepairInvoiceUpdateOne {
+	riuo.mutation.ClearSymptom()
+	return riuo
+}
+
+// ClearUser clears the user edge to User.
+func (riuo *RepairInvoiceUpdateOne) ClearUser() *RepairInvoiceUpdateOne {
+	riuo.mutation.ClearUser()
+	return riuo
+}
+
+// ClearReturninvoice clears the returninvoice edge to Returninvoice.
+func (riuo *RepairInvoiceUpdateOne) ClearReturninvoice() *RepairInvoiceUpdateOne {
+	riuo.mutation.ClearReturninvoice()
+	return riuo
 }
 
 // Save executes the query and returns the updated entity.
-func (ruo *RepairinvoiceUpdateOne) Save(ctx context.Context) (*Repairinvoice, error) {
+func (riuo *RepairInvoiceUpdateOne) Save(ctx context.Context) (*RepairInvoice, error) {
 
 	var (
 		err  error
-		node *Repairinvoice
+		node *RepairInvoice
 	)
-	if len(ruo.hooks) == 0 {
-		node, err = ruo.sqlSave(ctx)
+	if len(riuo.hooks) == 0 {
+		node, err = riuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*RepairinvoiceMutation)
+			mutation, ok := m.(*RepairInvoiceMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
 			}
-			ruo.mutation = mutation
-			node, err = ruo.sqlSave(ctx)
+			riuo.mutation = mutation
+			node, err = riuo.sqlSave(ctx)
 			mutation.done = true
 			return node, err
 		})
-		for i := len(ruo.hooks) - 1; i >= 0; i-- {
-			mut = ruo.hooks[i](mut)
+		for i := len(riuo.hooks) - 1; i >= 0; i-- {
+			mut = riuo.hooks[i](mut)
 		}
-		if _, err := mut.Mutate(ctx, ruo.mutation); err != nil {
+		if _, err := mut.Mutate(ctx, riuo.mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -402,28 +605,28 @@ func (ruo *RepairinvoiceUpdateOne) Save(ctx context.Context) (*Repairinvoice, er
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ruo *RepairinvoiceUpdateOne) SaveX(ctx context.Context) *Repairinvoice {
-	r, err := ruo.Save(ctx)
+func (riuo *RepairInvoiceUpdateOne) SaveX(ctx context.Context) *RepairInvoice {
+	ri, err := riuo.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return r
+	return ri
 }
 
 // Exec executes the query on the entity.
-func (ruo *RepairinvoiceUpdateOne) Exec(ctx context.Context) error {
-	_, err := ruo.Save(ctx)
+func (riuo *RepairInvoiceUpdateOne) Exec(ctx context.Context) error {
+	_, err := riuo.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ruo *RepairinvoiceUpdateOne) ExecX(ctx context.Context) {
-	if err := ruo.Exec(ctx); err != nil {
+func (riuo *RepairInvoiceUpdateOne) ExecX(ctx context.Context) {
+	if err := riuo.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (ruo *RepairinvoiceUpdateOne) sqlSave(ctx context.Context) (r *Repairinvoice, err error) {
+func (riuo *RepairInvoiceUpdateOne) sqlSave(ctx context.Context) (ri *RepairInvoice, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   repairinvoice.Table,
@@ -434,73 +637,164 @@ func (ruo *RepairinvoiceUpdateOne) sqlSave(ctx context.Context) (r *Repairinvoic
 			},
 		},
 	}
-	id, ok := ruo.mutation.ID()
+	id, ok := riuo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing Repairinvoice.ID for update")}
+		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing RepairInvoice.ID for update")}
 	}
 	_spec.Node.ID.Value = id
-	if value, ok := ruo.mutation.Symptomid(); ok {
+	if value, ok := riuo.mutation.Rename(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: repairinvoice.FieldSymptomid,
+			Column: repairinvoice.FieldRename,
 		})
 	}
-	if value, ok := ruo.mutation.AddedSymptomid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldSymptomid,
-		})
+	if riuo.mutation.DeviceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.DeviceTable,
+			Columns: []string{repairinvoice.DeviceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: device.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := ruo.mutation.Deviceid(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldDeviceid,
-		})
+	if nodes := riuo.mutation.DeviceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.DeviceTable,
+			Columns: []string{repairinvoice.DeviceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: device.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := ruo.mutation.AddedDeviceid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldDeviceid,
-		})
+	if riuo.mutation.StatusCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.StatusTable,
+			Columns: []string{repairinvoice.StatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: statusr.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := ruo.mutation.Userid(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldUserid,
-		})
+	if nodes := riuo.mutation.StatusIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.StatusTable,
+			Columns: []string{repairinvoice.StatusColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: statusr.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := ruo.mutation.AddedUserid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldUserid,
-		})
+	if riuo.mutation.SymptomCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.SymptomTable,
+			Columns: []string{repairinvoice.SymptomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: symptom.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := ruo.mutation.Statusrepairid(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldStatusrepairid,
-		})
+	if nodes := riuo.mutation.SymptomIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.SymptomTable,
+			Columns: []string{repairinvoice.SymptomColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: symptom.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := ruo.mutation.AddedStatusrepairid(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: repairinvoice.FieldStatusrepairid,
-		})
+	if riuo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.UserTable,
+			Columns: []string{repairinvoice.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if ruo.mutation.RepairinvoicesCleared() {
+	if nodes := riuo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   repairinvoice.UserTable,
+			Columns: []string{repairinvoice.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if riuo.mutation.ReturninvoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   repairinvoice.RepairinvoicesTable,
-			Columns: []string{repairinvoice.RepairinvoicesColumn},
+			Table:   repairinvoice.ReturninvoiceTable,
+			Columns: []string{repairinvoice.ReturninvoiceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -511,12 +805,12 @@ func (ruo *RepairinvoiceUpdateOne) sqlSave(ctx context.Context) (r *Repairinvoic
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.RepairinvoicesIDs(); len(nodes) > 0 {
+	if nodes := riuo.mutation.ReturninvoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   repairinvoice.RepairinvoicesTable,
-			Columns: []string{repairinvoice.RepairinvoicesColumn},
+			Table:   repairinvoice.ReturninvoiceTable,
+			Columns: []string{repairinvoice.ReturninvoiceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -530,10 +824,10 @@ func (ruo *RepairinvoiceUpdateOne) sqlSave(ctx context.Context) (r *Repairinvoic
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	r = &Repairinvoice{config: ruo.config}
-	_spec.Assign = r.assignValues
-	_spec.ScanValues = r.scanValues()
-	if err = sqlgraph.UpdateNode(ctx, ruo.driver, _spec); err != nil {
+	ri = &RepairInvoice{config: riuo.config}
+	_spec.Assign = ri.assignValues
+	_spec.ScanValues = ri.scanValues()
+	if err = sqlgraph.UpdateNode(ctx, riuo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{repairinvoice.Label}
 		} else if cerr, ok := isSQLConstraintError(err); ok {
@@ -541,5 +835,5 @@ func (ruo *RepairinvoiceUpdateOne) sqlSave(ctx context.Context) (r *Repairinvoic
 		}
 		return nil, err
 	}
-	return r, nil
+	return ri, nil
 }

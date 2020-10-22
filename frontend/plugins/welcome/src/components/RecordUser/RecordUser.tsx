@@ -49,7 +49,6 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 500 ,
       marginLeft:7,
       marginRight:-7,
-      //marginTop:10,
     },
     paper: {
       marginTop: theme.spacing(1),
@@ -167,9 +166,7 @@ const CreateUser = async () => {
   };
   console.log(user);
   const res: any = await http.createUser({ user: user });
-  console.log("bruhhhhhhhhh");
-  setStatus(true);
-  
+    setStatus(true);
   if (res.id != '') {
     setAlert(true);
   } else {
@@ -196,13 +193,10 @@ const CreateUser = async () => {
         <div className={classes.root}>
           <form noValidate autoComplete="off">
             <FormControl
-              //fullWidth
-              //className={classes.margin}
               variant="outlined"
             >
                <div className={classes.paper}><strong>รหัสประจำตัวผู้ใช้บริการ</strong></div>
               <TextField className={classes.textField}
-    //          style={{ width: 500 ,marginLeft:7,marginRight:-7}}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -222,7 +216,6 @@ const CreateUser = async () => {
 
             <div className={classes.paper}><strong>ชื่อผู้ใช้บริการ</strong></div>
               <TextField className={classes.textField}
-              //style={{ width: 500 ,marginLeft:7,marginRight:-7}}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -242,7 +235,6 @@ const CreateUser = async () => {
 
               <div className={classes.paper}><strong>คณะ/สำนักวิชา</strong></div>
               <Select className={classes.select}
-                //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
                 labelId="faculty-label"
                 id="faculty"
@@ -258,7 +250,6 @@ const CreateUser = async () => {
 
               <div className={classes.paper}><strong>สาขาวิชา</strong></div>
               <Select className={classes.select}
-                //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
                 id="branch"
                 value={branch}
@@ -273,7 +264,6 @@ const CreateUser = async () => {
 
               <div className={classes.paper}><strong>อาคาร</strong></div>
               <Select className={classes.select}
-                //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
                 id="building"
                 value={building}
@@ -288,7 +278,6 @@ const CreateUser = async () => {
 
               <div className={classes.paper}><strong>ห้อง</strong></div>
               <Select className={classes.select}
-               // style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
                 id="room"
                 value={room}
@@ -303,13 +292,12 @@ const CreateUser = async () => {
 
               {status ? ( 
                       <div className={classes.margin} style={{ width: 500 ,marginLeft:30,marginRight:-7,marginTop:16}}>
-              {alert ? ( 
-                      <Alert severity="success"> <AlertTitle>Success</AlertTitle> Complete data — check it out! </Alert>) 
-              : (     <Alert severity="warning"> <AlertTitle>Warining</AlertTitle> Incomplete data — please try again!</Alert>)} </div>
+              {alert ? 
+                (<Alert severity="success"> <AlertTitle>Success</AlertTitle> Complete data — check it out! </Alert>) 
+              : (<Alert severity="warning"> <AlertTitle>Warning</AlertTitle> Incomplete data — please try again!</Alert>)} </div>
             ) : null}
             
             </FormControl>
-
           </form>
         </div>
       </Content>

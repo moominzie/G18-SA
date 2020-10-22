@@ -23,16 +23,16 @@ type Returninvoice struct {
 	Addedtime time.Time `json:"addedtime,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReturninvoiceQuery when eager-loading is set.
-	Edges           ReturninvoiceEdges `json:"edges"`
-	employee_id     *int
-	reparinvoice_id *int
-	statust_id      *int
+	Edges            ReturninvoiceEdges `json:"edges"`
+	employee_id      *int
+	returninvoice_id *int
+	statust_id       *int
 }
 
 // ReturninvoiceEdges holds the relations/edges for other nodes in the graph.
 type ReturninvoiceEdges struct {
 	// Repairinvoice holds the value of the Repairinvoice edge.
-	Repairinvoice *Repairinvoice
+	Repairinvoice *RepairInvoice
 	// Employee holds the value of the Employee edge.
 	Employee *Employee
 	// Statust holds the value of the Statust edge.
@@ -44,7 +44,7 @@ type ReturninvoiceEdges struct {
 
 // RepairinvoiceOrErr returns the Repairinvoice value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ReturninvoiceEdges) RepairinvoiceOrErr() (*Repairinvoice, error) {
+func (e ReturninvoiceEdges) RepairinvoiceOrErr() (*RepairInvoice, error) {
 	if e.loadedTypes[0] {
 		if e.Repairinvoice == nil {
 			// The edge Repairinvoice was loaded in eager-loading,
@@ -96,7 +96,7 @@ func (*Returninvoice) scanValues() []interface{} {
 func (*Returninvoice) fkValues() []interface{} {
 	return []interface{}{
 		&sql.NullInt64{}, // employee_id
-		&sql.NullInt64{}, // reparinvoice_id
+		&sql.NullInt64{}, // returninvoice_id
 		&sql.NullInt64{}, // statust_id
 	}
 }
@@ -127,10 +127,10 @@ func (r *Returninvoice) assignValues(values ...interface{}) error {
 			*r.employee_id = int(value.Int64)
 		}
 		if value, ok := values[1].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field reparinvoice_id", value)
+			return fmt.Errorf("unexpected type %T for edge-field returninvoice_id", value)
 		} else if value.Valid {
-			r.reparinvoice_id = new(int)
-			*r.reparinvoice_id = int(value.Int64)
+			r.returninvoice_id = new(int)
+			*r.returninvoice_id = int(value.Int64)
 		}
 		if value, ok := values[2].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field statust_id", value)
@@ -143,7 +143,7 @@ func (r *Returninvoice) assignValues(values ...interface{}) error {
 }
 
 // QueryRepairinvoice queries the Repairinvoice edge of the Returninvoice.
-func (r *Returninvoice) QueryRepairinvoice() *RepairinvoiceQuery {
+func (r *Returninvoice) QueryRepairinvoice() *RepairInvoiceQuery {
 	return (&ReturninvoiceClient{config: r.config}).QueryRepairinvoice(r)
 }
 

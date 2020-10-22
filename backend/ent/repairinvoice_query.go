@@ -12,93 +12,174 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
+	"github.com/moominzie/user-record/ent/statusr"
+	"github.com/moominzie/user-record/ent/symptom"
+	"github.com/moominzie/user-record/ent/user"
 )
 
-// RepairinvoiceQuery is the builder for querying Repairinvoice entities.
-type RepairinvoiceQuery struct {
+// RepairInvoiceQuery is the builder for querying RepairInvoice entities.
+type RepairInvoiceQuery struct {
 	config
 	limit      *int
 	offset     *int
 	order      []OrderFunc
 	unique     []string
-	predicates []predicate.Repairinvoice
+	predicates []predicate.RepairInvoice
 	// eager-loading edges.
-	withRepairinvoices *ReturninvoiceQuery
+	withDevice        *DeviceQuery
+	withStatus        *StatusRQuery
+	withSymptom       *SymptomQuery
+	withUser          *UserQuery
+	withReturninvoice *ReturninvoiceQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
 // Where adds a new predicate for the builder.
-func (rq *RepairinvoiceQuery) Where(ps ...predicate.Repairinvoice) *RepairinvoiceQuery {
-	rq.predicates = append(rq.predicates, ps...)
-	return rq
+func (riq *RepairInvoiceQuery) Where(ps ...predicate.RepairInvoice) *RepairInvoiceQuery {
+	riq.predicates = append(riq.predicates, ps...)
+	return riq
 }
 
 // Limit adds a limit step to the query.
-func (rq *RepairinvoiceQuery) Limit(limit int) *RepairinvoiceQuery {
-	rq.limit = &limit
-	return rq
+func (riq *RepairInvoiceQuery) Limit(limit int) *RepairInvoiceQuery {
+	riq.limit = &limit
+	return riq
 }
 
 // Offset adds an offset step to the query.
-func (rq *RepairinvoiceQuery) Offset(offset int) *RepairinvoiceQuery {
-	rq.offset = &offset
-	return rq
+func (riq *RepairInvoiceQuery) Offset(offset int) *RepairInvoiceQuery {
+	riq.offset = &offset
+	return riq
 }
 
 // Order adds an order step to the query.
-func (rq *RepairinvoiceQuery) Order(o ...OrderFunc) *RepairinvoiceQuery {
-	rq.order = append(rq.order, o...)
-	return rq
+func (riq *RepairInvoiceQuery) Order(o ...OrderFunc) *RepairInvoiceQuery {
+	riq.order = append(riq.order, o...)
+	return riq
 }
 
-// QueryRepairinvoices chains the current query on the repairinvoices edge.
-func (rq *RepairinvoiceQuery) QueryRepairinvoices() *ReturninvoiceQuery {
-	query := &ReturninvoiceQuery{config: rq.config}
+// QueryDevice chains the current query on the device edge.
+func (riq *RepairInvoiceQuery) QueryDevice() *DeviceQuery {
+	query := &DeviceQuery{config: riq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
+		if err := riq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, rq.sqlQuery()),
-			sqlgraph.To(returninvoice.Table, returninvoice.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.RepairinvoicesTable, repairinvoice.RepairinvoicesColumn),
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.DeviceTable, repairinvoice.DeviceColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
-// First returns the first Repairinvoice entity in the query. Returns *NotFoundError when no repairinvoice was found.
-func (rq *RepairinvoiceQuery) First(ctx context.Context) (*Repairinvoice, error) {
-	rs, err := rq.Limit(1).All(ctx)
+// QueryStatus chains the current query on the status edge.
+func (riq *RepairInvoiceQuery) QueryStatus() *StatusRQuery {
+	query := &StatusRQuery{config: riq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := riq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
+			sqlgraph.To(statusr.Table, statusr.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.StatusTable, repairinvoice.StatusColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySymptom chains the current query on the symptom edge.
+func (riq *RepairInvoiceQuery) QuerySymptom() *SymptomQuery {
+	query := &SymptomQuery{config: riq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := riq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
+			sqlgraph.To(symptom.Table, symptom.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.SymptomTable, repairinvoice.SymptomColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUser chains the current query on the user edge.
+func (riq *RepairInvoiceQuery) QueryUser() *UserQuery {
+	query := &UserQuery{config: riq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := riq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, repairinvoice.UserTable, repairinvoice.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReturninvoice chains the current query on the returninvoice edge.
+func (riq *RepairInvoiceQuery) QueryReturninvoice() *ReturninvoiceQuery {
+	query := &ReturninvoiceQuery{config: riq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := riq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
+			sqlgraph.To(returninvoice.Table, returninvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.ReturninvoiceTable, repairinvoice.ReturninvoiceColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// First returns the first RepairInvoice entity in the query. Returns *NotFoundError when no repairinvoice was found.
+func (riq *RepairInvoiceQuery) First(ctx context.Context) (*RepairInvoice, error) {
+	ris, err := riq.Limit(1).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if len(rs) == 0 {
+	if len(ris) == 0 {
 		return nil, &NotFoundError{repairinvoice.Label}
 	}
-	return rs[0], nil
+	return ris[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) FirstX(ctx context.Context) *Repairinvoice {
-	r, err := rq.First(ctx)
+func (riq *RepairInvoiceQuery) FirstX(ctx context.Context) *RepairInvoice {
+	ri, err := riq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
-	return r
+	return ri
 }
 
-// FirstID returns the first Repairinvoice id in the query. Returns *NotFoundError when no id was found.
-func (rq *RepairinvoiceQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first RepairInvoice id in the query. Returns *NotFoundError when no id was found.
+func (riq *RepairInvoiceQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = rq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = riq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -109,23 +190,23 @@ func (rq *RepairinvoiceQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstXID is like FirstID, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) FirstXID(ctx context.Context) int {
-	id, err := rq.FirstID(ctx)
+func (riq *RepairInvoiceQuery) FirstXID(ctx context.Context) int {
+	id, err := riq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
 	return id
 }
 
-// Only returns the only Repairinvoice entity in the query, returns an error if not exactly one entity was returned.
-func (rq *RepairinvoiceQuery) Only(ctx context.Context) (*Repairinvoice, error) {
-	rs, err := rq.Limit(2).All(ctx)
+// Only returns the only RepairInvoice entity in the query, returns an error if not exactly one entity was returned.
+func (riq *RepairInvoiceQuery) Only(ctx context.Context) (*RepairInvoice, error) {
+	ris, err := riq.Limit(2).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	switch len(rs) {
+	switch len(ris) {
 	case 1:
-		return rs[0], nil
+		return ris[0], nil
 	case 0:
 		return nil, &NotFoundError{repairinvoice.Label}
 	default:
@@ -134,18 +215,18 @@ func (rq *RepairinvoiceQuery) Only(ctx context.Context) (*Repairinvoice, error) 
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) OnlyX(ctx context.Context) *Repairinvoice {
-	r, err := rq.Only(ctx)
+func (riq *RepairInvoiceQuery) OnlyX(ctx context.Context) *RepairInvoice {
+	ri, err := riq.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return r
+	return ri
 }
 
-// OnlyID returns the only Repairinvoice id in the query, returns an error if not exactly one id was returned.
-func (rq *RepairinvoiceQuery) OnlyID(ctx context.Context) (id int, err error) {
+// OnlyID returns the only RepairInvoice id in the query, returns an error if not exactly one id was returned.
+func (riq *RepairInvoiceQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = rq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = riq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -160,43 +241,43 @@ func (rq *RepairinvoiceQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) OnlyIDX(ctx context.Context) int {
-	id, err := rq.OnlyID(ctx)
+func (riq *RepairInvoiceQuery) OnlyIDX(ctx context.Context) int {
+	id, err := riq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return id
 }
 
-// All executes the query and returns a list of Repairinvoices.
-func (rq *RepairinvoiceQuery) All(ctx context.Context) ([]*Repairinvoice, error) {
-	if err := rq.prepareQuery(ctx); err != nil {
+// All executes the query and returns a list of RepairInvoices.
+func (riq *RepairInvoiceQuery) All(ctx context.Context) ([]*RepairInvoice, error) {
+	if err := riq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return rq.sqlAll(ctx)
+	return riq.sqlAll(ctx)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) AllX(ctx context.Context) []*Repairinvoice {
-	rs, err := rq.All(ctx)
+func (riq *RepairInvoiceQuery) AllX(ctx context.Context) []*RepairInvoice {
+	ris, err := riq.All(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return rs
+	return ris
 }
 
-// IDs executes the query and returns a list of Repairinvoice ids.
-func (rq *RepairinvoiceQuery) IDs(ctx context.Context) ([]int, error) {
+// IDs executes the query and returns a list of RepairInvoice ids.
+func (riq *RepairInvoiceQuery) IDs(ctx context.Context) ([]int, error) {
 	var ids []int
-	if err := rq.Select(repairinvoice.FieldID).Scan(ctx, &ids); err != nil {
+	if err := riq.Select(repairinvoice.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) IDsX(ctx context.Context) []int {
-	ids, err := rq.IDs(ctx)
+func (riq *RepairInvoiceQuery) IDsX(ctx context.Context) []int {
+	ids, err := riq.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -204,16 +285,16 @@ func (rq *RepairinvoiceQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (rq *RepairinvoiceQuery) Count(ctx context.Context) (int, error) {
-	if err := rq.prepareQuery(ctx); err != nil {
+func (riq *RepairInvoiceQuery) Count(ctx context.Context) (int, error) {
+	if err := riq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return rq.sqlCount(ctx)
+	return riq.sqlCount(ctx)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) CountX(ctx context.Context) int {
-	count, err := rq.Count(ctx)
+func (riq *RepairInvoiceQuery) CountX(ctx context.Context) int {
+	count, err := riq.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -221,16 +302,16 @@ func (rq *RepairinvoiceQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (rq *RepairinvoiceQuery) Exist(ctx context.Context) (bool, error) {
-	if err := rq.prepareQuery(ctx); err != nil {
+func (riq *RepairInvoiceQuery) Exist(ctx context.Context) (bool, error) {
+	if err := riq.prepareQuery(ctx); err != nil {
 		return false, err
 	}
-	return rq.sqlExist(ctx)
+	return riq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (rq *RepairinvoiceQuery) ExistX(ctx context.Context) bool {
-	exist, err := rq.Exist(ctx)
+func (riq *RepairInvoiceQuery) ExistX(ctx context.Context) bool {
+	exist, err := riq.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -239,29 +320,73 @@ func (rq *RepairinvoiceQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the query builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (rq *RepairinvoiceQuery) Clone() *RepairinvoiceQuery {
-	return &RepairinvoiceQuery{
-		config:     rq.config,
-		limit:      rq.limit,
-		offset:     rq.offset,
-		order:      append([]OrderFunc{}, rq.order...),
-		unique:     append([]string{}, rq.unique...),
-		predicates: append([]predicate.Repairinvoice{}, rq.predicates...),
+func (riq *RepairInvoiceQuery) Clone() *RepairInvoiceQuery {
+	return &RepairInvoiceQuery{
+		config:     riq.config,
+		limit:      riq.limit,
+		offset:     riq.offset,
+		order:      append([]OrderFunc{}, riq.order...),
+		unique:     append([]string{}, riq.unique...),
+		predicates: append([]predicate.RepairInvoice{}, riq.predicates...),
 		// clone intermediate query.
-		sql:  rq.sql.Clone(),
-		path: rq.path,
+		sql:  riq.sql.Clone(),
+		path: riq.path,
 	}
 }
 
-//  WithRepairinvoices tells the query-builder to eager-loads the nodes that are connected to
-// the "repairinvoices" edge. The optional arguments used to configure the query builder of the edge.
-func (rq *RepairinvoiceQuery) WithRepairinvoices(opts ...func(*ReturninvoiceQuery)) *RepairinvoiceQuery {
-	query := &ReturninvoiceQuery{config: rq.config}
+//  WithDevice tells the query-builder to eager-loads the nodes that are connected to
+// the "device" edge. The optional arguments used to configure the query builder of the edge.
+func (riq *RepairInvoiceQuery) WithDevice(opts ...func(*DeviceQuery)) *RepairInvoiceQuery {
+	query := &DeviceQuery{config: riq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	rq.withRepairinvoices = query
-	return rq
+	riq.withDevice = query
+	return riq
+}
+
+//  WithStatus tells the query-builder to eager-loads the nodes that are connected to
+// the "status" edge. The optional arguments used to configure the query builder of the edge.
+func (riq *RepairInvoiceQuery) WithStatus(opts ...func(*StatusRQuery)) *RepairInvoiceQuery {
+	query := &StatusRQuery{config: riq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	riq.withStatus = query
+	return riq
+}
+
+//  WithSymptom tells the query-builder to eager-loads the nodes that are connected to
+// the "symptom" edge. The optional arguments used to configure the query builder of the edge.
+func (riq *RepairInvoiceQuery) WithSymptom(opts ...func(*SymptomQuery)) *RepairInvoiceQuery {
+	query := &SymptomQuery{config: riq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	riq.withSymptom = query
+	return riq
+}
+
+//  WithUser tells the query-builder to eager-loads the nodes that are connected to
+// the "user" edge. The optional arguments used to configure the query builder of the edge.
+func (riq *RepairInvoiceQuery) WithUser(opts ...func(*UserQuery)) *RepairInvoiceQuery {
+	query := &UserQuery{config: riq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	riq.withUser = query
+	return riq
+}
+
+//  WithReturninvoice tells the query-builder to eager-loads the nodes that are connected to
+// the "returninvoice" edge. The optional arguments used to configure the query builder of the edge.
+func (riq *RepairInvoiceQuery) WithReturninvoice(opts ...func(*ReturninvoiceQuery)) *RepairInvoiceQuery {
+	query := &ReturninvoiceQuery{config: riq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	riq.withReturninvoice = query
+	return riq
 }
 
 // GroupBy used to group vertices by one or more fields/columns.
@@ -270,23 +395,23 @@ func (rq *RepairinvoiceQuery) WithRepairinvoices(opts ...func(*ReturninvoiceQuer
 // Example:
 //
 //	var v []struct {
-//		Symptomid int `json:"symptomid,omitempty"`
+//		Rename string `json:"Rename,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Repairinvoice.Query().
-//		GroupBy(repairinvoice.FieldSymptomid).
+//	client.RepairInvoice.Query().
+//		GroupBy(repairinvoice.FieldRename).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
-func (rq *RepairinvoiceQuery) GroupBy(field string, fields ...string) *RepairinvoiceGroupBy {
-	group := &RepairinvoiceGroupBy{config: rq.config}
+func (riq *RepairInvoiceQuery) GroupBy(field string, fields ...string) *RepairInvoiceGroupBy {
+	group := &RepairInvoiceGroupBy{config: riq.config}
 	group.fields = append([]string{field}, fields...)
 	group.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
+		if err := riq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		return rq.sqlQuery(), nil
+		return riq.sqlQuery(), nil
 	}
 	return group
 }
@@ -296,48 +421,62 @@ func (rq *RepairinvoiceQuery) GroupBy(field string, fields ...string) *Repairinv
 // Example:
 //
 //	var v []struct {
-//		Symptomid int `json:"symptomid,omitempty"`
+//		Rename string `json:"Rename,omitempty"`
 //	}
 //
-//	client.Repairinvoice.Query().
-//		Select(repairinvoice.FieldSymptomid).
+//	client.RepairInvoice.Query().
+//		Select(repairinvoice.FieldRename).
 //		Scan(ctx, &v)
 //
-func (rq *RepairinvoiceQuery) Select(field string, fields ...string) *RepairinvoiceSelect {
-	selector := &RepairinvoiceSelect{config: rq.config}
+func (riq *RepairInvoiceQuery) Select(field string, fields ...string) *RepairInvoiceSelect {
+	selector := &RepairInvoiceSelect{config: riq.config}
 	selector.fields = append([]string{field}, fields...)
 	selector.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
+		if err := riq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		return rq.sqlQuery(), nil
+		return riq.sqlQuery(), nil
 	}
 	return selector
 }
 
-func (rq *RepairinvoiceQuery) prepareQuery(ctx context.Context) error {
-	if rq.path != nil {
-		prev, err := rq.path(ctx)
+func (riq *RepairInvoiceQuery) prepareQuery(ctx context.Context) error {
+	if riq.path != nil {
+		prev, err := riq.path(ctx)
 		if err != nil {
 			return err
 		}
-		rq.sql = prev
+		riq.sql = prev
 	}
 	return nil
 }
 
-func (rq *RepairinvoiceQuery) sqlAll(ctx context.Context) ([]*Repairinvoice, error) {
+func (riq *RepairInvoiceQuery) sqlAll(ctx context.Context) ([]*RepairInvoice, error) {
 	var (
-		nodes       = []*Repairinvoice{}
-		_spec       = rq.querySpec()
-		loadedTypes = [1]bool{
-			rq.withRepairinvoices != nil,
+		nodes       = []*RepairInvoice{}
+		withFKs     = riq.withFKs
+		_spec       = riq.querySpec()
+		loadedTypes = [5]bool{
+			riq.withDevice != nil,
+			riq.withStatus != nil,
+			riq.withSymptom != nil,
+			riq.withUser != nil,
+			riq.withReturninvoice != nil,
 		}
 	)
+	if riq.withDevice != nil || riq.withStatus != nil || riq.withSymptom != nil || riq.withUser != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, repairinvoice.ForeignKeys...)
+	}
 	_spec.ScanValues = func() []interface{} {
-		node := &Repairinvoice{config: rq.config}
+		node := &RepairInvoice{config: riq.config}
 		nodes = append(nodes, node)
 		values := node.scanValues()
+		if withFKs {
+			values = append(values, node.fkValues()...)
+		}
 		return values
 	}
 	_spec.Assign = func(values ...interface{}) error {
@@ -348,58 +487,158 @@ func (rq *RepairinvoiceQuery) sqlAll(ctx context.Context) ([]*Repairinvoice, err
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(values...)
 	}
-	if err := sqlgraph.QueryNodes(ctx, rq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, riq.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
 
-	if query := rq.withRepairinvoices; query != nil {
+	if query := riq.withDevice; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*RepairInvoice)
+		for i := range nodes {
+			if fk := nodes[i].device_id; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(device.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "device_id" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Device = n
+			}
+		}
+	}
+
+	if query := riq.withStatus; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*RepairInvoice)
+		for i := range nodes {
+			if fk := nodes[i].statusr_id; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(statusr.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "statusr_id" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Status = n
+			}
+		}
+	}
+
+	if query := riq.withSymptom; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*RepairInvoice)
+		for i := range nodes {
+			if fk := nodes[i].symptom_id; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(symptom.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "symptom_id" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Symptom = n
+			}
+		}
+	}
+
+	if query := riq.withUser; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*RepairInvoice)
+		for i := range nodes {
+			if fk := nodes[i].repairinvoice_id; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(user.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "repairinvoice_id" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.User = n
+			}
+		}
+	}
+
+	if query := riq.withReturninvoice; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Repairinvoice)
+		nodeids := make(map[int]*RepairInvoice)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
 		}
 		query.withFKs = true
 		query.Where(predicate.Returninvoice(func(s *sql.Selector) {
-			s.Where(sql.InValues(repairinvoice.RepairinvoicesColumn, fks...))
+			s.Where(sql.InValues(repairinvoice.ReturninvoiceColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.reparinvoice_id
+			fk := n.returninvoice_id
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "reparinvoice_id" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "returninvoice_id" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "reparinvoice_id" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "returninvoice_id" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.Repairinvoices = n
+			node.Edges.Returninvoice = n
 		}
 	}
 
 	return nodes, nil
 }
 
-func (rq *RepairinvoiceQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := rq.querySpec()
-	return sqlgraph.CountNodes(ctx, rq.driver, _spec)
+func (riq *RepairInvoiceQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := riq.querySpec()
+	return sqlgraph.CountNodes(ctx, riq.driver, _spec)
 }
 
-func (rq *RepairinvoiceQuery) sqlExist(ctx context.Context) (bool, error) {
-	n, err := rq.sqlCount(ctx)
+func (riq *RepairInvoiceQuery) sqlExist(ctx context.Context) (bool, error) {
+	n, err := riq.sqlCount(ctx)
 	if err != nil {
 		return false, fmt.Errorf("ent: check existence: %v", err)
 	}
 	return n > 0, nil
 }
 
-func (rq *RepairinvoiceQuery) querySpec() *sqlgraph.QuerySpec {
+func (riq *RepairInvoiceQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := &sqlgraph.QuerySpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   repairinvoice.Table,
@@ -409,23 +648,23 @@ func (rq *RepairinvoiceQuery) querySpec() *sqlgraph.QuerySpec {
 				Column: repairinvoice.FieldID,
 			},
 		},
-		From:   rq.sql,
+		From:   riq.sql,
 		Unique: true,
 	}
-	if ps := rq.predicates; len(ps) > 0 {
+	if ps := riq.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := rq.limit; limit != nil {
+	if limit := riq.limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := rq.offset; offset != nil {
+	if offset := riq.offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := rq.order; len(ps) > 0 {
+	if ps := riq.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -435,33 +674,33 @@ func (rq *RepairinvoiceQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (rq *RepairinvoiceQuery) sqlQuery() *sql.Selector {
-	builder := sql.Dialect(rq.driver.Dialect())
+func (riq *RepairInvoiceQuery) sqlQuery() *sql.Selector {
+	builder := sql.Dialect(riq.driver.Dialect())
 	t1 := builder.Table(repairinvoice.Table)
 	selector := builder.Select(t1.Columns(repairinvoice.Columns...)...).From(t1)
-	if rq.sql != nil {
-		selector = rq.sql
+	if riq.sql != nil {
+		selector = riq.sql
 		selector.Select(selector.Columns(repairinvoice.Columns...)...)
 	}
-	for _, p := range rq.predicates {
+	for _, p := range riq.predicates {
 		p(selector)
 	}
-	for _, p := range rq.order {
+	for _, p := range riq.order {
 		p(selector)
 	}
-	if offset := rq.offset; offset != nil {
+	if offset := riq.offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := rq.limit; limit != nil {
+	if limit := riq.limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
-// RepairinvoiceGroupBy is the builder for group-by Repairinvoice entities.
-type RepairinvoiceGroupBy struct {
+// RepairInvoiceGroupBy is the builder for group-by RepairInvoice entities.
+type RepairInvoiceGroupBy struct {
 	config
 	fields []string
 	fns    []AggregateFunc
@@ -471,43 +710,43 @@ type RepairinvoiceGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (rgb *RepairinvoiceGroupBy) Aggregate(fns ...AggregateFunc) *RepairinvoiceGroupBy {
-	rgb.fns = append(rgb.fns, fns...)
-	return rgb
+func (rigb *RepairInvoiceGroupBy) Aggregate(fns ...AggregateFunc) *RepairInvoiceGroupBy {
+	rigb.fns = append(rigb.fns, fns...)
+	return rigb
 }
 
 // Scan applies the group-by query and scan the result into the given value.
-func (rgb *RepairinvoiceGroupBy) Scan(ctx context.Context, v interface{}) error {
-	query, err := rgb.path(ctx)
+func (rigb *RepairInvoiceGroupBy) Scan(ctx context.Context, v interface{}) error {
+	query, err := rigb.path(ctx)
 	if err != nil {
 		return err
 	}
-	rgb.sql = query
-	return rgb.sqlScan(ctx, v)
+	rigb.sql = query
+	return rigb.sqlScan(ctx, v)
 }
 
 // ScanX is like Scan, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) ScanX(ctx context.Context, v interface{}) {
-	if err := rgb.Scan(ctx, v); err != nil {
+func (rigb *RepairInvoiceGroupBy) ScanX(ctx context.Context, v interface{}) {
+	if err := rigb.Scan(ctx, v); err != nil {
 		panic(err)
 	}
 }
 
 // Strings returns list of strings from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) Strings(ctx context.Context) ([]string, error) {
-	if len(rgb.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceGroupBy.Strings is not achievable when grouping more than 1 field")
+func (rigb *RepairInvoiceGroupBy) Strings(ctx context.Context) ([]string, error) {
+	if len(rigb.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceGroupBy.Strings is not achievable when grouping more than 1 field")
 	}
 	var v []string
-	if err := rgb.Scan(ctx, &v); err != nil {
+	if err := rigb.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // StringsX is like Strings, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) StringsX(ctx context.Context) []string {
-	v, err := rgb.Strings(ctx)
+func (rigb *RepairInvoiceGroupBy) StringsX(ctx context.Context) []string {
+	v, err := rigb.Strings(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -515,9 +754,9 @@ func (rgb *RepairinvoiceGroupBy) StringsX(ctx context.Context) []string {
 }
 
 // String returns a single string from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) String(ctx context.Context) (_ string, err error) {
+func (rigb *RepairInvoiceGroupBy) String(ctx context.Context) (_ string, err error) {
 	var v []string
-	if v, err = rgb.Strings(ctx); err != nil {
+	if v, err = rigb.Strings(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -526,14 +765,14 @@ func (rgb *RepairinvoiceGroupBy) String(ctx context.Context) (_ string, err erro
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceGroupBy.Strings returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceGroupBy.Strings returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // StringX is like String, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) StringX(ctx context.Context) string {
-	v, err := rgb.String(ctx)
+func (rigb *RepairInvoiceGroupBy) StringX(ctx context.Context) string {
+	v, err := rigb.String(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -541,20 +780,20 @@ func (rgb *RepairinvoiceGroupBy) StringX(ctx context.Context) string {
 }
 
 // Ints returns list of ints from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) Ints(ctx context.Context) ([]int, error) {
-	if len(rgb.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceGroupBy.Ints is not achievable when grouping more than 1 field")
+func (rigb *RepairInvoiceGroupBy) Ints(ctx context.Context) ([]int, error) {
+	if len(rigb.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceGroupBy.Ints is not achievable when grouping more than 1 field")
 	}
 	var v []int
-	if err := rgb.Scan(ctx, &v); err != nil {
+	if err := rigb.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // IntsX is like Ints, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) IntsX(ctx context.Context) []int {
-	v, err := rgb.Ints(ctx)
+func (rigb *RepairInvoiceGroupBy) IntsX(ctx context.Context) []int {
+	v, err := rigb.Ints(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -562,9 +801,9 @@ func (rgb *RepairinvoiceGroupBy) IntsX(ctx context.Context) []int {
 }
 
 // Int returns a single int from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) Int(ctx context.Context) (_ int, err error) {
+func (rigb *RepairInvoiceGroupBy) Int(ctx context.Context) (_ int, err error) {
 	var v []int
-	if v, err = rgb.Ints(ctx); err != nil {
+	if v, err = rigb.Ints(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -573,14 +812,14 @@ func (rgb *RepairinvoiceGroupBy) Int(ctx context.Context) (_ int, err error) {
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceGroupBy.Ints returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceGroupBy.Ints returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // IntX is like Int, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) IntX(ctx context.Context) int {
-	v, err := rgb.Int(ctx)
+func (rigb *RepairInvoiceGroupBy) IntX(ctx context.Context) int {
+	v, err := rigb.Int(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -588,20 +827,20 @@ func (rgb *RepairinvoiceGroupBy) IntX(ctx context.Context) int {
 }
 
 // Float64s returns list of float64s from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) Float64s(ctx context.Context) ([]float64, error) {
-	if len(rgb.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceGroupBy.Float64s is not achievable when grouping more than 1 field")
+func (rigb *RepairInvoiceGroupBy) Float64s(ctx context.Context) ([]float64, error) {
+	if len(rigb.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceGroupBy.Float64s is not achievable when grouping more than 1 field")
 	}
 	var v []float64
-	if err := rgb.Scan(ctx, &v); err != nil {
+	if err := rigb.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // Float64sX is like Float64s, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) Float64sX(ctx context.Context) []float64 {
-	v, err := rgb.Float64s(ctx)
+func (rigb *RepairInvoiceGroupBy) Float64sX(ctx context.Context) []float64 {
+	v, err := rigb.Float64s(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -609,9 +848,9 @@ func (rgb *RepairinvoiceGroupBy) Float64sX(ctx context.Context) []float64 {
 }
 
 // Float64 returns a single float64 from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) Float64(ctx context.Context) (_ float64, err error) {
+func (rigb *RepairInvoiceGroupBy) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
-	if v, err = rgb.Float64s(ctx); err != nil {
+	if v, err = rigb.Float64s(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -620,14 +859,14 @@ func (rgb *RepairinvoiceGroupBy) Float64(ctx context.Context) (_ float64, err er
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceGroupBy.Float64s returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceGroupBy.Float64s returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // Float64X is like Float64, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) Float64X(ctx context.Context) float64 {
-	v, err := rgb.Float64(ctx)
+func (rigb *RepairInvoiceGroupBy) Float64X(ctx context.Context) float64 {
+	v, err := rigb.Float64(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -635,20 +874,20 @@ func (rgb *RepairinvoiceGroupBy) Float64X(ctx context.Context) float64 {
 }
 
 // Bools returns list of bools from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) Bools(ctx context.Context) ([]bool, error) {
-	if len(rgb.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceGroupBy.Bools is not achievable when grouping more than 1 field")
+func (rigb *RepairInvoiceGroupBy) Bools(ctx context.Context) ([]bool, error) {
+	if len(rigb.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceGroupBy.Bools is not achievable when grouping more than 1 field")
 	}
 	var v []bool
-	if err := rgb.Scan(ctx, &v); err != nil {
+	if err := rigb.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // BoolsX is like Bools, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) BoolsX(ctx context.Context) []bool {
-	v, err := rgb.Bools(ctx)
+func (rigb *RepairInvoiceGroupBy) BoolsX(ctx context.Context) []bool {
+	v, err := rigb.Bools(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -656,9 +895,9 @@ func (rgb *RepairinvoiceGroupBy) BoolsX(ctx context.Context) []bool {
 }
 
 // Bool returns a single bool from group-by. It is only allowed when querying group-by with one field.
-func (rgb *RepairinvoiceGroupBy) Bool(ctx context.Context) (_ bool, err error) {
+func (rigb *RepairInvoiceGroupBy) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
-	if v, err = rgb.Bools(ctx); err != nil {
+	if v, err = rigb.Bools(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -667,42 +906,42 @@ func (rgb *RepairinvoiceGroupBy) Bool(ctx context.Context) (_ bool, err error) {
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceGroupBy.Bools returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceGroupBy.Bools returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // BoolX is like Bool, but panics if an error occurs.
-func (rgb *RepairinvoiceGroupBy) BoolX(ctx context.Context) bool {
-	v, err := rgb.Bool(ctx)
+func (rigb *RepairInvoiceGroupBy) BoolX(ctx context.Context) bool {
+	v, err := rigb.Bool(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return v
 }
 
-func (rgb *RepairinvoiceGroupBy) sqlScan(ctx context.Context, v interface{}) error {
+func (rigb *RepairInvoiceGroupBy) sqlScan(ctx context.Context, v interface{}) error {
 	rows := &sql.Rows{}
-	query, args := rgb.sqlQuery().Query()
-	if err := rgb.driver.Query(ctx, query, args, rows); err != nil {
+	query, args := rigb.sqlQuery().Query()
+	if err := rigb.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (rgb *RepairinvoiceGroupBy) sqlQuery() *sql.Selector {
-	selector := rgb.sql
-	columns := make([]string, 0, len(rgb.fields)+len(rgb.fns))
-	columns = append(columns, rgb.fields...)
-	for _, fn := range rgb.fns {
+func (rigb *RepairInvoiceGroupBy) sqlQuery() *sql.Selector {
+	selector := rigb.sql
+	columns := make([]string, 0, len(rigb.fields)+len(rigb.fns))
+	columns = append(columns, rigb.fields...)
+	for _, fn := range rigb.fns {
 		columns = append(columns, fn(selector))
 	}
-	return selector.Select(columns...).GroupBy(rgb.fields...)
+	return selector.Select(columns...).GroupBy(rigb.fields...)
 }
 
-// RepairinvoiceSelect is the builder for select fields of Repairinvoice entities.
-type RepairinvoiceSelect struct {
+// RepairInvoiceSelect is the builder for select fields of RepairInvoice entities.
+type RepairInvoiceSelect struct {
 	config
 	fields []string
 	// intermediate query (i.e. traversal path).
@@ -711,37 +950,37 @@ type RepairinvoiceSelect struct {
 }
 
 // Scan applies the selector query and scan the result into the given value.
-func (rs *RepairinvoiceSelect) Scan(ctx context.Context, v interface{}) error {
-	query, err := rs.path(ctx)
+func (ris *RepairInvoiceSelect) Scan(ctx context.Context, v interface{}) error {
+	query, err := ris.path(ctx)
 	if err != nil {
 		return err
 	}
-	rs.sql = query
-	return rs.sqlScan(ctx, v)
+	ris.sql = query
+	return ris.sqlScan(ctx, v)
 }
 
 // ScanX is like Scan, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) ScanX(ctx context.Context, v interface{}) {
-	if err := rs.Scan(ctx, v); err != nil {
+func (ris *RepairInvoiceSelect) ScanX(ctx context.Context, v interface{}) {
+	if err := ris.Scan(ctx, v); err != nil {
 		panic(err)
 	}
 }
 
 // Strings returns list of strings from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) Strings(ctx context.Context) ([]string, error) {
-	if len(rs.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceSelect.Strings is not achievable when selecting more than 1 field")
+func (ris *RepairInvoiceSelect) Strings(ctx context.Context) ([]string, error) {
+	if len(ris.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceSelect.Strings is not achievable when selecting more than 1 field")
 	}
 	var v []string
-	if err := rs.Scan(ctx, &v); err != nil {
+	if err := ris.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // StringsX is like Strings, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) StringsX(ctx context.Context) []string {
-	v, err := rs.Strings(ctx)
+func (ris *RepairInvoiceSelect) StringsX(ctx context.Context) []string {
+	v, err := ris.Strings(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -749,9 +988,9 @@ func (rs *RepairinvoiceSelect) StringsX(ctx context.Context) []string {
 }
 
 // String returns a single string from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) String(ctx context.Context) (_ string, err error) {
+func (ris *RepairInvoiceSelect) String(ctx context.Context) (_ string, err error) {
 	var v []string
-	if v, err = rs.Strings(ctx); err != nil {
+	if v, err = ris.Strings(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -760,14 +999,14 @@ func (rs *RepairinvoiceSelect) String(ctx context.Context) (_ string, err error)
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceSelect.Strings returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceSelect.Strings returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // StringX is like String, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) StringX(ctx context.Context) string {
-	v, err := rs.String(ctx)
+func (ris *RepairInvoiceSelect) StringX(ctx context.Context) string {
+	v, err := ris.String(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -775,20 +1014,20 @@ func (rs *RepairinvoiceSelect) StringX(ctx context.Context) string {
 }
 
 // Ints returns list of ints from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) Ints(ctx context.Context) ([]int, error) {
-	if len(rs.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceSelect.Ints is not achievable when selecting more than 1 field")
+func (ris *RepairInvoiceSelect) Ints(ctx context.Context) ([]int, error) {
+	if len(ris.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceSelect.Ints is not achievable when selecting more than 1 field")
 	}
 	var v []int
-	if err := rs.Scan(ctx, &v); err != nil {
+	if err := ris.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // IntsX is like Ints, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) IntsX(ctx context.Context) []int {
-	v, err := rs.Ints(ctx)
+func (ris *RepairInvoiceSelect) IntsX(ctx context.Context) []int {
+	v, err := ris.Ints(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -796,9 +1035,9 @@ func (rs *RepairinvoiceSelect) IntsX(ctx context.Context) []int {
 }
 
 // Int returns a single int from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) Int(ctx context.Context) (_ int, err error) {
+func (ris *RepairInvoiceSelect) Int(ctx context.Context) (_ int, err error) {
 	var v []int
-	if v, err = rs.Ints(ctx); err != nil {
+	if v, err = ris.Ints(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -807,14 +1046,14 @@ func (rs *RepairinvoiceSelect) Int(ctx context.Context) (_ int, err error) {
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceSelect.Ints returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceSelect.Ints returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // IntX is like Int, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) IntX(ctx context.Context) int {
-	v, err := rs.Int(ctx)
+func (ris *RepairInvoiceSelect) IntX(ctx context.Context) int {
+	v, err := ris.Int(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -822,20 +1061,20 @@ func (rs *RepairinvoiceSelect) IntX(ctx context.Context) int {
 }
 
 // Float64s returns list of float64s from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) Float64s(ctx context.Context) ([]float64, error) {
-	if len(rs.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceSelect.Float64s is not achievable when selecting more than 1 field")
+func (ris *RepairInvoiceSelect) Float64s(ctx context.Context) ([]float64, error) {
+	if len(ris.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceSelect.Float64s is not achievable when selecting more than 1 field")
 	}
 	var v []float64
-	if err := rs.Scan(ctx, &v); err != nil {
+	if err := ris.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // Float64sX is like Float64s, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) Float64sX(ctx context.Context) []float64 {
-	v, err := rs.Float64s(ctx)
+func (ris *RepairInvoiceSelect) Float64sX(ctx context.Context) []float64 {
+	v, err := ris.Float64s(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -843,9 +1082,9 @@ func (rs *RepairinvoiceSelect) Float64sX(ctx context.Context) []float64 {
 }
 
 // Float64 returns a single float64 from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) Float64(ctx context.Context) (_ float64, err error) {
+func (ris *RepairInvoiceSelect) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
-	if v, err = rs.Float64s(ctx); err != nil {
+	if v, err = ris.Float64s(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -854,14 +1093,14 @@ func (rs *RepairinvoiceSelect) Float64(ctx context.Context) (_ float64, err erro
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceSelect.Float64s returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceSelect.Float64s returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // Float64X is like Float64, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) Float64X(ctx context.Context) float64 {
-	v, err := rs.Float64(ctx)
+func (ris *RepairInvoiceSelect) Float64X(ctx context.Context) float64 {
+	v, err := ris.Float64(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -869,20 +1108,20 @@ func (rs *RepairinvoiceSelect) Float64X(ctx context.Context) float64 {
 }
 
 // Bools returns list of bools from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) Bools(ctx context.Context) ([]bool, error) {
-	if len(rs.fields) > 1 {
-		return nil, errors.New("ent: RepairinvoiceSelect.Bools is not achievable when selecting more than 1 field")
+func (ris *RepairInvoiceSelect) Bools(ctx context.Context) ([]bool, error) {
+	if len(ris.fields) > 1 {
+		return nil, errors.New("ent: RepairInvoiceSelect.Bools is not achievable when selecting more than 1 field")
 	}
 	var v []bool
-	if err := rs.Scan(ctx, &v); err != nil {
+	if err := ris.Scan(ctx, &v); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
 // BoolsX is like Bools, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) BoolsX(ctx context.Context) []bool {
-	v, err := rs.Bools(ctx)
+func (ris *RepairInvoiceSelect) BoolsX(ctx context.Context) []bool {
+	v, err := ris.Bools(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -890,9 +1129,9 @@ func (rs *RepairinvoiceSelect) BoolsX(ctx context.Context) []bool {
 }
 
 // Bool returns a single bool from selector. It is only allowed when selecting one field.
-func (rs *RepairinvoiceSelect) Bool(ctx context.Context) (_ bool, err error) {
+func (ris *RepairInvoiceSelect) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
-	if v, err = rs.Bools(ctx); err != nil {
+	if v, err = ris.Bools(ctx); err != nil {
 		return
 	}
 	switch len(v) {
@@ -901,32 +1140,32 @@ func (rs *RepairinvoiceSelect) Bool(ctx context.Context) (_ bool, err error) {
 	case 0:
 		err = &NotFoundError{repairinvoice.Label}
 	default:
-		err = fmt.Errorf("ent: RepairinvoiceSelect.Bools returned %d results when one was expected", len(v))
+		err = fmt.Errorf("ent: RepairInvoiceSelect.Bools returned %d results when one was expected", len(v))
 	}
 	return
 }
 
 // BoolX is like Bool, but panics if an error occurs.
-func (rs *RepairinvoiceSelect) BoolX(ctx context.Context) bool {
-	v, err := rs.Bool(ctx)
+func (ris *RepairInvoiceSelect) BoolX(ctx context.Context) bool {
+	v, err := ris.Bool(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return v
 }
 
-func (rs *RepairinvoiceSelect) sqlScan(ctx context.Context, v interface{}) error {
+func (ris *RepairInvoiceSelect) sqlScan(ctx context.Context, v interface{}) error {
 	rows := &sql.Rows{}
-	query, args := rs.sqlQuery().Query()
-	if err := rs.driver.Query(ctx, query, args, rows); err != nil {
+	query, args := ris.sqlQuery().Query()
+	if err := ris.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (rs *RepairinvoiceSelect) sqlQuery() sql.Querier {
-	selector := rs.sql
-	selector.Select(selector.Columns(rs.fields...)...)
+func (ris *RepairInvoiceSelect) sqlQuery() sql.Querier {
+	selector := ris.sql
+	selector.Select(selector.Columns(ris.fields...)...)
 	return selector
 }

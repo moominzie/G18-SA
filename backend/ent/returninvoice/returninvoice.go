@@ -21,11 +21,11 @@ const (
 	Table = "returninvoices"
 	// RepairinvoiceTable is the table the holds the Repairinvoice relation/edge.
 	RepairinvoiceTable = "returninvoices"
-	// RepairinvoiceInverseTable is the table name for the Repairinvoice entity.
+	// RepairinvoiceInverseTable is the table name for the RepairInvoice entity.
 	// It exists in this package in order to avoid circular dependency with the "repairinvoice" package.
-	RepairinvoiceInverseTable = "repairinvoices"
+	RepairinvoiceInverseTable = "repair_invoices"
 	// RepairinvoiceColumn is the table column denoting the Repairinvoice relation/edge.
-	RepairinvoiceColumn = "reparinvoice_id"
+	RepairinvoiceColumn = "returninvoice_id"
 	// EmployeeTable is the table the holds the Employee relation/edge.
 	EmployeeTable = "returninvoices"
 	// EmployeeInverseTable is the table name for the Employee entity.
@@ -51,6 +51,6 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the Returninvoice type.
 var ForeignKeys = []string{
 	"employee_id",
-	"reparinvoice_id",
+	"returninvoice_id",
 	"statust_id",
 }

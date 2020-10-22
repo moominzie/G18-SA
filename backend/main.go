@@ -91,6 +91,14 @@ type StatusR struct {
 	Sname string
 }
 
+type Billingstatuss struct {
+	Billingstatus []Billingstatus
+}
+
+type Billingstatus struct {
+	Billingstatusname string
+}
+
 // @title SUT SA Example API
 // @version 1.0
 // @description This is a sample server for SUT SE 2563
@@ -158,6 +166,8 @@ func main() {
 	controllers.NewStatusRController(v1, client)
 	controllers.NewSymptomController(v1, client)
 	controllers.NewRepairInvoiceController(v1, client)
+	controllers.NewBillingstatusController(v1, client)
+	controllers.NewBillController(v1, client)
 
 	// Set Facultys Data
 	facultys := Facultys{
@@ -300,6 +310,20 @@ func main() {
 		client.Symptom.
 			Create().
 			SetSyname(sy.Syname).
+			Save(context.Background())
+	}
+
+	// Set Billingstatuss Data
+	billingstatuss := Billingstatuss{
+		Billingstatus: []Billingstatus{
+			Billingstatus{"Paid"},
+			Billingstatus{"Not Paid"},
+		},
+	}
+	for _, bs := range billingstatuss.Billingstatus {
+		client.Billingstatus.
+			Create().
+			SetBillingstatusname(bs.Billingstatusname).
 			Save(context.Background())
 	}
 

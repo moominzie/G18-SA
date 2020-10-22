@@ -194,7 +194,7 @@ const CreateRepairInvoice = async () => {
               variant="outlined"
              
             >
-               <div className={classes.paper}><strong>รหัสใบส่งซ่อม</strong></div>
+               <div className={classes.paper}><strong>Repair Invoice ID</strong></div>
               <TextField className={classes.textField}
     //          style={{ width: 500 ,marginLeft:7,marginRight:-7}}
               InputProps={{
@@ -214,7 +214,7 @@ const CreateRepairInvoice = async () => {
                 onChange={handleRenameChange}
               />   
               
-              <div className={classes.paper}><strong>ชื่อผู้เป็นเจ้าของเครื่อง</strong></div>
+              <div className={classes.paper}><strong>Owner Name</strong></div>
               <Select className={classes.select}
                 //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
@@ -222,14 +222,14 @@ const CreateRepairInvoice = async () => {
                 value={username}
                 onChange={UserhandleChange}
               >
-                <InputLabel className={classes.insideLabel} id="device-label">เลือกชื่อ(User)</InputLabel>
+                <InputLabel className={classes.insideLabel} id="device-label">Choose Owner</InputLabel>
 
                 {users.map((item: EntUser) => (
                   <MenuItem value={item.id}>{item.personalName}</MenuItem>
                 ))}
               </Select>
 
-              <div className={classes.paper}><strong>อุปกรณ์</strong></div>
+              <div className={classes.paper}><strong>Device</strong></div>
               <Select className={classes.select}
                 //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
@@ -237,7 +237,7 @@ const CreateRepairInvoice = async () => {
                 value={device}
                 onChange={DevicehandleChange}
               >
-                <InputLabel className={classes.insideLabel} id="device-label">เลือกอุปกรณ์(Device)</InputLabel>
+                <InputLabel className={classes.insideLabel} id="device-label">Choose Device</InputLabel>
 
                 {devices.map((item: EntDevice) => (
                   <MenuItem value={item.id}>{item.dname}</MenuItem>
@@ -246,7 +246,7 @@ const CreateRepairInvoice = async () => {
 
            
 
-              <div className={classes.paper}><strong>รูปแบบอาการ</strong></div>
+              <div className={classes.paper}><strong>Symptom Type </strong></div>
               <Select className={classes.select}
                 //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
@@ -254,14 +254,14 @@ const CreateRepairInvoice = async () => {
                 value={symptom}
                 onChange={SymptomhandleChange}
               >
-                <InputLabel className={classes.insideLabel}>เลือกรูปแบบอาการ(Symptom)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Symptom</InputLabel>
 
                 {symptoms.map((item: EntSymptom) => (
                   <MenuItem value={item.id}>{item.syname}</MenuItem>
                 ))}
               </Select>
 
-              <div className={classes.paper}><strong>สถานะการซ่อม</strong></div>
+              <div className={classes.paper}><strong>Repair Status</strong></div>
               <Select className={classes.select}
                // style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
@@ -269,7 +269,7 @@ const CreateRepairInvoice = async () => {
                 value={statusr}
                 onChange={StatusRhandleChange}
               >
-                <InputLabel className={classes.insideLabel}>เลือกสถานะการซ่อม(Status)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Repair status</InputLabel>
 
                 {statusrs.map((item: EntStatusR) => (
                   <MenuItem value={item.id}>{item.sname}</MenuItem>

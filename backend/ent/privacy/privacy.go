@@ -210,6 +210,54 @@ func DenyMutationOperationRule(op ent.Op) MutationRule {
 	return OnMutationOperation(rule, op)
 }
 
+// The BillQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type BillQueryRuleFunc func(context.Context, *ent.BillQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f BillQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.BillQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.BillQuery", q)
+}
+
+// The BillMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type BillMutationRuleFunc func(context.Context, *ent.BillMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f BillMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.BillMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.BillMutation", m)
+}
+
+// The BillingstatusQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type BillingstatusQueryRuleFunc func(context.Context, *ent.BillingstatusQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f BillingstatusQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.BillingstatusQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.BillingstatusQuery", q)
+}
+
+// The BillingstatusMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type BillingstatusMutationRuleFunc func(context.Context, *ent.BillingstatusMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f BillingstatusMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.BillingstatusMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.BillingstatusMutation", m)
+}
+
 // The BranchQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type BranchQueryRuleFunc func(context.Context, *ent.BranchQuery) error

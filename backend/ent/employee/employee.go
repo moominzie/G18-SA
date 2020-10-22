@@ -16,6 +16,8 @@ const (
 
 	// EdgeEmployees holds the string denoting the employees edge name in mutations.
 	EdgeEmployees = "employees"
+	// EdgeEmployeebill holds the string denoting the employeebill edge name in mutations.
+	EdgeEmployeebill = "employeebill"
 
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
@@ -26,6 +28,13 @@ const (
 	EmployeesInverseTable = "returninvoices"
 	// EmployeesColumn is the table column denoting the employees relation/edge.
 	EmployeesColumn = "employee_id"
+	// EmployeebillTable is the table the holds the employeebill relation/edge.
+	EmployeebillTable = "bills"
+	// EmployeebillInverseTable is the table name for the Bill entity.
+	// It exists in this package in order to avoid circular dependency with the "bill" package.
+	EmployeebillInverseTable = "bills"
+	// EmployeebillColumn is the table column denoting the employeebill relation/edge.
+	EmployeebillColumn = "employee_id"
 )
 
 // Columns holds all SQL columns for employee fields.

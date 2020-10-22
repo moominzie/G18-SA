@@ -12,6 +12,7 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/repairinvoice"
@@ -35,6 +36,7 @@ type RepairInvoiceQuery struct {
 	withSymptom       *SymptomQuery
 	withUser          *UserQuery
 	withReturninvoice *ReturninvoiceQuery
+	withBill          *BillQuery
 	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -148,6 +150,24 @@ func (riq *RepairInvoiceQuery) QueryReturninvoice() *ReturninvoiceQuery {
 			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
 			sqlgraph.To(returninvoice.Table, returninvoice.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.ReturninvoiceTable, repairinvoice.ReturninvoiceColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryBill chains the current query on the bill edge.
+func (riq *RepairInvoiceQuery) QueryBill() *BillQuery {
+	query := &BillQuery{config: riq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := riq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
+			sqlgraph.To(bill.Table, bill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.BillTable, repairinvoice.BillColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
 		return fromU, nil
@@ -389,6 +409,17 @@ func (riq *RepairInvoiceQuery) WithReturninvoice(opts ...func(*ReturninvoiceQuer
 	return riq
 }
 
+//  WithBill tells the query-builder to eager-loads the nodes that are connected to
+// the "bill" edge. The optional arguments used to configure the query builder of the edge.
+func (riq *RepairInvoiceQuery) WithBill(opts ...func(*BillQuery)) *RepairInvoiceQuery {
+	query := &BillQuery{config: riq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	riq.withBill = query
+	return riq
+}
+
 // GroupBy used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -456,12 +487,13 @@ func (riq *RepairInvoiceQuery) sqlAll(ctx context.Context) ([]*RepairInvoice, er
 		nodes       = []*RepairInvoice{}
 		withFKs     = riq.withFKs
 		_spec       = riq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			riq.withDevice != nil,
 			riq.withStatus != nil,
 			riq.withSymptom != nil,
 			riq.withUser != nil,
 			riq.withReturninvoice != nil,
+			riq.withBill != nil,
 		}
 	)
 	if riq.withDevice != nil || riq.withStatus != nil || riq.withSymptom != nil || riq.withUser != nil {
@@ -619,6 +651,34 @@ func (riq *RepairInvoiceQuery) sqlAll(ctx context.Context) ([]*RepairInvoice, er
 				return nil, fmt.Errorf(`unexpected foreign-key "returninvoice_id" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Returninvoice = n
+		}
+	}
+
+	if query := riq.withBill; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*RepairInvoice)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+		}
+		query.withFKs = true
+		query.Where(predicate.Bill(func(s *sql.Selector) {
+			s.Where(sql.InValues(repairinvoice.BillColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.bill_id
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "bill_id" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "bill_id" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Bill = n
 		}
 	}
 

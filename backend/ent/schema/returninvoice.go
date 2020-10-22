@@ -21,17 +21,8 @@ func (Returninvoice) Fields() []ent.Field {
 // Edges of the Returninvoice.
 func (Returninvoice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("Repairinvoice", RepairInvoice.Type).
-			Ref("returninvoice").
-			Unique().
-			Required(),
-
-		edge.From("Employee", Employee.Type).
-			Ref("employees").
-			Unique(),
-
-		edge.From("Statust", Statust.Type).
-			Ref("statusts").
-			Unique(),
+		edge.From("Repairinvoice", RepairInvoice.Type).Ref("returninvoice").Unique().Required(),
+		edge.From("Employee", Employee.Type).Ref("employees").Unique(),
+		edge.From("Statust", Statust.Type).Ref("statusts").Unique(),
 	}
 }

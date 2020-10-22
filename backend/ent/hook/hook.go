@@ -9,6 +9,32 @@ import (
 	"github.com/moominzie/user-record/ent"
 )
 
+// The BillFunc type is an adapter to allow the use of ordinary
+// function as Bill mutator.
+type BillFunc func(context.Context, *ent.BillMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.BillMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BillMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The BillingstatusFunc type is an adapter to allow the use of ordinary
+// function as Billingstatus mutator.
+type BillingstatusFunc func(context.Context, *ent.BillingstatusMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BillingstatusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.BillingstatusMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BillingstatusMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The BranchFunc type is an adapter to allow the use of ordinary
 // function as Branch mutator.
 type BranchFunc func(context.Context, *ent.BranchMutation) (ent.Value, error)

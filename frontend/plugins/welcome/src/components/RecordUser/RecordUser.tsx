@@ -195,7 +195,7 @@ const CreateUser = async () => {
             <FormControl
               variant="outlined"
             >
-               <div className={classes.paper}><strong>รหัสประจำตัวผู้ใช้บริการ</strong></div>
+               <div className={classes.paper}><strong>Personal ID</strong></div>
               <TextField className={classes.textField}
               InputProps={{
                 startAdornment: (
@@ -214,7 +214,7 @@ const CreateUser = async () => {
                 onChange={handlePersonalIDChange}
               />
 
-            <div className={classes.paper}><strong>ชื่อผู้ใช้บริการ</strong></div>
+            <div className={classes.paper}><strong>Name</strong></div>
               <TextField className={classes.textField}
               InputProps={{
                 startAdornment: (
@@ -233,7 +233,7 @@ const CreateUser = async () => {
                 onChange={handlePersonalNameChange}
               />
 
-              <div className={classes.paper}><strong>คณะ/สำนักวิชา</strong></div>
+              <div className={classes.paper}><strong>Faculty</strong></div>
               <Select className={classes.select}
                 color="secondary"
                 labelId="faculty-label"
@@ -241,49 +241,49 @@ const CreateUser = async () => {
                 value={faculty}
                 onChange={FacultyhandleChange}
               >
-                <InputLabel className={classes.insideLabel} id="faculty-label">เลือกคณะ/สำนักวิชา(Faculty)</InputLabel>
+                <InputLabel className={classes.insideLabel} id="faculty-label">Choose Faculty</InputLabel>
 
                 {facultys.map((item: EntFaculty) => (
                   <MenuItem value={item.id}>{item.fname}</MenuItem>
                 ))}
               </Select>
 
-              <div className={classes.paper}><strong>สาขาวิชา</strong></div>
+              <div className={classes.paper}><strong>Branch</strong></div>
               <Select className={classes.select}
                 color="secondary"
                 id="branch"
                 value={branch}
                 onChange={BranchhandleChange}
               >
-                <InputLabel className={classes.insideLabel}>เลือกสาขาวิชา(Branch)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Branch</InputLabel>
 
                 {branchs.map((item: EntBranch) => (
                   <MenuItem value={item.id}>{item.brname}</MenuItem>
                 ))}
               </Select>
 
-              <div className={classes.paper}><strong>อาคาร</strong></div>
+              <div className={classes.paper}><strong>Building</strong></div>
               <Select className={classes.select}
                 color="secondary"
                 id="building"
                 value={building}
                 onChange={BuildinghandleChange}
               >
-                <InputLabel className={classes.insideLabel}>เลือกอาคาร(Building)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Building</InputLabel>
 
                 {buildings.map((item: EntBuilding) => (
                   <MenuItem value={item.id}>{item.buname}</MenuItem>
                 ))}
               </Select>
 
-              <div className={classes.paper}><strong>ห้อง</strong></div>
+              <div className={classes.paper}><strong>Room</strong></div>
               <Select className={classes.select}
                 color="secondary"
                 id="room"
                 value={room}
                 onChange={RoomhandleChange}
               >
-                <InputLabel className={classes.insideLabel}>เลือกห้อง(Room)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Room</InputLabel>
 
                 {rooms.map((item: EntRoom) => (
                   <MenuItem value={item.id}>{item.rname}</MenuItem>

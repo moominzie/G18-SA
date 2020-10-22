@@ -76,7 +76,7 @@ export default function WelcomePage() {
             <Button className={classes.margin}
               variant="outlined" 
               color="secondary" 
-              href="/recordusertable" 
+              href="/recordbilltable" 
               startIcon={<LocalFloristRoundedIcon />}> 
               Payment Bill
             </Button>

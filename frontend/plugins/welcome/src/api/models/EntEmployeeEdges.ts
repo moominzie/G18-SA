@@ -14,6 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    EntBill,
+    EntBillFromJSON,
+    EntBillFromJSONTyped,
+    EntBillToJSON,
     EntReturninvoice,
     EntReturninvoiceFromJSON,
     EntReturninvoiceFromJSONTyped,
@@ -26,6 +30,12 @@ import {
  * @interface EntEmployeeEdges
  */
 export interface EntEmployeeEdges {
+    /**
+     * Employeebill holds the value of the employeebill edge.
+     * @type {Array<EntBill>}
+     * @memberof EntEmployeeEdges
+     */
+    employeebill?: Array<EntBill>;
     /**
      * Employees holds the value of the employees edge.
      * @type {Array<EntReturninvoice>}
@@ -44,6 +54,7 @@ export function EntEmployeeEdgesFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
+        'employeebill': !exists(json, 'employeebill') ? undefined : ((json['employeebill'] as Array<any>).map(EntBillFromJSON)),
         'employees': !exists(json, 'employees') ? undefined : ((json['employees'] as Array<any>).map(EntReturninvoiceFromJSON)),
     };
 }
@@ -57,6 +68,7 @@ export function EntEmployeeEdgesToJSON(value?: EntEmployeeEdges | null): any {
     }
     return {
         
+        'employeebill': value.employeebill === undefined ? undefined : ((value.employeebill as Array<any>).map(EntBillToJSON)),
         'employees': value.employees === undefined ? undefined : ((value.employees as Array<any>).map(EntReturninvoiceToJSON)),
     };
 }

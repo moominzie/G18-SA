@@ -9,6 +9,7 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/repairinvoice"
@@ -133,6 +134,25 @@ func (riu *RepairInvoiceUpdate) SetReturninvoice(r *Returninvoice) *RepairInvoic
 	return riu.SetReturninvoiceID(r.ID)
 }
 
+// SetBillID sets the bill edge to Bill by id.
+func (riu *RepairInvoiceUpdate) SetBillID(id int) *RepairInvoiceUpdate {
+	riu.mutation.SetBillID(id)
+	return riu
+}
+
+// SetNillableBillID sets the bill edge to Bill by id if the given value is not nil.
+func (riu *RepairInvoiceUpdate) SetNillableBillID(id *int) *RepairInvoiceUpdate {
+	if id != nil {
+		riu = riu.SetBillID(*id)
+	}
+	return riu
+}
+
+// SetBill sets the bill edge to Bill.
+func (riu *RepairInvoiceUpdate) SetBill(b *Bill) *RepairInvoiceUpdate {
+	return riu.SetBillID(b.ID)
+}
+
 // Mutation returns the RepairInvoiceMutation object of the builder.
 func (riu *RepairInvoiceUpdate) Mutation() *RepairInvoiceMutation {
 	return riu.mutation
@@ -165,6 +185,12 @@ func (riu *RepairInvoiceUpdate) ClearUser() *RepairInvoiceUpdate {
 // ClearReturninvoice clears the returninvoice edge to Returninvoice.
 func (riu *RepairInvoiceUpdate) ClearReturninvoice() *RepairInvoiceUpdate {
 	riu.mutation.ClearReturninvoice()
+	return riu
+}
+
+// ClearBill clears the bill edge to Bill.
+func (riu *RepairInvoiceUpdate) ClearBill() *RepairInvoiceUpdate {
+	riu.mutation.ClearBill()
 	return riu
 }
 
@@ -420,6 +446,41 @@ func (riu *RepairInvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if riu.mutation.BillCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.BillTable,
+			Columns: []string{repairinvoice.BillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := riu.mutation.BillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.BillTable,
+			Columns: []string{repairinvoice.BillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, riu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{repairinvoice.Label}
@@ -539,6 +600,25 @@ func (riuo *RepairInvoiceUpdateOne) SetReturninvoice(r *Returninvoice) *RepairIn
 	return riuo.SetReturninvoiceID(r.ID)
 }
 
+// SetBillID sets the bill edge to Bill by id.
+func (riuo *RepairInvoiceUpdateOne) SetBillID(id int) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetBillID(id)
+	return riuo
+}
+
+// SetNillableBillID sets the bill edge to Bill by id if the given value is not nil.
+func (riuo *RepairInvoiceUpdateOne) SetNillableBillID(id *int) *RepairInvoiceUpdateOne {
+	if id != nil {
+		riuo = riuo.SetBillID(*id)
+	}
+	return riuo
+}
+
+// SetBill sets the bill edge to Bill.
+func (riuo *RepairInvoiceUpdateOne) SetBill(b *Bill) *RepairInvoiceUpdateOne {
+	return riuo.SetBillID(b.ID)
+}
+
 // Mutation returns the RepairInvoiceMutation object of the builder.
 func (riuo *RepairInvoiceUpdateOne) Mutation() *RepairInvoiceMutation {
 	return riuo.mutation
@@ -571,6 +651,12 @@ func (riuo *RepairInvoiceUpdateOne) ClearUser() *RepairInvoiceUpdateOne {
 // ClearReturninvoice clears the returninvoice edge to Returninvoice.
 func (riuo *RepairInvoiceUpdateOne) ClearReturninvoice() *RepairInvoiceUpdateOne {
 	riuo.mutation.ClearReturninvoice()
+	return riuo
+}
+
+// ClearBill clears the bill edge to Bill.
+func (riuo *RepairInvoiceUpdateOne) ClearBill() *RepairInvoiceUpdateOne {
+	riuo.mutation.ClearBill()
 	return riuo
 }
 
@@ -816,6 +902,41 @@ func (riuo *RepairInvoiceUpdateOne) sqlSave(ctx context.Context) (ri *RepairInvo
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: returninvoice.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if riuo.mutation.BillCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.BillTable,
+			Columns: []string{repairinvoice.BillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := riuo.mutation.BillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.BillTable,
+			Columns: []string{repairinvoice.BillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
 				},
 			},
 		}

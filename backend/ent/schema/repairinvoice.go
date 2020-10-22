@@ -24,9 +24,9 @@ func (RepairInvoice) Edges() []ent.Edge {
 		edge.From("device", Device.Type).Ref("repair_information").Unique(),
 		edge.From("status", StatusR.Type).Ref("repair_information").Unique(),
 		edge.From("symptom", Symptom.Type).Ref("repair_information").Unique(),
-
 		edge.From("user", User.Type).Ref("repairinvoice_informations").Unique(),
-		edge.To("returninvoice", Returninvoice.Type).
-			Unique().StorageKey(edge.Column("returninvoice_id")),
+		edge.To("returninvoice", Returninvoice.Type).Unique().StorageKey(edge.Column("returninvoice_id")),
+
+		edge.To("bill", Bill.Type).Unique().StorageKey(edge.Column("bill_id")),
 	}
 }

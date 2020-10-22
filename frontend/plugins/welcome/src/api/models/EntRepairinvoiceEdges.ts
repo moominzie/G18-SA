@@ -14,6 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    EntBill,
+    EntBillFromJSON,
+    EntBillFromJSONTyped,
+    EntBillToJSON,
     EntDevice,
     EntDeviceFromJSON,
     EntDeviceFromJSONTyped,
@@ -42,6 +46,12 @@ import {
  * @interface EntRepairInvoiceEdges
  */
 export interface EntRepairInvoiceEdges {
+    /**
+     * 
+     * @type {EntBill}
+     * @memberof EntRepairInvoiceEdges
+     */
+    bill?: EntBill;
     /**
      * 
      * @type {EntDevice}
@@ -84,6 +94,7 @@ export function EntRepairInvoiceEdgesFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
+        'bill': !exists(json, 'Bill') ? undefined : EntBillFromJSON(json['Bill']),
         'device': !exists(json, 'Device') ? undefined : EntDeviceFromJSON(json['Device']),
         'returninvoice': !exists(json, 'Returninvoice') ? undefined : EntReturninvoiceFromJSON(json['Returninvoice']),
         'status': !exists(json, 'Status') ? undefined : EntStatusRFromJSON(json['Status']),
@@ -101,6 +112,7 @@ export function EntRepairInvoiceEdgesToJSON(value?: EntRepairInvoiceEdges | null
     }
     return {
         
+        'bill': EntBillToJSON(value.bill),
         'device': EntDeviceToJSON(value.device),
         'returninvoice': EntReturninvoiceToJSON(value.returninvoice),
         'status': EntStatusRToJSON(value.status),

@@ -176,7 +176,7 @@ const CreateReturninvoice = async () => {
               variant="outlined"
             >
 
-              <div className={classes.paper}><strong>Repair invoice NO.</strong></div>
+              <div className={classes.paper}><strong>Repair Invoice NO.</strong></div>
               <Select className={classes.select}
                 //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
@@ -184,7 +184,7 @@ const CreateReturninvoice = async () => {
                 value={repairinvoice}
                 onChange={RepairinvoicehandleChange}
               >
-                <InputLabel className={classes.insideLabel}>NO.(Repairinvoice)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Repair invoice</InputLabel>
 
                 {repairinvoices.map((item: EntRepairInvoice) => (
                   <MenuItem value={item.id}>{item.rename}</MenuItem>
@@ -199,14 +199,14 @@ const CreateReturninvoice = async () => {
                 value={employee}
                 onChange={EmployeehandleChange}
               >
-                <InputLabel className={classes.insideLabel}>Name(Employee)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Employee</InputLabel>
 
                 {employees.map((item: EntEmployee) => (
                   <MenuItem value={item.id}>{item.employeename}</MenuItem>
                 ))}
               </Select>
 
-              <div className={classes.paper}><strong>Status transport</strong></div>
+              <div className={classes.paper}><strong>Transport status</strong></div>
               <Select className={classes.select}
                 //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
                 color="secondary"
@@ -214,7 +214,7 @@ const CreateReturninvoice = async () => {
                 value={statust}
                 onChange={StatusthandleChange}
               >
-                <InputLabel className={classes.insideLabel}>Status(Statust)</InputLabel>
+                <InputLabel className={classes.insideLabel}>Choose Transport status</InputLabel>
 
                 {statusts.map((item: EntStatust) => (
                   <MenuItem value={item.id}>{item.statustname}</MenuItem>

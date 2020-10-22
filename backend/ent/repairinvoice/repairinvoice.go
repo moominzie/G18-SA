@@ -20,6 +20,8 @@ const (
 	EdgeUser = "user"
 	// EdgeReturninvoice holds the string denoting the returninvoice edge name in mutations.
 	EdgeReturninvoice = "returninvoice"
+	// EdgeBill holds the string denoting the bill edge name in mutations.
+	EdgeBill = "bill"
 
 	// Table holds the table name of the repairinvoice in the database.
 	Table = "repair_invoices"
@@ -58,6 +60,13 @@ const (
 	ReturninvoiceInverseTable = "returninvoices"
 	// ReturninvoiceColumn is the table column denoting the returninvoice relation/edge.
 	ReturninvoiceColumn = "returninvoice_id"
+	// BillTable is the table the holds the bill relation/edge.
+	BillTable = "bills"
+	// BillInverseTable is the table name for the Bill entity.
+	// It exists in this package in order to avoid circular dependency with the "bill" package.
+	BillInverseTable = "bills"
+	// BillColumn is the table column denoting the bill relation/edge.
+	BillColumn = "bill_id"
 )
 
 // Columns holds all SQL columns for repairinvoice fields.

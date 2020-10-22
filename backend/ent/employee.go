@@ -30,9 +30,11 @@ type Employee struct {
 type EmployeeEdges struct {
 	// Employees holds the value of the employees edge.
 	Employees []*Returninvoice
+	// Employeebill holds the value of the employeebill edge.
+	Employeebill []*Bill
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // EmployeesOrErr returns the Employees value or an error if the edge
@@ -42,6 +44,15 @@ func (e EmployeeEdges) EmployeesOrErr() ([]*Returninvoice, error) {
 		return e.Employees, nil
 	}
 	return nil, &NotLoadedError{edge: "employees"}
+}
+
+// EmployeebillOrErr returns the Employeebill value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) EmployeebillOrErr() ([]*Bill, error) {
+	if e.loadedTypes[1] {
+		return e.Employeebill, nil
+	}
+	return nil, &NotLoadedError{edge: "employeebill"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -87,6 +98,11 @@ func (e *Employee) assignValues(values ...interface{}) error {
 // QueryEmployees queries the employees edge of the Employee.
 func (e *Employee) QueryEmployees() *ReturninvoiceQuery {
 	return (&EmployeeClient{config: e.config}).QueryEmployees(e)
+}
+
+// QueryEmployeebill queries the employeebill edge of the Employee.
+func (e *Employee) QueryEmployeebill() *BillQuery {
+	return (&EmployeeClient{config: e.config}).QueryEmployeebill(e)
 }
 
 // Update returns a builder for updating this Employee.

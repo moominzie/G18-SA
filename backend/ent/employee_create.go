@@ -9,6 +9,7 @@ import (
 
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/employee"
 	"github.com/moominzie/user-record/ent/returninvoice"
 )
@@ -51,6 +52,21 @@ func (ec *EmployeeCreate) AddEmployees(r ...*Returninvoice) *EmployeeCreate {
 		ids[i] = r[i].ID
 	}
 	return ec.AddEmployeeIDs(ids...)
+}
+
+// AddEmployeebillIDs adds the employeebill edge to Bill by ids.
+func (ec *EmployeeCreate) AddEmployeebillIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddEmployeebillIDs(ids...)
+	return ec
+}
+
+// AddEmployeebill adds the employeebill edges to Bill.
+func (ec *EmployeeCreate) AddEmployeebill(b ...*Bill) *EmployeeCreate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return ec.AddEmployeebillIDs(ids...)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -179,6 +195,25 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: returninvoice.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.EmployeebillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.EmployeebillTable,
+			Columns: []string{employee.EmployeebillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
 				},
 			},
 		}

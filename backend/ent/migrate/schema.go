@@ -8,6 +8,56 @@ import (
 )
 
 var (
+	// BillsColumns holds the columns for the "bills" table.
+	BillsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "price", Type: field.TypeInt, Unique: true},
+		{Name: "time", Type: field.TypeInt, Unique: true},
+		{Name: "billingstatus_id", Type: field.TypeInt, Nullable: true},
+		{Name: "employee_id", Type: field.TypeInt, Nullable: true},
+		{Name: "bill_id", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// BillsTable holds the schema information for the "bills" table.
+	BillsTable = &schema.Table{
+		Name:       "bills",
+		Columns:    BillsColumns,
+		PrimaryKey: []*schema.Column{BillsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "bills_billingstatuses_billingstatuss",
+				Columns: []*schema.Column{BillsColumns[3]},
+
+				RefColumns: []*schema.Column{BillingstatusesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "bills_employees_employeebill",
+				Columns: []*schema.Column{BillsColumns[4]},
+
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "bills_repair_invoices_bill",
+				Columns: []*schema.Column{BillsColumns[5]},
+
+				RefColumns: []*schema.Column{RepairInvoicesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// BillingstatusesColumns holds the columns for the "billingstatuses" table.
+	BillingstatusesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "billingstatusname", Type: field.TypeString, Unique: true},
+	}
+	// BillingstatusesTable holds the schema information for the "billingstatuses" table.
+	BillingstatusesTable = &schema.Table{
+		Name:        "billingstatuses",
+		Columns:     BillingstatusesColumns,
+		PrimaryKey:  []*schema.Column{BillingstatusesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// BranchesColumns holds the columns for the "branches" table.
 	BranchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -266,6 +316,8 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		BillsTable,
+		BillingstatusesTable,
 		BranchesTable,
 		BuildingsTable,
 		DevicesTable,
@@ -282,6 +334,9 @@ var (
 )
 
 func init() {
+	BillsTable.ForeignKeys[0].RefTable = BillingstatusesTable
+	BillsTable.ForeignKeys[1].RefTable = EmployeesTable
+	BillsTable.ForeignKeys[2].RefTable = RepairInvoicesTable
 	BranchesTable.ForeignKeys[0].RefTable = FacultiesTable
 	RepairInvoicesTable.ForeignKeys[0].RefTable = DevicesTable
 	RepairInvoicesTable.ForeignKeys[1].RefTable = StatusRsTable

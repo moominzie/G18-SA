@@ -9,6 +9,7 @@ import (
 
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
@@ -123,6 +124,25 @@ func (ric *RepairInvoiceCreate) SetNillableReturninvoiceID(id *int) *RepairInvoi
 // SetReturninvoice sets the returninvoice edge to Returninvoice.
 func (ric *RepairInvoiceCreate) SetReturninvoice(r *Returninvoice) *RepairInvoiceCreate {
 	return ric.SetReturninvoiceID(r.ID)
+}
+
+// SetBillID sets the bill edge to Bill by id.
+func (ric *RepairInvoiceCreate) SetBillID(id int) *RepairInvoiceCreate {
+	ric.mutation.SetBillID(id)
+	return ric
+}
+
+// SetNillableBillID sets the bill edge to Bill by id if the given value is not nil.
+func (ric *RepairInvoiceCreate) SetNillableBillID(id *int) *RepairInvoiceCreate {
+	if id != nil {
+		ric = ric.SetBillID(*id)
+	}
+	return ric
+}
+
+// SetBill sets the bill edge to Bill.
+func (ric *RepairInvoiceCreate) SetBill(b *Bill) *RepairInvoiceCreate {
+	return ric.SetBillID(b.ID)
 }
 
 // Mutation returns the RepairInvoiceMutation object of the builder.
@@ -290,6 +310,25 @@ func (ric *RepairInvoiceCreate) createSpec() (*RepairInvoice, *sqlgraph.CreateSp
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: returninvoice.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ric.mutation.BillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.BillTable,
+			Columns: []string{repairinvoice.BillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
 				},
 			},
 		}

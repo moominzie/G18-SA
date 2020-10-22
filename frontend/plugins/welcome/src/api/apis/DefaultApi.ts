@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    ControllersBill,
+    ControllersBillFromJSON,
+    ControllersBillToJSON,
     ControllersRepairInvoice,
     ControllersRepairInvoiceFromJSON,
     ControllersRepairInvoiceToJSON,
@@ -24,6 +27,12 @@ import {
     ControllersUser,
     ControllersUserFromJSON,
     ControllersUserToJSON,
+    EntBill,
+    EntBillFromJSON,
+    EntBillToJSON,
+    EntBillingstatus,
+    EntBillingstatusFromJSON,
+    EntBillingstatusToJSON,
     EntBranch,
     EntBranchFromJSON,
     EntBranchToJSON,
@@ -61,6 +70,14 @@ import {
     EntUserFromJSON,
     EntUserToJSON,
 } from '../models';
+
+export interface CreateBillRequest {
+    bill: ControllersBill;
+}
+
+export interface CreateBillingstatusRequest {
+    billingstatus: EntBillingstatus;
+}
 
 export interface CreateBranchRequest {
     branch: EntBranch;
@@ -154,6 +171,10 @@ export interface DeleteUserRequest {
     id: number;
 }
 
+export interface GetBillingstatusRequest {
+    id: number;
+}
+
 export interface GetBranchRequest {
     id: number;
 }
@@ -188,6 +209,16 @@ export interface GetStatustRequest {
 
 export interface GetSymptomRequest {
     id: number;
+}
+
+export interface ListBillRequest {
+    limit?: number;
+    offset?: number;
+}
+
+export interface ListBillingstatusRequest {
+    limit?: number;
+    offset?: number;
 }
 
 export interface ListBranchRequest {
@@ -254,6 +285,76 @@ export interface ListUserRequest {
  * 
  */
 export class DefaultApi extends runtime.BaseAPI {
+
+    /**
+     * Create bill
+     * Create bill
+     */
+    async createBillRaw(requestParameters: CreateBillRequest): Promise<runtime.ApiResponse<ControllersBill>> {
+        if (requestParameters.bill === null || requestParameters.bill === undefined) {
+            throw new runtime.RequiredError('bill','Required parameter requestParameters.bill was null or undefined when calling createBill.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/bills`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ControllersBillToJSON(requestParameters.bill),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ControllersBillFromJSON(jsonValue));
+    }
+
+    /**
+     * Create bill
+     * Create bill
+     */
+    async createBill(requestParameters: CreateBillRequest): Promise<ControllersBill> {
+        const response = await this.createBillRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Create billingstatus
+     * Create billingstatus
+     */
+    async createBillingstatusRaw(requestParameters: CreateBillingstatusRequest): Promise<runtime.ApiResponse<EntBillingstatus>> {
+        if (requestParameters.billingstatus === null || requestParameters.billingstatus === undefined) {
+            throw new runtime.RequiredError('billingstatus','Required parameter requestParameters.billingstatus was null or undefined when calling createBillingstatus.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/billingstatuss`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EntBillingstatusToJSON(requestParameters.billingstatus),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntBillingstatusFromJSON(jsonValue));
+    }
+
+    /**
+     * Create billingstatus
+     * Create billingstatus
+     */
+    async createBillingstatus(requestParameters: CreateBillingstatusRequest): Promise<EntBillingstatus> {
+        const response = await this.createBillingstatusRaw(requestParameters);
+        return await response.value();
+    }
 
     /**
      * Create branch
@@ -1028,6 +1129,38 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get billingstatus by ID
+     * Get a billingstatus entity by ID
+     */
+    async getBillingstatusRaw(requestParameters: GetBillingstatusRequest): Promise<runtime.ApiResponse<EntBillingstatus>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getBillingstatus.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/billingstatuss/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntBillingstatusFromJSON(jsonValue));
+    }
+
+    /**
+     * get billingstatus by ID
+     * Get a billingstatus entity by ID
+     */
+    async getBillingstatus(requestParameters: GetBillingstatusRequest): Promise<EntBillingstatus> {
+        const response = await this.getBillingstatusRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get branch by ID
      * Get a branch entity by ID
      */
@@ -1312,6 +1445,78 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async getSymptom(requestParameters: GetSymptomRequest): Promise<EntSymptom> {
         const response = await this.getSymptomRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * list bill entities
+     * List bill entities
+     */
+    async listBillRaw(requestParameters: ListBillRequest): Promise<runtime.ApiResponse<Array<EntBill>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/bills`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntBillFromJSON));
+    }
+
+    /**
+     * list bill entities
+     * List bill entities
+     */
+    async listBill(requestParameters: ListBillRequest): Promise<Array<EntBill>> {
+        const response = await this.listBillRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * list billingstatus entities
+     * List billingstatus entities
+     */
+    async listBillingstatusRaw(requestParameters: ListBillingstatusRequest): Promise<runtime.ApiResponse<Array<EntBillingstatus>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/billingstatuss`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntBillingstatusFromJSON));
+    }
+
+    /**
+     * list billingstatus entities
+     * List billingstatus entities
+     */
+    async listBillingstatus(requestParameters: ListBillingstatusRequest): Promise<Array<EntBillingstatus>> {
+        const response = await this.listBillingstatusRaw(requestParameters);
         return await response.value();
     }
 

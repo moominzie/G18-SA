@@ -64,9 +64,9 @@ export function EntReturninvoiceEdgesFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'employee': !exists(json, 'Employee') ? undefined : EntEmployeeFromJSON(json['Employee']),
-        'repairinvoice': !exists(json, 'Repairinvoice') ? undefined : EntRepairInvoiceFromJSON(json['Repairinvoice']),
-        'statust': !exists(json, 'Statust') ? undefined : EntStatustFromJSON(json['Statust']),
+        'employee': !exists(json, 'employee') ? undefined : EntEmployeeFromJSON(json['employee']),
+        'repairinvoice': !exists(json, 'repairinvoice') ? undefined : EntRepairInvoiceFromJSON(json['repairinvoice']),
+        'statust': !exists(json, 'statust') ? undefined : EntStatustFromJSON(json['statust']),
     };
 }
 

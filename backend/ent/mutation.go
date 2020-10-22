@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/moominzie/user-record/ent/bill"
+	"github.com/moominzie/user-record/ent/billingstatus"
 	"github.com/moominzie/user-record/ent/branch"
 	"github.com/moominzie/user-record/ent/building"
 	"github.com/moominzie/user-record/ent/device"
@@ -33,6 +35,8 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeBill          = "Bill"
+	TypeBillingstatus = "Billingstatus"
 	TypeBranch        = "Branch"
 	TypeBuilding      = "Building"
 	TypeDevice        = "Device"
@@ -46,6 +50,978 @@ const (
 	TypeSymptom       = "Symptom"
 	TypeUser          = "User"
 )
+
+// BillMutation represents an operation that mutate the Bills
+// nodes in the graph.
+type BillMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *int
+	price                 *int
+	addprice              *int
+	time                  *int
+	addtime               *int
+	clearedFields         map[string]struct{}
+	_Repairinvoice        *int
+	cleared_Repairinvoice bool
+	_Employee             *int
+	cleared_Employee      bool
+	_Billingstatus        *int
+	cleared_Billingstatus bool
+	done                  bool
+	oldValue              func(context.Context) (*Bill, error)
+}
+
+var _ ent.Mutation = (*BillMutation)(nil)
+
+// billOption allows to manage the mutation configuration using functional options.
+type billOption func(*BillMutation)
+
+// newBillMutation creates new mutation for $n.Name.
+func newBillMutation(c config, op Op, opts ...billOption) *BillMutation {
+	m := &BillMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBill,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBillID sets the id field of the mutation.
+func withBillID(id int) billOption {
+	return func(m *BillMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Bill
+		)
+		m.oldValue = func(ctx context.Context) (*Bill, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Bill.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBill sets the old Bill of the mutation.
+func withBill(node *Bill) billOption {
+	return func(m *BillMutation) {
+		m.oldValue = func(context.Context) (*Bill, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BillMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BillMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *BillMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetPrice sets the price field.
+func (m *BillMutation) SetPrice(i int) {
+	m.price = &i
+	m.addprice = nil
+}
+
+// Price returns the price value in the mutation.
+func (m *BillMutation) Price() (r int, exists bool) {
+	v := m.price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrice returns the old price value of the Bill.
+// If the Bill object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *BillMutation) OldPrice(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPrice is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPrice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrice: %w", err)
+	}
+	return oldValue.Price, nil
+}
+
+// AddPrice adds i to price.
+func (m *BillMutation) AddPrice(i int) {
+	if m.addprice != nil {
+		*m.addprice += i
+	} else {
+		m.addprice = &i
+	}
+}
+
+// AddedPrice returns the value that was added to the price field in this mutation.
+func (m *BillMutation) AddedPrice() (r int, exists bool) {
+	v := m.addprice
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPrice reset all changes of the "price" field.
+func (m *BillMutation) ResetPrice() {
+	m.price = nil
+	m.addprice = nil
+}
+
+// SetTime sets the time field.
+func (m *BillMutation) SetTime(i int) {
+	m.time = &i
+	m.addtime = nil
+}
+
+// Time returns the time value in the mutation.
+func (m *BillMutation) Time() (r int, exists bool) {
+	v := m.time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTime returns the old time value of the Bill.
+// If the Bill object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *BillMutation) OldTime(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTime is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTime: %w", err)
+	}
+	return oldValue.Time, nil
+}
+
+// AddTime adds i to time.
+func (m *BillMutation) AddTime(i int) {
+	if m.addtime != nil {
+		*m.addtime += i
+	} else {
+		m.addtime = &i
+	}
+}
+
+// AddedTime returns the value that was added to the time field in this mutation.
+func (m *BillMutation) AddedTime() (r int, exists bool) {
+	v := m.addtime
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTime reset all changes of the "time" field.
+func (m *BillMutation) ResetTime() {
+	m.time = nil
+	m.addtime = nil
+}
+
+// SetRepairinvoiceID sets the Repairinvoice edge to RepairInvoice by id.
+func (m *BillMutation) SetRepairinvoiceID(id int) {
+	m._Repairinvoice = &id
+}
+
+// ClearRepairinvoice clears the Repairinvoice edge to RepairInvoice.
+func (m *BillMutation) ClearRepairinvoice() {
+	m.cleared_Repairinvoice = true
+}
+
+// RepairinvoiceCleared returns if the edge Repairinvoice was cleared.
+func (m *BillMutation) RepairinvoiceCleared() bool {
+	return m.cleared_Repairinvoice
+}
+
+// RepairinvoiceID returns the Repairinvoice id in the mutation.
+func (m *BillMutation) RepairinvoiceID() (id int, exists bool) {
+	if m._Repairinvoice != nil {
+		return *m._Repairinvoice, true
+	}
+	return
+}
+
+// RepairinvoiceIDs returns the Repairinvoice ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// RepairinvoiceID instead. It exists only for internal usage by the builders.
+func (m *BillMutation) RepairinvoiceIDs() (ids []int) {
+	if id := m._Repairinvoice; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRepairinvoice reset all changes of the "Repairinvoice" edge.
+func (m *BillMutation) ResetRepairinvoice() {
+	m._Repairinvoice = nil
+	m.cleared_Repairinvoice = false
+}
+
+// SetEmployeeID sets the Employee edge to Employee by id.
+func (m *BillMutation) SetEmployeeID(id int) {
+	m._Employee = &id
+}
+
+// ClearEmployee clears the Employee edge to Employee.
+func (m *BillMutation) ClearEmployee() {
+	m.cleared_Employee = true
+}
+
+// EmployeeCleared returns if the edge Employee was cleared.
+func (m *BillMutation) EmployeeCleared() bool {
+	return m.cleared_Employee
+}
+
+// EmployeeID returns the Employee id in the mutation.
+func (m *BillMutation) EmployeeID() (id int, exists bool) {
+	if m._Employee != nil {
+		return *m._Employee, true
+	}
+	return
+}
+
+// EmployeeIDs returns the Employee ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// EmployeeID instead. It exists only for internal usage by the builders.
+func (m *BillMutation) EmployeeIDs() (ids []int) {
+	if id := m._Employee; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEmployee reset all changes of the "Employee" edge.
+func (m *BillMutation) ResetEmployee() {
+	m._Employee = nil
+	m.cleared_Employee = false
+}
+
+// SetBillingstatusID sets the Billingstatus edge to Billingstatus by id.
+func (m *BillMutation) SetBillingstatusID(id int) {
+	m._Billingstatus = &id
+}
+
+// ClearBillingstatus clears the Billingstatus edge to Billingstatus.
+func (m *BillMutation) ClearBillingstatus() {
+	m.cleared_Billingstatus = true
+}
+
+// BillingstatusCleared returns if the edge Billingstatus was cleared.
+func (m *BillMutation) BillingstatusCleared() bool {
+	return m.cleared_Billingstatus
+}
+
+// BillingstatusID returns the Billingstatus id in the mutation.
+func (m *BillMutation) BillingstatusID() (id int, exists bool) {
+	if m._Billingstatus != nil {
+		return *m._Billingstatus, true
+	}
+	return
+}
+
+// BillingstatusIDs returns the Billingstatus ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// BillingstatusID instead. It exists only for internal usage by the builders.
+func (m *BillMutation) BillingstatusIDs() (ids []int) {
+	if id := m._Billingstatus; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBillingstatus reset all changes of the "Billingstatus" edge.
+func (m *BillMutation) ResetBillingstatus() {
+	m._Billingstatus = nil
+	m.cleared_Billingstatus = false
+}
+
+// Op returns the operation name.
+func (m *BillMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Bill).
+func (m *BillMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *BillMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.price != nil {
+		fields = append(fields, bill.FieldPrice)
+	}
+	if m.time != nil {
+		fields = append(fields, bill.FieldTime)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *BillMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case bill.FieldPrice:
+		return m.Price()
+	case bill.FieldTime:
+		return m.Time()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *BillMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case bill.FieldPrice:
+		return m.OldPrice(ctx)
+	case bill.FieldTime:
+		return m.OldTime(ctx)
+	}
+	return nil, fmt.Errorf("unknown Bill field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *BillMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case bill.FieldPrice:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrice(v)
+		return nil
+	case bill.FieldTime:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTime(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Bill field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *BillMutation) AddedFields() []string {
+	var fields []string
+	if m.addprice != nil {
+		fields = append(fields, bill.FieldPrice)
+	}
+	if m.addtime != nil {
+		fields = append(fields, bill.FieldTime)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *BillMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case bill.FieldPrice:
+		return m.AddedPrice()
+	case bill.FieldTime:
+		return m.AddedTime()
+	}
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *BillMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case bill.FieldPrice:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPrice(v)
+		return nil
+	case bill.FieldTime:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTime(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Bill numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *BillMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *BillMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BillMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Bill nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *BillMutation) ResetField(name string) error {
+	switch name {
+	case bill.FieldPrice:
+		m.ResetPrice()
+		return nil
+	case bill.FieldTime:
+		m.ResetTime()
+		return nil
+	}
+	return fmt.Errorf("unknown Bill field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *BillMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m._Repairinvoice != nil {
+		edges = append(edges, bill.EdgeRepairinvoice)
+	}
+	if m._Employee != nil {
+		edges = append(edges, bill.EdgeEmployee)
+	}
+	if m._Billingstatus != nil {
+		edges = append(edges, bill.EdgeBillingstatus)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *BillMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case bill.EdgeRepairinvoice:
+		if id := m._Repairinvoice; id != nil {
+			return []ent.Value{*id}
+		}
+	case bill.EdgeEmployee:
+		if id := m._Employee; id != nil {
+			return []ent.Value{*id}
+		}
+	case bill.EdgeBillingstatus:
+		if id := m._Billingstatus; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *BillMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *BillMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *BillMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.cleared_Repairinvoice {
+		edges = append(edges, bill.EdgeRepairinvoice)
+	}
+	if m.cleared_Employee {
+		edges = append(edges, bill.EdgeEmployee)
+	}
+	if m.cleared_Billingstatus {
+		edges = append(edges, bill.EdgeBillingstatus)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *BillMutation) EdgeCleared(name string) bool {
+	switch name {
+	case bill.EdgeRepairinvoice:
+		return m.cleared_Repairinvoice
+	case bill.EdgeEmployee:
+		return m.cleared_Employee
+	case bill.EdgeBillingstatus:
+		return m.cleared_Billingstatus
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *BillMutation) ClearEdge(name string) error {
+	switch name {
+	case bill.EdgeRepairinvoice:
+		m.ClearRepairinvoice()
+		return nil
+	case bill.EdgeEmployee:
+		m.ClearEmployee()
+		return nil
+	case bill.EdgeBillingstatus:
+		m.ClearBillingstatus()
+		return nil
+	}
+	return fmt.Errorf("unknown Bill unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *BillMutation) ResetEdge(name string) error {
+	switch name {
+	case bill.EdgeRepairinvoice:
+		m.ResetRepairinvoice()
+		return nil
+	case bill.EdgeEmployee:
+		m.ResetEmployee()
+		return nil
+	case bill.EdgeBillingstatus:
+		m.ResetBillingstatus()
+		return nil
+	}
+	return fmt.Errorf("unknown Bill edge %s", name)
+}
+
+// BillingstatusMutation represents an operation that mutate the Billingstatuses
+// nodes in the graph.
+type BillingstatusMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *int
+	billingstatusname     *string
+	clearedFields         map[string]struct{}
+	billingstatuss        map[int]struct{}
+	removedbillingstatuss map[int]struct{}
+	done                  bool
+	oldValue              func(context.Context) (*Billingstatus, error)
+}
+
+var _ ent.Mutation = (*BillingstatusMutation)(nil)
+
+// billingstatusOption allows to manage the mutation configuration using functional options.
+type billingstatusOption func(*BillingstatusMutation)
+
+// newBillingstatusMutation creates new mutation for $n.Name.
+func newBillingstatusMutation(c config, op Op, opts ...billingstatusOption) *BillingstatusMutation {
+	m := &BillingstatusMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBillingstatus,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBillingstatusID sets the id field of the mutation.
+func withBillingstatusID(id int) billingstatusOption {
+	return func(m *BillingstatusMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Billingstatus
+		)
+		m.oldValue = func(ctx context.Context) (*Billingstatus, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Billingstatus.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBillingstatus sets the old Billingstatus of the mutation.
+func withBillingstatus(node *Billingstatus) billingstatusOption {
+	return func(m *BillingstatusMutation) {
+		m.oldValue = func(context.Context) (*Billingstatus, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BillingstatusMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BillingstatusMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *BillingstatusMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetBillingstatusname sets the billingstatusname field.
+func (m *BillingstatusMutation) SetBillingstatusname(s string) {
+	m.billingstatusname = &s
+}
+
+// Billingstatusname returns the billingstatusname value in the mutation.
+func (m *BillingstatusMutation) Billingstatusname() (r string, exists bool) {
+	v := m.billingstatusname
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBillingstatusname returns the old billingstatusname value of the Billingstatus.
+// If the Billingstatus object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *BillingstatusMutation) OldBillingstatusname(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldBillingstatusname is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldBillingstatusname requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBillingstatusname: %w", err)
+	}
+	return oldValue.Billingstatusname, nil
+}
+
+// ResetBillingstatusname reset all changes of the "billingstatusname" field.
+func (m *BillingstatusMutation) ResetBillingstatusname() {
+	m.billingstatusname = nil
+}
+
+// AddBillingstatusIDs adds the billingstatuss edge to Bill by ids.
+func (m *BillingstatusMutation) AddBillingstatusIDs(ids ...int) {
+	if m.billingstatuss == nil {
+		m.billingstatuss = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.billingstatuss[ids[i]] = struct{}{}
+	}
+}
+
+// RemoveBillingstatusIDs removes the billingstatuss edge to Bill by ids.
+func (m *BillingstatusMutation) RemoveBillingstatusIDs(ids ...int) {
+	if m.removedbillingstatuss == nil {
+		m.removedbillingstatuss = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedbillingstatuss[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBillingstatuss returns the removed ids of billingstatuss.
+func (m *BillingstatusMutation) RemovedBillingstatussIDs() (ids []int) {
+	for id := range m.removedbillingstatuss {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BillingstatussIDs returns the billingstatuss ids in the mutation.
+func (m *BillingstatusMutation) BillingstatussIDs() (ids []int) {
+	for id := range m.billingstatuss {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBillingstatuss reset all changes of the "billingstatuss" edge.
+func (m *BillingstatusMutation) ResetBillingstatuss() {
+	m.billingstatuss = nil
+	m.removedbillingstatuss = nil
+}
+
+// Op returns the operation name.
+func (m *BillingstatusMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Billingstatus).
+func (m *BillingstatusMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *BillingstatusMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.billingstatusname != nil {
+		fields = append(fields, billingstatus.FieldBillingstatusname)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *BillingstatusMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case billingstatus.FieldBillingstatusname:
+		return m.Billingstatusname()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *BillingstatusMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case billingstatus.FieldBillingstatusname:
+		return m.OldBillingstatusname(ctx)
+	}
+	return nil, fmt.Errorf("unknown Billingstatus field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *BillingstatusMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case billingstatus.FieldBillingstatusname:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBillingstatusname(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Billingstatus field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *BillingstatusMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *BillingstatusMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *BillingstatusMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Billingstatus numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *BillingstatusMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *BillingstatusMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BillingstatusMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Billingstatus nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *BillingstatusMutation) ResetField(name string) error {
+	switch name {
+	case billingstatus.FieldBillingstatusname:
+		m.ResetBillingstatusname()
+		return nil
+	}
+	return fmt.Errorf("unknown Billingstatus field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *BillingstatusMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.billingstatuss != nil {
+		edges = append(edges, billingstatus.EdgeBillingstatuss)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *BillingstatusMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case billingstatus.EdgeBillingstatuss:
+		ids := make([]ent.Value, 0, len(m.billingstatuss))
+		for id := range m.billingstatuss {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *BillingstatusMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedbillingstatuss != nil {
+		edges = append(edges, billingstatus.EdgeBillingstatuss)
+	}
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *BillingstatusMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case billingstatus.EdgeBillingstatuss:
+		ids := make([]ent.Value, 0, len(m.removedbillingstatuss))
+		for id := range m.removedbillingstatuss {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *BillingstatusMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *BillingstatusMutation) EdgeCleared(name string) bool {
+	switch name {
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *BillingstatusMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Billingstatus unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *BillingstatusMutation) ResetEdge(name string) error {
+	switch name {
+	case billingstatus.EdgeBillingstatuss:
+		m.ResetBillingstatuss()
+		return nil
+	}
+	return fmt.Errorf("unknown Billingstatus edge %s", name)
+}
 
 // BranchMutation represents an operation that mutate the Branches
 // nodes in the graph.
@@ -1279,17 +2255,19 @@ func (m *DeviceMutation) ResetEdge(name string) error {
 // nodes in the graph.
 type EmployeeMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *int
-	employeename     *string
-	employeeemail    *string
-	password         *string
-	clearedFields    map[string]struct{}
-	employees        map[int]struct{}
-	removedemployees map[int]struct{}
-	done             bool
-	oldValue         func(context.Context) (*Employee, error)
+	op                  Op
+	typ                 string
+	id                  *int
+	employeename        *string
+	employeeemail       *string
+	password            *string
+	clearedFields       map[string]struct{}
+	employees           map[int]struct{}
+	removedemployees    map[int]struct{}
+	employeebill        map[int]struct{}
+	removedemployeebill map[int]struct{}
+	done                bool
+	oldValue            func(context.Context) (*Employee, error)
 }
 
 var _ ent.Mutation = (*EmployeeMutation)(nil)
@@ -1524,6 +2502,48 @@ func (m *EmployeeMutation) ResetEmployees() {
 	m.removedemployees = nil
 }
 
+// AddEmployeebillIDs adds the employeebill edge to Bill by ids.
+func (m *EmployeeMutation) AddEmployeebillIDs(ids ...int) {
+	if m.employeebill == nil {
+		m.employeebill = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.employeebill[ids[i]] = struct{}{}
+	}
+}
+
+// RemoveEmployeebillIDs removes the employeebill edge to Bill by ids.
+func (m *EmployeeMutation) RemoveEmployeebillIDs(ids ...int) {
+	if m.removedemployeebill == nil {
+		m.removedemployeebill = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedemployeebill[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEmployeebill returns the removed ids of employeebill.
+func (m *EmployeeMutation) RemovedEmployeebillIDs() (ids []int) {
+	for id := range m.removedemployeebill {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EmployeebillIDs returns the employeebill ids in the mutation.
+func (m *EmployeeMutation) EmployeebillIDs() (ids []int) {
+	for id := range m.employeebill {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEmployeebill reset all changes of the "employeebill" edge.
+func (m *EmployeeMutation) ResetEmployeebill() {
+	m.employeebill = nil
+	m.removedemployeebill = nil
+}
+
 // Op returns the operation name.
 func (m *EmployeeMutation) Op() Op {
 	return m.op
@@ -1673,9 +2693,12 @@ func (m *EmployeeMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *EmployeeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.employees != nil {
 		edges = append(edges, employee.EdgeEmployees)
+	}
+	if m.employeebill != nil {
+		edges = append(edges, employee.EdgeEmployeebill)
 	}
 	return edges
 }
@@ -1690,6 +2713,12 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case employee.EdgeEmployeebill:
+		ids := make([]ent.Value, 0, len(m.employeebill))
+		for id := range m.employeebill {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -1697,9 +2726,12 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *EmployeeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedemployees != nil {
 		edges = append(edges, employee.EdgeEmployees)
+	}
+	if m.removedemployeebill != nil {
+		edges = append(edges, employee.EdgeEmployeebill)
 	}
 	return edges
 }
@@ -1714,6 +2746,12 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case employee.EdgeEmployeebill:
+		ids := make([]ent.Value, 0, len(m.removedemployeebill))
+		for id := range m.removedemployeebill {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -1721,7 +2759,7 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *EmployeeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -1748,6 +2786,9 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	switch name {
 	case employee.EdgeEmployees:
 		m.ResetEmployees()
+		return nil
+	case employee.EdgeEmployeebill:
+		m.ResetEmployeebill()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee edge %s", name)
@@ -2205,6 +3246,8 @@ type RepairInvoiceMutation struct {
 	cleareduser          bool
 	returninvoice        *int
 	clearedreturninvoice bool
+	bill                 *int
+	clearedbill          bool
 	done                 bool
 	oldValue             func(context.Context) (*RepairInvoice, error)
 }
@@ -2520,6 +3563,45 @@ func (m *RepairInvoiceMutation) ResetReturninvoice() {
 	m.clearedreturninvoice = false
 }
 
+// SetBillID sets the bill edge to Bill by id.
+func (m *RepairInvoiceMutation) SetBillID(id int) {
+	m.bill = &id
+}
+
+// ClearBill clears the bill edge to Bill.
+func (m *RepairInvoiceMutation) ClearBill() {
+	m.clearedbill = true
+}
+
+// BillCleared returns if the edge bill was cleared.
+func (m *RepairInvoiceMutation) BillCleared() bool {
+	return m.clearedbill
+}
+
+// BillID returns the bill id in the mutation.
+func (m *RepairInvoiceMutation) BillID() (id int, exists bool) {
+	if m.bill != nil {
+		return *m.bill, true
+	}
+	return
+}
+
+// BillIDs returns the bill ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// BillID instead. It exists only for internal usage by the builders.
+func (m *RepairInvoiceMutation) BillIDs() (ids []int) {
+	if id := m.bill; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBill reset all changes of the "bill" edge.
+func (m *RepairInvoiceMutation) ResetBill() {
+	m.bill = nil
+	m.clearedbill = false
+}
+
 // Op returns the operation name.
 func (m *RepairInvoiceMutation) Op() Op {
 	return m.op
@@ -2635,7 +3717,7 @@ func (m *RepairInvoiceMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *RepairInvoiceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.device != nil {
 		edges = append(edges, repairinvoice.EdgeDevice)
 	}
@@ -2650,6 +3732,9 @@ func (m *RepairInvoiceMutation) AddedEdges() []string {
 	}
 	if m.returninvoice != nil {
 		edges = append(edges, repairinvoice.EdgeReturninvoice)
+	}
+	if m.bill != nil {
+		edges = append(edges, repairinvoice.EdgeBill)
 	}
 	return edges
 }
@@ -2678,6 +3763,10 @@ func (m *RepairInvoiceMutation) AddedIDs(name string) []ent.Value {
 		if id := m.returninvoice; id != nil {
 			return []ent.Value{*id}
 		}
+	case repairinvoice.EdgeBill:
+		if id := m.bill; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
@@ -2685,7 +3774,7 @@ func (m *RepairInvoiceMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *RepairInvoiceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	return edges
 }
 
@@ -2700,7 +3789,7 @@ func (m *RepairInvoiceMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *RepairInvoiceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.cleareddevice {
 		edges = append(edges, repairinvoice.EdgeDevice)
 	}
@@ -2715,6 +3804,9 @@ func (m *RepairInvoiceMutation) ClearedEdges() []string {
 	}
 	if m.clearedreturninvoice {
 		edges = append(edges, repairinvoice.EdgeReturninvoice)
+	}
+	if m.clearedbill {
+		edges = append(edges, repairinvoice.EdgeBill)
 	}
 	return edges
 }
@@ -2733,6 +3825,8 @@ func (m *RepairInvoiceMutation) EdgeCleared(name string) bool {
 		return m.cleareduser
 	case repairinvoice.EdgeReturninvoice:
 		return m.clearedreturninvoice
+	case repairinvoice.EdgeBill:
+		return m.clearedbill
 	}
 	return false
 }
@@ -2755,6 +3849,9 @@ func (m *RepairInvoiceMutation) ClearEdge(name string) error {
 		return nil
 	case repairinvoice.EdgeReturninvoice:
 		m.ClearReturninvoice()
+		return nil
+	case repairinvoice.EdgeBill:
+		m.ClearBill()
 		return nil
 	}
 	return fmt.Errorf("unknown RepairInvoice unique edge %s", name)
@@ -2779,6 +3876,9 @@ func (m *RepairInvoiceMutation) ResetEdge(name string) error {
 		return nil
 	case repairinvoice.EdgeReturninvoice:
 		m.ResetReturninvoice()
+		return nil
+	case repairinvoice.EdgeBill:
+		m.ResetBill()
 		return nil
 	}
 	return fmt.Errorf("unknown RepairInvoice edge %s", name)

@@ -1,5 +1,18 @@
 basePath: /api/v1
 definitions:
+  controllers.Bill:
+    properties:
+      billingstatus:
+        type: integer
+      employee:
+        type: integer
+      price:
+        type: integer
+      repairinvoice:
+        type: integer
+      time:
+        type: integer
+    type: object
   controllers.RepairInvoice:
     properties:
       device:
@@ -38,6 +51,62 @@ definitions:
         type: string
       room:
         type: integer
+    type: object
+  ent.Bill:
+    properties:
+      edges:
+        $ref: '#/definitions/ent.BillEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the BillQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+      price:
+        description: Price holds the value of the "price" field.
+        type: integer
+      time:
+        description: Time holds the value of the "time" field.
+        type: integer
+    type: object
+  ent.BillEdges:
+    properties:
+      billingstatus:
+        $ref: '#/definitions/ent.Billingstatus'
+        description: Billingstatus holds the value of the Billingstatus edge.
+        type: object
+      employee:
+        $ref: '#/definitions/ent.Employee'
+        description: Employee holds the value of the Employee edge.
+        type: object
+      repairinvoice:
+        $ref: '#/definitions/ent.RepairInvoice'
+        description: Repairinvoice holds the value of the Repairinvoice edge.
+        type: object
+    type: object
+  ent.Billingstatus:
+    properties:
+      billingstatusname:
+        description: Billingstatusname holds the value of the "billingstatusname" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.BillingstatusEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the BillingstatusQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.BillingstatusEdges:
+    properties:
+      billingstatuss:
+        description: Billingstatuss holds the value of the billingstatuss edge.
+        items:
+          $ref: '#/definitions/ent.Bill'
+        type: array
     type: object
   ent.Branch:
     properties:
@@ -140,6 +209,11 @@ definitions:
     type: object
   ent.EmployeeEdges:
     properties:
+      employeebill:
+        description: Employeebill holds the value of the employeebill edge.
+        items:
+          $ref: '#/definitions/ent.Bill'
+        type: array
       employees:
         description: Employees holds the value of the employees edge.
         items:
@@ -191,6 +265,10 @@ definitions:
     type: object
   ent.RepairInvoiceEdges:
     properties:
+      bill:
+        $ref: '#/definitions/ent.Bill'
+        description: Bill holds the value of the bill edge.
+        type: object
       device:
         $ref: '#/definitions/ent.Device'
         description: Device holds the value of the device edge.
@@ -397,6 +475,154 @@ info:
   title: SUT SA Example API
   version: "1.0"
 paths:
+  /billingstatuss:
+    get:
+      description: list billingstatus entities
+      operationId: list-billingstatus
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Billingstatus'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List billingstatus entities
+    post:
+      consumes:
+      - application/json
+      description: Create billingstatus
+      operationId: create-billingstatus
+      parameters:
+      - description: Billingstatus entity
+        in: body
+        name: billingstatus
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Billingstatus'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Billingstatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create billingstatus
+  /billingstatuss/{id}:
+    get:
+      description: get billingstatus by ID
+      operationId: get-billingstatus
+      parameters:
+      - description: Billingstatus ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Billingstatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a billingstatus entity by ID
+  /bills:
+    get:
+      description: list bill entities
+      operationId: list-bill
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Bill'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List bill entities
+    post:
+      consumes:
+      - application/json
+      description: Create bill
+      operationId: create-bill
+      parameters:
+      - description: Bill entity
+        in: body
+        name: bill
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Bill'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.Bill'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create bill
   /branch/{id}:
     delete:
       description: get branch by ID

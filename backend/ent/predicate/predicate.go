@@ -6,6 +6,12 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 )
 
+// Bill is the predicate function for bill builders.
+type Bill func(*sql.Selector)
+
+// Billingstatus is the predicate function for billingstatus builders.
+type Billingstatus func(*sql.Selector)
+
 // Branch is the predicate function for branch builders.
 type Branch func(*sql.Selector)
 

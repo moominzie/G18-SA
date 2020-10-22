@@ -18,6 +18,229 @@
     "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
+        "/billingstatuss": {
+            "get": {
+                "description": "list billingstatus entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List billingstatus entities",
+                "operationId": "list-billingstatus",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Billingstatus"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create billingstatus",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create billingstatus",
+                "operationId": "create-billingstatus",
+                "parameters": [
+                    {
+                        "description": "Billingstatus entity",
+                        "name": "billingstatus",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ent.Billingstatus"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Billingstatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/billingstatuss/{id}": {
+            "get": {
+                "description": "get billingstatus by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a billingstatus entity by ID",
+                "operationId": "get-billingstatus",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Billingstatus ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Billingstatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/bills": {
+            "get": {
+                "description": "list bill entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List bill entities",
+                "operationId": "list-bill",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Bill"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create bill",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create bill",
+                "operationId": "create-bill",
+                "parameters": [
+                    {
+                        "description": "Bill entity",
+                        "name": "bill",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Bill"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Bill"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
         "/branch/{id}": {
             "delete": {
                 "description": "get branch by ID",
@@ -1988,6 +2211,26 @@
         }
     },
     "definitions": {
+        "controllers.Bill": {
+            "type": "object",
+            "properties": {
+                "billingstatus": {
+                    "type": "integer"
+                },
+                "employee": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "repairinvoice": {
+                    "type": "integer"
+                },
+                "time": {
+                    "type": "integer"
+                }
+            }
+        },
         "controllers.RepairInvoice": {
             "type": "object",
             "properties": {
@@ -2045,6 +2288,78 @@
                 },
                 "room": {
                     "type": "integer"
+                }
+            }
+        },
+        "ent.Bill": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the BillQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.BillEdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "price": {
+                    "description": "Price holds the value of the \"price\" field.",
+                    "type": "integer"
+                },
+                "time": {
+                    "description": "Time holds the value of the \"time\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.BillEdges": {
+            "type": "object",
+            "properties": {
+                "billingstatus": {
+                    "description": "Billingstatus holds the value of the Billingstatus edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Billingstatus"
+                },
+                "employee": {
+                    "description": "Employee holds the value of the Employee edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Employee"
+                },
+                "repairinvoice": {
+                    "description": "Repairinvoice holds the value of the Repairinvoice edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.RepairInvoice"
+                }
+            }
+        },
+        "ent.Billingstatus": {
+            "type": "object",
+            "properties": {
+                "billingstatusname": {
+                    "description": "Billingstatusname holds the value of the \"billingstatusname\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the BillingstatusQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.BillingstatusEdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.BillingstatusEdges": {
+            "type": "object",
+            "properties": {
+                "billingstatuss": {
+                    "description": "Billingstatuss holds the value of the billingstatuss edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Bill"
+                    }
                 }
             }
         },
@@ -2179,6 +2494,13 @@
         "ent.EmployeeEdges": {
             "type": "object",
             "properties": {
+                "employeebill": {
+                    "description": "Employeebill holds the value of the employeebill edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Bill"
+                    }
+                },
                 "employees": {
                     "description": "Employees holds the value of the employees edge.",
                     "type": "array",
@@ -2246,6 +2568,11 @@
         "ent.RepairInvoiceEdges": {
             "type": "object",
             "properties": {
+                "bill": {
+                    "description": "Bill holds the value of the bill edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Bill"
+                },
                 "device": {
                     "description": "Device holds the value of the device edge.",
                     "type": "object",

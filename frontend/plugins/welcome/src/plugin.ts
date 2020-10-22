@@ -6,6 +6,8 @@ import CreateReturninvoice from './components/RecordReturninvoice';
 import ShowReturninvoice from './components/RecordReturninvoiceTable';
 import CreateRepairInvoice from './components/RecordRepairInvoice';
 import ShowRepairInvoice from './components/RecordRepairInvoiceTable';
+import CreateBill from './components/RecordBill';
+import ShowBill from './components/RecordBillTable';
 import SignIn from './components/SignIn';
  
 export const plugin = createPlugin({
@@ -18,6 +20,8 @@ export const plugin = createPlugin({
     router.registerRoute('/RecordReturninvoiceTable', ShowReturninvoice);
     router.registerRoute('/RecordRepairInvoice', CreateRepairInvoice);
     router.registerRoute('/RecordRepairInvoiceTable', ShowRepairInvoice);
+    router.registerRoute('/RecordBill', CreateBill);
+    router.registerRoute('/RecordBillTable', ShowBill);
     router.registerRoute('/', SignIn);
   },
 });

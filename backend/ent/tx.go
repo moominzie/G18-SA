@@ -12,6 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Bill is the client for interacting with the Bill builders.
+	Bill *BillClient
+	// Billingstatus is the client for interacting with the Billingstatus builders.
+	Billingstatus *BillingstatusClient
 	// Branch is the client for interacting with the Branch builders.
 	Branch *BranchClient
 	// Building is the client for interacting with the Building builders.
@@ -171,6 +175,8 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Bill = NewBillClient(tx.config)
+	tx.Billingstatus = NewBillingstatusClient(tx.config)
 	tx.Branch = NewBranchClient(tx.config)
 	tx.Building = NewBuildingClient(tx.config)
 	tx.Device = NewDeviceClient(tx.config)
@@ -192,7 +198,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Branch.QueryXXX(), the query will be executed
+// applies a query, for example: Bill.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

@@ -9,6 +9,8 @@ import (
 
 	"github.com/moominzie/user-record/ent/migrate"
 
+	"github.com/moominzie/user-record/ent/bill"
+	"github.com/moominzie/user-record/ent/billingstatus"
 	"github.com/moominzie/user-record/ent/branch"
 	"github.com/moominzie/user-record/ent/building"
 	"github.com/moominzie/user-record/ent/device"
@@ -32,6 +34,10 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Bill is the client for interacting with the Bill builders.
+	Bill *BillClient
+	// Billingstatus is the client for interacting with the Billingstatus builders.
+	Billingstatus *BillingstatusClient
 	// Branch is the client for interacting with the Branch builders.
 	Branch *BranchClient
 	// Building is the client for interacting with the Building builders.
@@ -69,6 +75,8 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Bill = NewBillClient(c.config)
+	c.Billingstatus = NewBillingstatusClient(c.config)
 	c.Branch = NewBranchClient(c.config)
 	c.Building = NewBuildingClient(c.config)
 	c.Device = NewDeviceClient(c.config)
@@ -113,6 +121,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		Bill:          NewBillClient(cfg),
+		Billingstatus: NewBillingstatusClient(cfg),
 		Branch:        NewBranchClient(cfg),
 		Building:      NewBuildingClient(cfg),
 		Device:        NewDeviceClient(cfg),
@@ -140,6 +150,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := config{driver: &txDriver{tx: tx, drv: c.driver}, log: c.log, debug: c.debug, hooks: c.hooks}
 	return &Tx{
 		config:        cfg,
+		Bill:          NewBillClient(cfg),
+		Billingstatus: NewBillingstatusClient(cfg),
 		Branch:        NewBranchClient(cfg),
 		Building:      NewBuildingClient(cfg),
 		Device:        NewDeviceClient(cfg),
@@ -158,7 +170,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Branch.
+//		Bill.
 //		Query().
 //		Count(ctx)
 //
@@ -180,6 +192,8 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Bill.Use(hooks...)
+	c.Billingstatus.Use(hooks...)
 	c.Branch.Use(hooks...)
 	c.Building.Use(hooks...)
 	c.Device.Use(hooks...)
@@ -192,6 +206,236 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Statust.Use(hooks...)
 	c.Symptom.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// BillClient is a client for the Bill schema.
+type BillClient struct {
+	config
+}
+
+// NewBillClient returns a client for the Bill from the given config.
+func NewBillClient(c config) *BillClient {
+	return &BillClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `bill.Hooks(f(g(h())))`.
+func (c *BillClient) Use(hooks ...Hook) {
+	c.hooks.Bill = append(c.hooks.Bill, hooks...)
+}
+
+// Create returns a create builder for Bill.
+func (c *BillClient) Create() *BillCreate {
+	mutation := newBillMutation(c.config, OpCreate)
+	return &BillCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for Bill.
+func (c *BillClient) Update() *BillUpdate {
+	mutation := newBillMutation(c.config, OpUpdate)
+	return &BillUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BillClient) UpdateOne(b *Bill) *BillUpdateOne {
+	mutation := newBillMutation(c.config, OpUpdateOne, withBill(b))
+	return &BillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BillClient) UpdateOneID(id int) *BillUpdateOne {
+	mutation := newBillMutation(c.config, OpUpdateOne, withBillID(id))
+	return &BillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Bill.
+func (c *BillClient) Delete() *BillDelete {
+	mutation := newBillMutation(c.config, OpDelete)
+	return &BillDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *BillClient) DeleteOne(b *Bill) *BillDeleteOne {
+	return c.DeleteOneID(b.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *BillClient) DeleteOneID(id int) *BillDeleteOne {
+	builder := c.Delete().Where(bill.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BillDeleteOne{builder}
+}
+
+// Create returns a query builder for Bill.
+func (c *BillClient) Query() *BillQuery {
+	return &BillQuery{config: c.config}
+}
+
+// Get returns a Bill entity by its id.
+func (c *BillClient) Get(ctx context.Context, id int) (*Bill, error) {
+	return c.Query().Where(bill.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BillClient) GetX(ctx context.Context, id int) *Bill {
+	b, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+// QueryRepairinvoice queries the Repairinvoice edge of a Bill.
+func (c *BillClient) QueryRepairinvoice(b *Bill) *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bill.Table, bill.FieldID, id),
+			sqlgraph.To(repairinvoice.Table, repairinvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, bill.RepairinvoiceTable, bill.RepairinvoiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEmployee queries the Employee edge of a Bill.
+func (c *BillClient) QueryEmployee(b *Bill) *EmployeeQuery {
+	query := &EmployeeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bill.Table, bill.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, bill.EmployeeTable, bill.EmployeeColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBillingstatus queries the Billingstatus edge of a Bill.
+func (c *BillClient) QueryBillingstatus(b *Bill) *BillingstatusQuery {
+	query := &BillingstatusQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bill.Table, bill.FieldID, id),
+			sqlgraph.To(billingstatus.Table, billingstatus.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, bill.BillingstatusTable, bill.BillingstatusColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BillClient) Hooks() []Hook {
+	return c.hooks.Bill
+}
+
+// BillingstatusClient is a client for the Billingstatus schema.
+type BillingstatusClient struct {
+	config
+}
+
+// NewBillingstatusClient returns a client for the Billingstatus from the given config.
+func NewBillingstatusClient(c config) *BillingstatusClient {
+	return &BillingstatusClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `billingstatus.Hooks(f(g(h())))`.
+func (c *BillingstatusClient) Use(hooks ...Hook) {
+	c.hooks.Billingstatus = append(c.hooks.Billingstatus, hooks...)
+}
+
+// Create returns a create builder for Billingstatus.
+func (c *BillingstatusClient) Create() *BillingstatusCreate {
+	mutation := newBillingstatusMutation(c.config, OpCreate)
+	return &BillingstatusCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for Billingstatus.
+func (c *BillingstatusClient) Update() *BillingstatusUpdate {
+	mutation := newBillingstatusMutation(c.config, OpUpdate)
+	return &BillingstatusUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BillingstatusClient) UpdateOne(b *Billingstatus) *BillingstatusUpdateOne {
+	mutation := newBillingstatusMutation(c.config, OpUpdateOne, withBillingstatus(b))
+	return &BillingstatusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BillingstatusClient) UpdateOneID(id int) *BillingstatusUpdateOne {
+	mutation := newBillingstatusMutation(c.config, OpUpdateOne, withBillingstatusID(id))
+	return &BillingstatusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Billingstatus.
+func (c *BillingstatusClient) Delete() *BillingstatusDelete {
+	mutation := newBillingstatusMutation(c.config, OpDelete)
+	return &BillingstatusDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *BillingstatusClient) DeleteOne(b *Billingstatus) *BillingstatusDeleteOne {
+	return c.DeleteOneID(b.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *BillingstatusClient) DeleteOneID(id int) *BillingstatusDeleteOne {
+	builder := c.Delete().Where(billingstatus.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BillingstatusDeleteOne{builder}
+}
+
+// Create returns a query builder for Billingstatus.
+func (c *BillingstatusClient) Query() *BillingstatusQuery {
+	return &BillingstatusQuery{config: c.config}
+}
+
+// Get returns a Billingstatus entity by its id.
+func (c *BillingstatusClient) Get(ctx context.Context, id int) (*Billingstatus, error) {
+	return c.Query().Where(billingstatus.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BillingstatusClient) GetX(ctx context.Context, id int) *Billingstatus {
+	b, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+// QueryBillingstatuss queries the billingstatuss edge of a Billingstatus.
+func (c *BillingstatusClient) QueryBillingstatuss(b *Billingstatus) *BillQuery {
+	query := &BillQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(billingstatus.Table, billingstatus.FieldID, id),
+			sqlgraph.To(bill.Table, bill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, billingstatus.BillingstatussTable, billingstatus.BillingstatussColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BillingstatusClient) Hooks() []Hook {
+	return c.hooks.Billingstatus
 }
 
 // BranchClient is a client for the Branch schema.
@@ -617,6 +861,22 @@ func (c *EmployeeClient) QueryEmployees(e *Employee) *ReturninvoiceQuery {
 	return query
 }
 
+// QueryEmployeebill queries the employeebill edge of a Employee.
+func (c *EmployeeClient) QueryEmployeebill(e *Employee) *BillQuery {
+	query := &BillQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(bill.Table, bill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.EmployeebillTable, employee.EmployeebillColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EmployeeClient) Hooks() []Hook {
 	return c.hooks.Employee
@@ -888,6 +1148,22 @@ func (c *RepairInvoiceClient) QueryReturninvoice(ri *RepairInvoice) *Returninvoi
 			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
 			sqlgraph.To(returninvoice.Table, returninvoice.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.ReturninvoiceTable, repairinvoice.ReturninvoiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBill queries the bill edge of a RepairInvoice.
+func (c *RepairInvoiceClient) QueryBill(ri *RepairInvoice) *BillQuery {
+	query := &BillQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ri.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
+			sqlgraph.To(bill.Table, bill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.BillTable, repairinvoice.BillColumn),
 		)
 		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
 		return fromV, nil

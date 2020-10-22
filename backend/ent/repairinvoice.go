@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
@@ -43,9 +44,11 @@ type RepairInvoiceEdges struct {
 	User *User
 	// Returninvoice holds the value of the returninvoice edge.
 	Returninvoice *Returninvoice
+	// Bill holds the value of the bill edge.
+	Bill *Bill
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // DeviceOrErr returns the Device value or an error if the edge
@@ -116,6 +119,20 @@ func (e RepairInvoiceEdges) ReturninvoiceOrErr() (*Returninvoice, error) {
 		return e.Returninvoice, nil
 	}
 	return nil, &NotLoadedError{edge: "returninvoice"}
+}
+
+// BillOrErr returns the Bill value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RepairInvoiceEdges) BillOrErr() (*Bill, error) {
+	if e.loadedTypes[5] {
+		if e.Bill == nil {
+			// The edge bill was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: bill.Label}
+		}
+		return e.Bill, nil
+	}
+	return nil, &NotLoadedError{edge: "bill"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -206,6 +223,11 @@ func (ri *RepairInvoice) QueryUser() *UserQuery {
 // QueryReturninvoice queries the returninvoice edge of the RepairInvoice.
 func (ri *RepairInvoice) QueryReturninvoice() *ReturninvoiceQuery {
 	return (&RepairInvoiceClient{config: ri.config}).QueryReturninvoice(ri)
+}
+
+// QueryBill queries the bill edge of the RepairInvoice.
+func (ri *RepairInvoice) QueryBill() *BillQuery {
+	return (&RepairInvoiceClient{config: ri.config}).QueryBill(ri)
 }
 
 // Update returns a builder for updating this RepairInvoice.

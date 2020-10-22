@@ -9,6 +9,7 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/employee"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/returninvoice"
@@ -61,6 +62,21 @@ func (eu *EmployeeUpdate) AddEmployees(r ...*Returninvoice) *EmployeeUpdate {
 	return eu.AddEmployeeIDs(ids...)
 }
 
+// AddEmployeebillIDs adds the employeebill edge to Bill by ids.
+func (eu *EmployeeUpdate) AddEmployeebillIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.AddEmployeebillIDs(ids...)
+	return eu
+}
+
+// AddEmployeebill adds the employeebill edges to Bill.
+func (eu *EmployeeUpdate) AddEmployeebill(b ...*Bill) *EmployeeUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return eu.AddEmployeebillIDs(ids...)
+}
+
 // Mutation returns the EmployeeMutation object of the builder.
 func (eu *EmployeeUpdate) Mutation() *EmployeeMutation {
 	return eu.mutation
@@ -79,6 +95,21 @@ func (eu *EmployeeUpdate) RemoveEmployees(r ...*Returninvoice) *EmployeeUpdate {
 		ids[i] = r[i].ID
 	}
 	return eu.RemoveEmployeeIDs(ids...)
+}
+
+// RemoveEmployeebillIDs removes the employeebill edge to Bill by ids.
+func (eu *EmployeeUpdate) RemoveEmployeebillIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.RemoveEmployeebillIDs(ids...)
+	return eu
+}
+
+// RemoveEmployeebill removes employeebill edges to Bill.
+func (eu *EmployeeUpdate) RemoveEmployeebill(b ...*Bill) *EmployeeUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return eu.RemoveEmployeebillIDs(ids...)
 }
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
@@ -225,6 +256,44 @@ func (eu *EmployeeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if nodes := eu.mutation.RemovedEmployeebillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.EmployeebillTable,
+			Columns: []string{employee.EmployeebillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.EmployeebillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.EmployeebillTable,
+			Columns: []string{employee.EmployeebillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{employee.Label}
@@ -276,6 +345,21 @@ func (euo *EmployeeUpdateOne) AddEmployees(r ...*Returninvoice) *EmployeeUpdateO
 	return euo.AddEmployeeIDs(ids...)
 }
 
+// AddEmployeebillIDs adds the employeebill edge to Bill by ids.
+func (euo *EmployeeUpdateOne) AddEmployeebillIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.AddEmployeebillIDs(ids...)
+	return euo
+}
+
+// AddEmployeebill adds the employeebill edges to Bill.
+func (euo *EmployeeUpdateOne) AddEmployeebill(b ...*Bill) *EmployeeUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return euo.AddEmployeebillIDs(ids...)
+}
+
 // Mutation returns the EmployeeMutation object of the builder.
 func (euo *EmployeeUpdateOne) Mutation() *EmployeeMutation {
 	return euo.mutation
@@ -294,6 +378,21 @@ func (euo *EmployeeUpdateOne) RemoveEmployees(r ...*Returninvoice) *EmployeeUpda
 		ids[i] = r[i].ID
 	}
 	return euo.RemoveEmployeeIDs(ids...)
+}
+
+// RemoveEmployeebillIDs removes the employeebill edge to Bill by ids.
+func (euo *EmployeeUpdateOne) RemoveEmployeebillIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.RemoveEmployeebillIDs(ids...)
+	return euo
+}
+
+// RemoveEmployeebill removes employeebill edges to Bill.
+func (euo *EmployeeUpdateOne) RemoveEmployeebill(b ...*Bill) *EmployeeUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return euo.RemoveEmployeebillIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -430,6 +529,44 @@ func (euo *EmployeeUpdateOne) sqlSave(ctx context.Context) (e *Employee, err err
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: returninvoice.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nodes := euo.mutation.RemovedEmployeebillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.EmployeebillTable,
+			Columns: []string{employee.EmployeebillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.EmployeebillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.EmployeebillTable,
+			Columns: []string{employee.EmployeebillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bill.FieldID,
 				},
 			},
 		}

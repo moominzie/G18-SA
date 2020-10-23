@@ -16,6 +16,8 @@ import (
 	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/employee"
 	"github.com/moominzie/user-record/ent/faculty"
+	"github.com/moominzie/user-record/ent/part"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
 	"github.com/moominzie/user-record/ent/room"
@@ -48,6 +50,10 @@ type Client struct {
 	Employee *EmployeeClient
 	// Faculty is the client for interacting with the Faculty builders.
 	Faculty *FacultyClient
+	// Part is the client for interacting with the Part builders.
+	Part *PartClient
+	// Partorder is the client for interacting with the Partorder builders.
+	Partorder *PartorderClient
 	// RepairInvoice is the client for interacting with the RepairInvoice builders.
 	RepairInvoice *RepairInvoiceClient
 	// Returninvoice is the client for interacting with the Returninvoice builders.
@@ -82,6 +88,8 @@ func (c *Client) init() {
 	c.Device = NewDeviceClient(c.config)
 	c.Employee = NewEmployeeClient(c.config)
 	c.Faculty = NewFacultyClient(c.config)
+	c.Part = NewPartClient(c.config)
+	c.Partorder = NewPartorderClient(c.config)
 	c.RepairInvoice = NewRepairInvoiceClient(c.config)
 	c.Returninvoice = NewReturninvoiceClient(c.config)
 	c.Room = NewRoomClient(c.config)
@@ -128,6 +136,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Device:        NewDeviceClient(cfg),
 		Employee:      NewEmployeeClient(cfg),
 		Faculty:       NewFacultyClient(cfg),
+		Part:          NewPartClient(cfg),
+		Partorder:     NewPartorderClient(cfg),
 		RepairInvoice: NewRepairInvoiceClient(cfg),
 		Returninvoice: NewReturninvoiceClient(cfg),
 		Room:          NewRoomClient(cfg),
@@ -157,6 +167,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Device:        NewDeviceClient(cfg),
 		Employee:      NewEmployeeClient(cfg),
 		Faculty:       NewFacultyClient(cfg),
+		Part:          NewPartClient(cfg),
+		Partorder:     NewPartorderClient(cfg),
 		RepairInvoice: NewRepairInvoiceClient(cfg),
 		Returninvoice: NewReturninvoiceClient(cfg),
 		Room:          NewRoomClient(cfg),
@@ -199,6 +211,8 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Device.Use(hooks...)
 	c.Employee.Use(hooks...)
 	c.Faculty.Use(hooks...)
+	c.Part.Use(hooks...)
+	c.Partorder.Use(hooks...)
 	c.RepairInvoice.Use(hooks...)
 	c.Returninvoice.Use(hooks...)
 	c.Room.Use(hooks...)
@@ -877,6 +891,22 @@ func (c *EmployeeClient) QueryEmployeebill(e *Employee) *BillQuery {
 	return query
 }
 
+// QueryEmployeepart queries the employeepart edge of a Employee.
+func (c *EmployeeClient) QueryEmployeepart(e *Employee) *PartorderQuery {
+	query := &PartorderQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(partorder.Table, partorder.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.EmployeepartTable, employee.EmployeepartColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EmployeeClient) Hooks() []Hook {
 	return c.hooks.Employee
@@ -995,6 +1025,236 @@ func (c *FacultyClient) QueryUserInformations(f *Faculty) *UserQuery {
 // Hooks returns the client hooks.
 func (c *FacultyClient) Hooks() []Hook {
 	return c.hooks.Faculty
+}
+
+// PartClient is a client for the Part schema.
+type PartClient struct {
+	config
+}
+
+// NewPartClient returns a client for the Part from the given config.
+func NewPartClient(c config) *PartClient {
+	return &PartClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `part.Hooks(f(g(h())))`.
+func (c *PartClient) Use(hooks ...Hook) {
+	c.hooks.Part = append(c.hooks.Part, hooks...)
+}
+
+// Create returns a create builder for Part.
+func (c *PartClient) Create() *PartCreate {
+	mutation := newPartMutation(c.config, OpCreate)
+	return &PartCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for Part.
+func (c *PartClient) Update() *PartUpdate {
+	mutation := newPartMutation(c.config, OpUpdate)
+	return &PartUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PartClient) UpdateOne(pa *Part) *PartUpdateOne {
+	mutation := newPartMutation(c.config, OpUpdateOne, withPart(pa))
+	return &PartUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PartClient) UpdateOneID(id int) *PartUpdateOne {
+	mutation := newPartMutation(c.config, OpUpdateOne, withPartID(id))
+	return &PartUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Part.
+func (c *PartClient) Delete() *PartDelete {
+	mutation := newPartMutation(c.config, OpDelete)
+	return &PartDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *PartClient) DeleteOne(pa *Part) *PartDeleteOne {
+	return c.DeleteOneID(pa.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *PartClient) DeleteOneID(id int) *PartDeleteOne {
+	builder := c.Delete().Where(part.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PartDeleteOne{builder}
+}
+
+// Create returns a query builder for Part.
+func (c *PartClient) Query() *PartQuery {
+	return &PartQuery{config: c.config}
+}
+
+// Get returns a Part entity by its id.
+func (c *PartClient) Get(ctx context.Context, id int) (*Part, error) {
+	return c.Query().Where(part.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PartClient) GetX(ctx context.Context, id int) *Part {
+	pa, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return pa
+}
+
+// QueryPartInformations queries the part_informations edge of a Part.
+func (c *PartClient) QueryPartInformations(pa *Part) *PartorderQuery {
+	query := &PartorderQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(part.Table, part.FieldID, id),
+			sqlgraph.To(partorder.Table, partorder.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, part.PartInformationsTable, part.PartInformationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PartClient) Hooks() []Hook {
+	return c.hooks.Part
+}
+
+// PartorderClient is a client for the Partorder schema.
+type PartorderClient struct {
+	config
+}
+
+// NewPartorderClient returns a client for the Partorder from the given config.
+func NewPartorderClient(c config) *PartorderClient {
+	return &PartorderClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `partorder.Hooks(f(g(h())))`.
+func (c *PartorderClient) Use(hooks ...Hook) {
+	c.hooks.Partorder = append(c.hooks.Partorder, hooks...)
+}
+
+// Create returns a create builder for Partorder.
+func (c *PartorderClient) Create() *PartorderCreate {
+	mutation := newPartorderMutation(c.config, OpCreate)
+	return &PartorderCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for Partorder.
+func (c *PartorderClient) Update() *PartorderUpdate {
+	mutation := newPartorderMutation(c.config, OpUpdate)
+	return &PartorderUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PartorderClient) UpdateOne(pa *Partorder) *PartorderUpdateOne {
+	mutation := newPartorderMutation(c.config, OpUpdateOne, withPartorder(pa))
+	return &PartorderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PartorderClient) UpdateOneID(id int) *PartorderUpdateOne {
+	mutation := newPartorderMutation(c.config, OpUpdateOne, withPartorderID(id))
+	return &PartorderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Partorder.
+func (c *PartorderClient) Delete() *PartorderDelete {
+	mutation := newPartorderMutation(c.config, OpDelete)
+	return &PartorderDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *PartorderClient) DeleteOne(pa *Partorder) *PartorderDeleteOne {
+	return c.DeleteOneID(pa.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *PartorderClient) DeleteOneID(id int) *PartorderDeleteOne {
+	builder := c.Delete().Where(partorder.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PartorderDeleteOne{builder}
+}
+
+// Create returns a query builder for Partorder.
+func (c *PartorderClient) Query() *PartorderQuery {
+	return &PartorderQuery{config: c.config}
+}
+
+// Get returns a Partorder entity by its id.
+func (c *PartorderClient) Get(ctx context.Context, id int) (*Partorder, error) {
+	return c.Query().Where(partorder.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PartorderClient) GetX(ctx context.Context, id int) *Partorder {
+	pa, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return pa
+}
+
+// QueryRepairinvoice queries the repairinvoice edge of a Partorder.
+func (c *PartorderClient) QueryRepairinvoice(pa *Partorder) *RepairInvoiceQuery {
+	query := &RepairInvoiceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(partorder.Table, partorder.FieldID, id),
+			sqlgraph.To(repairinvoice.Table, repairinvoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, partorder.RepairinvoiceTable, partorder.RepairinvoiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEmployee queries the employee edge of a Partorder.
+func (c *PartorderClient) QueryEmployee(pa *Partorder) *EmployeeQuery {
+	query := &EmployeeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(partorder.Table, partorder.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, partorder.EmployeeTable, partorder.EmployeeColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPart queries the part edge of a Partorder.
+func (c *PartorderClient) QueryPart(pa *Partorder) *PartQuery {
+	query := &PartQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(partorder.Table, partorder.FieldID, id),
+			sqlgraph.To(part.Table, part.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, partorder.PartTable, partorder.PartColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PartorderClient) Hooks() []Hook {
+	return c.hooks.Partorder
 }
 
 // RepairInvoiceClient is a client for the RepairInvoice schema.
@@ -1164,6 +1424,22 @@ func (c *RepairInvoiceClient) QueryBill(ri *RepairInvoice) *BillQuery {
 			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
 			sqlgraph.To(bill.Table, bill.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.BillTable, repairinvoice.BillColumn),
+		)
+		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPartInformations queries the part_informations edge of a RepairInvoice.
+func (c *RepairInvoiceClient) QueryPartInformations(ri *RepairInvoice) *PartorderQuery {
+	query := &PartorderQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ri.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, id),
+			sqlgraph.To(partorder.Table, partorder.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.PartInformationsTable, repairinvoice.PartInformationsColumn),
 		)
 		fromV = sqlgraph.Neighbors(ri.driver.Dialect(), step)
 		return fromV, nil

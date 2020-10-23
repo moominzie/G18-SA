@@ -44,7 +44,7 @@ export default function ComponentsRecordBillTable() {
   
  return (
   <Page theme={pageTheme.tool}>
-    <Header title={`Bill record`} type="Repairing computer systems" >
+    <Header title={`Payment Billing`} type="Repairing computer systems" >
     <Button variant="contained" color="default" href="/recordbill" startIcon={<PersonAddRoundedIcon />}> New Bill</Button>
     <div>&nbsp;&nbsp;&nbsp;</div>
     <Button variant="contained" color="primary" href="/home" startIcon={<HomeRoundedIcon/>}> home</Button>

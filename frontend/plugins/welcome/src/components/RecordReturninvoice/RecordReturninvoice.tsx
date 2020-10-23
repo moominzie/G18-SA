@@ -159,12 +159,12 @@ const CreateReturninvoice = async () => {
     <Page theme={pageTheme.tool}>
 
       <Header
-        title={`Create return invoice`}
+        title={`Return Invoice Record`}
         type="Repairing computer systems"> 
       </Header>
 
       <Content>
-        <ContentHeader title="Return invoice"> 
+        <ContentHeader title="Return Invoice"> 
               <Button onClick={() => {CreateReturninvoice();}} variant="contained"  color="primary" startIcon={<SaveRoundedIcon/>}> Create new return invoice </Button>
               <Button style={{ marginLeft: 20 }} component={RouterLink} to="/RecordReturninvoiceTable" variant="contained" startIcon={<CancelRoundedIcon/>}>  Dismiss </Button>
         </ContentHeader>  

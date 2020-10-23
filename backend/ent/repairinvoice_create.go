@@ -11,6 +11,7 @@ import (
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
 	"github.com/moominzie/user-record/ent/statusr"
@@ -143,6 +144,25 @@ func (ric *RepairInvoiceCreate) SetNillableBillID(id *int) *RepairInvoiceCreate 
 // SetBill sets the bill edge to Bill.
 func (ric *RepairInvoiceCreate) SetBill(b *Bill) *RepairInvoiceCreate {
 	return ric.SetBillID(b.ID)
+}
+
+// SetPartInformationsID sets the part_informations edge to Partorder by id.
+func (ric *RepairInvoiceCreate) SetPartInformationsID(id int) *RepairInvoiceCreate {
+	ric.mutation.SetPartInformationsID(id)
+	return ric
+}
+
+// SetNillablePartInformationsID sets the part_informations edge to Partorder by id if the given value is not nil.
+func (ric *RepairInvoiceCreate) SetNillablePartInformationsID(id *int) *RepairInvoiceCreate {
+	if id != nil {
+		ric = ric.SetPartInformationsID(*id)
+	}
+	return ric
+}
+
+// SetPartInformations sets the part_informations edge to Partorder.
+func (ric *RepairInvoiceCreate) SetPartInformations(p *Partorder) *RepairInvoiceCreate {
+	return ric.SetPartInformationsID(p.ID)
 }
 
 // Mutation returns the RepairInvoiceMutation object of the builder.
@@ -329,6 +349,25 @@ func (ric *RepairInvoiceCreate) createSpec() (*RepairInvoice, *sqlgraph.CreateSp
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: bill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ric.mutation.PartInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.PartInformationsTable,
+			Columns: []string{repairinvoice.PartInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: partorder.FieldID,
 				},
 			},
 		}

@@ -22,6 +22,10 @@ import {
     EntDeviceFromJSON,
     EntDeviceFromJSONTyped,
     EntDeviceToJSON,
+    EntPartorder,
+    EntPartorderFromJSON,
+    EntPartorderFromJSONTyped,
+    EntPartorderToJSON,
     EntReturninvoice,
     EntReturninvoiceFromJSON,
     EntReturninvoiceFromJSONTyped,
@@ -60,6 +64,12 @@ export interface EntRepairInvoiceEdges {
     device?: EntDevice;
     /**
      * 
+     * @type {EntPartorder}
+     * @memberof EntRepairInvoiceEdges
+     */
+    partInformations?: EntPartorder;
+    /**
+     * 
      * @type {EntReturninvoice}
      * @memberof EntRepairInvoiceEdges
      */
@@ -96,6 +106,7 @@ export function EntRepairInvoiceEdgesFromJSONTyped(json: any, ignoreDiscriminato
         
         'bill': !exists(json, 'Bill') ? undefined : EntBillFromJSON(json['Bill']),
         'device': !exists(json, 'Device') ? undefined : EntDeviceFromJSON(json['Device']),
+        'partInformations': !exists(json, 'PartInformations') ? undefined : EntPartorderFromJSON(json['PartInformations']),
         'returninvoice': !exists(json, 'Returninvoice') ? undefined : EntReturninvoiceFromJSON(json['Returninvoice']),
         'status': !exists(json, 'Status') ? undefined : EntStatusRFromJSON(json['Status']),
         'symptom': !exists(json, 'Symptom') ? undefined : EntSymptomFromJSON(json['Symptom']),
@@ -114,6 +125,7 @@ export function EntRepairInvoiceEdgesToJSON(value?: EntRepairInvoiceEdges | null
         
         'bill': EntBillToJSON(value.bill),
         'device': EntDeviceToJSON(value.device),
+        'partInformations': EntPartorderToJSON(value.partInformations),
         'returninvoice': EntReturninvoiceToJSON(value.returninvoice),
         'status': EntStatusRToJSON(value.status),
         'symptom': EntSymptomToJSON(value.symptom),

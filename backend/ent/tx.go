@@ -26,6 +26,10 @@ type Tx struct {
 	Employee *EmployeeClient
 	// Faculty is the client for interacting with the Faculty builders.
 	Faculty *FacultyClient
+	// Part is the client for interacting with the Part builders.
+	Part *PartClient
+	// Partorder is the client for interacting with the Partorder builders.
+	Partorder *PartorderClient
 	// RepairInvoice is the client for interacting with the RepairInvoice builders.
 	RepairInvoice *RepairInvoiceClient
 	// Returninvoice is the client for interacting with the Returninvoice builders.
@@ -182,6 +186,8 @@ func (tx *Tx) init() {
 	tx.Device = NewDeviceClient(tx.config)
 	tx.Employee = NewEmployeeClient(tx.config)
 	tx.Faculty = NewFacultyClient(tx.config)
+	tx.Part = NewPartClient(tx.config)
+	tx.Partorder = NewPartorderClient(tx.config)
 	tx.RepairInvoice = NewRepairInvoiceClient(tx.config)
 	tx.Returninvoice = NewReturninvoiceClient(tx.config)
 	tx.Room = NewRoomClient(tx.config)

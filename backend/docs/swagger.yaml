@@ -13,6 +13,15 @@ definitions:
       time:
         type: integer
     type: object
+  controllers.Partorder:
+    properties:
+      employee:
+        type: integer
+      part:
+        type: integer
+      repairinvoice:
+        type: integer
+    type: object
   controllers.RepairInvoice:
     properties:
       device:
@@ -214,6 +223,11 @@ definitions:
         items:
           $ref: '#/definitions/ent.Bill'
         type: array
+      employeepart:
+        description: Employeepart holds the value of the employeepart edge.
+        items:
+          $ref: '#/definitions/ent.Partorder'
+        type: array
       employees:
         description: Employees holds the value of the employees edge.
         items:
@@ -248,6 +262,56 @@ definitions:
           $ref: '#/definitions/ent.User'
         type: array
     type: object
+  ent.Part:
+    properties:
+      Pname:
+        description: Pname holds the value of the "Pname" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.PartEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the PartQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.PartEdges:
+    properties:
+      partInformations:
+        description: PartInformations holds the value of the part_informations edge.
+        items:
+          $ref: '#/definitions/ent.Partorder'
+        type: array
+    type: object
+  ent.Partorder:
+    properties:
+      edges:
+        $ref: '#/definitions/ent.PartorderEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the PartorderQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.PartorderEdges:
+    properties:
+      employee:
+        $ref: '#/definitions/ent.Employee'
+        description: Employee holds the value of the employee edge.
+        type: object
+      part:
+        $ref: '#/definitions/ent.Part'
+        description: Part holds the value of the part edge.
+        type: object
+      repairinvoice:
+        $ref: '#/definitions/ent.RepairInvoice'
+        description: Repairinvoice holds the value of the repairinvoice edge.
+        type: object
+    type: object
   ent.RepairInvoice:
     properties:
       Rename:
@@ -272,6 +336,10 @@ definitions:
       device:
         $ref: '#/definitions/ent.Device'
         description: Device holds the value of the device edge.
+        type: object
+      partInformations:
+        $ref: '#/definitions/ent.Partorder'
+        description: PartInformations holds the value of the part_informations edge.
         type: object
       returninvoice:
         $ref: '#/definitions/ent.Returninvoice'
@@ -1218,6 +1286,214 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Get a faculty entity by ID
+  /part:
+    post:
+      consumes:
+      - application/json
+      description: Create part
+      operationId: create-part
+      parameters:
+      - description: Part entity
+        in: body
+        name: part
+        required: true
+        schema:
+          $ref: '#/definitions/ent.Part'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Part'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create part
+  /partorders:
+    get:
+      description: list partorder entities
+      operationId: list-partorder
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Partorder'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List partorder entities
+    post:
+      consumes:
+      - application/json
+      description: Create partorder
+      operationId: create-partorder
+      parameters:
+      - description: Partorder entity
+        in: body
+        name: partorder
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Partorder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.Partorder'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create partorder
+  /partorders/{id}:
+    delete:
+      description: get partorder by ID
+      operationId: delete-partorder
+      parameters:
+      - description: Partorder ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a partorder entity by ID
+  /parts:
+    get:
+      description: list part entities
+      operationId: list-part
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Part'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List part entities
+  /parts/{id}:
+    delete:
+      description: get part by ID
+      operationId: delete-part
+      parameters:
+      - description: Part ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a part entity by ID
+    get:
+      description: get part by ID
+      operationId: get-part
+      parameters:
+      - description: Part ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Part'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a part entity by ID
   /repairinvoices:
     get:
       description: list repairInvoice entities

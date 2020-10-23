@@ -14,6 +14,7 @@ import (
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/employee"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/returninvoice"
 )
@@ -29,6 +30,7 @@ type EmployeeQuery struct {
 	// eager-loading edges.
 	withEmployees    *ReturninvoiceQuery
 	withEmployeebill *BillQuery
+	withEmployeepart *PartorderQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -87,6 +89,24 @@ func (eq *EmployeeQuery) QueryEmployeebill() *BillQuery {
 			sqlgraph.From(employee.Table, employee.FieldID, eq.sqlQuery()),
 			sqlgraph.To(bill.Table, bill.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, employee.EmployeebillTable, employee.EmployeebillColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEmployeepart chains the current query on the employeepart edge.
+func (eq *EmployeeQuery) QueryEmployeepart() *PartorderQuery {
+	query := &PartorderQuery{config: eq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, eq.sqlQuery()),
+			sqlgraph.To(partorder.Table, partorder.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.EmployeepartTable, employee.EmployeepartColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -295,6 +315,17 @@ func (eq *EmployeeQuery) WithEmployeebill(opts ...func(*BillQuery)) *EmployeeQue
 	return eq
 }
 
+//  WithEmployeepart tells the query-builder to eager-loads the nodes that are connected to
+// the "employeepart" edge. The optional arguments used to configure the query builder of the edge.
+func (eq *EmployeeQuery) WithEmployeepart(opts ...func(*PartorderQuery)) *EmployeeQuery {
+	query := &PartorderQuery{config: eq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withEmployeepart = query
+	return eq
+}
+
 // GroupBy used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -361,9 +392,10 @@ func (eq *EmployeeQuery) sqlAll(ctx context.Context) ([]*Employee, error) {
 	var (
 		nodes       = []*Employee{}
 		_spec       = eq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			eq.withEmployees != nil,
 			eq.withEmployeebill != nil,
+			eq.withEmployeepart != nil,
 		}
 	)
 	_spec.ScanValues = func() []interface{} {
@@ -440,6 +472,34 @@ func (eq *EmployeeQuery) sqlAll(ctx context.Context) ([]*Employee, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "employee_id" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Employeebill = append(node.Edges.Employeebill, n)
+		}
+	}
+
+	if query := eq.withEmployeepart; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*Employee)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+		}
+		query.withFKs = true
+		query.Where(predicate.Partorder(func(s *sql.Selector) {
+			s.Where(sql.InValues(employee.EmployeepartColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.employee_id
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "employee_id" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "employee_id" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Employeepart = append(node.Edges.Employeepart, n)
 		}
 	}
 

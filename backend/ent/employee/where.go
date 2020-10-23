@@ -501,6 +501,34 @@ func HasEmployeebillWith(preds ...predicate.Bill) predicate.Employee {
 	})
 }
 
+// HasEmployeepart applies the HasEdge predicate on the "employeepart" edge.
+func HasEmployeepart() predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(EmployeepartTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmployeepartTable, EmployeepartColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEmployeepartWith applies the HasEdge predicate on the "employeepart" edge with a given conditions (other predicates).
+func HasEmployeepartWith(preds ...predicate.Partorder) predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(EmployeepartInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmployeepartTable, EmployeepartColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups list of predicates with the AND operator between them.
 func And(predicates ...predicate.Employee) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {

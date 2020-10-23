@@ -129,6 +129,54 @@ var (
 		PrimaryKey:  []*schema.Column{FacultiesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// PartsColumns holds the columns for the "parts" table.
+	PartsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "pname", Type: field.TypeString, Unique: true},
+	}
+	// PartsTable holds the schema information for the "parts" table.
+	PartsTable = &schema.Table{
+		Name:        "parts",
+		Columns:     PartsColumns,
+		PrimaryKey:  []*schema.Column{PartsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// PartordersColumns holds the columns for the "partorders" table.
+	PartordersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "employee_id", Type: field.TypeInt, Nullable: true},
+		{Name: "part_id", Type: field.TypeInt, Nullable: true},
+		{Name: "reparinvoice_id", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// PartordersTable holds the schema information for the "partorders" table.
+	PartordersTable = &schema.Table{
+		Name:       "partorders",
+		Columns:    PartordersColumns,
+		PrimaryKey: []*schema.Column{PartordersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "partorders_employees_employeepart",
+				Columns: []*schema.Column{PartordersColumns[1]},
+
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "partorders_parts_part_informations",
+				Columns: []*schema.Column{PartordersColumns[2]},
+
+				RefColumns: []*schema.Column{PartsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:  "partorders_repair_invoices_part_informations",
+				Columns: []*schema.Column{PartordersColumns[3]},
+
+				RefColumns: []*schema.Column{RepairInvoicesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// RepairInvoicesColumns holds the columns for the "repair_invoices" table.
 	RepairInvoicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -323,6 +371,8 @@ var (
 		DevicesTable,
 		EmployeesTable,
 		FacultiesTable,
+		PartsTable,
+		PartordersTable,
 		RepairInvoicesTable,
 		ReturninvoicesTable,
 		RoomsTable,
@@ -338,6 +388,9 @@ func init() {
 	BillsTable.ForeignKeys[1].RefTable = EmployeesTable
 	BillsTable.ForeignKeys[2].RefTable = RepairInvoicesTable
 	BranchesTable.ForeignKeys[0].RefTable = FacultiesTable
+	PartordersTable.ForeignKeys[0].RefTable = EmployeesTable
+	PartordersTable.ForeignKeys[1].RefTable = PartsTable
+	PartordersTable.ForeignKeys[2].RefTable = RepairInvoicesTable
 	RepairInvoicesTable.ForeignKeys[0].RefTable = DevicesTable
 	RepairInvoicesTable.ForeignKeys[1].RefTable = StatusRsTable
 	RepairInvoicesTable.ForeignKeys[2].RefTable = SymptomsTable

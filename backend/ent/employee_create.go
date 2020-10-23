@@ -11,6 +11,7 @@ import (
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/employee"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/returninvoice"
 )
 
@@ -67,6 +68,21 @@ func (ec *EmployeeCreate) AddEmployeebill(b ...*Bill) *EmployeeCreate {
 		ids[i] = b[i].ID
 	}
 	return ec.AddEmployeebillIDs(ids...)
+}
+
+// AddEmployeepartIDs adds the employeepart edge to Partorder by ids.
+func (ec *EmployeeCreate) AddEmployeepartIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddEmployeepartIDs(ids...)
+	return ec
+}
+
+// AddEmployeepart adds the employeepart edges to Partorder.
+func (ec *EmployeeCreate) AddEmployeepart(p ...*Partorder) *EmployeeCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ec.AddEmployeepartIDs(ids...)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -214,6 +230,25 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: bill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.EmployeepartIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.EmployeepartTable,
+			Columns: []string{employee.EmployeepartColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: partorder.FieldID,
 				},
 			},
 		}

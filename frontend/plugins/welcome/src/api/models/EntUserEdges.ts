@@ -87,7 +87,7 @@ export function EntUserEdgesFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'branch': !exists(json, 'Branch') ? undefined : EntBranchFromJSON(json['Branch']),
         'building': !exists(json, 'Building') ? undefined : EntBuildingFromJSON(json['Building']),
         'faculty': !exists(json, 'Faculty') ? undefined : EntFacultyFromJSON(json['Faculty']),
-        'repairinvoiceInformations': !exists(json, 'repairinvoiceInformations') ? undefined : ((json['repairinvoiceInformations'] as Array<any>).map(EntRepairInvoiceFromJSON)),
+        'repairinvoiceInformations': !exists(json, 'RepairinvoiceInformations') ? undefined : ((json['RepairinvoiceInformations'] as Array<any>).map(EntRepairInvoiceFromJSON)),
         'room': !exists(json, 'Room') ? undefined : EntRoomFromJSON(json['Room']),
     };
 }

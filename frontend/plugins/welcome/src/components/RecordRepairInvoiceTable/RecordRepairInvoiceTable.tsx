@@ -50,7 +50,7 @@ export default function ComponentsRecordRepairInvoiceTable() {
   
  return (
   <Page theme={pageTheme.tool}>
-    <Header title={`Repaired Invoice record`} type="Repairing computer systems" >
+    <Header title={`Repair Invoice`} type="Repairing computer systems" >
     <Button variant="contained" color="default" href="/recordrepairinvoice" startIcon={<PersonAddRoundedIcon />}> New Repaired Invoice</Button>
     <div>&nbsp;&nbsp;&nbsp;</div>
     <Button variant="contained" color="primary" href="/home" startIcon={<HomeRoundedIcon/>}> home</Button>

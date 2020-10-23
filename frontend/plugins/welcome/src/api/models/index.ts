@@ -1,4 +1,5 @@
 export * from './ControllersBill';
+export * from './ControllersPartorder';
 export * from './ControllersRepairInvoice';
 export * from './ControllersReturninvoice';
 export * from './ControllersUser';
@@ -16,6 +17,10 @@ export * from './EntEmployee';
 export * from './EntEmployeeEdges';
 export * from './EntFaculty';
 export * from './EntFacultyEdges';
+export * from './EntPart';
+export * from './EntPartEdges';
+export * from './EntPartorder';
+export * from './EntPartorderEdges';
 export * from './EntRepairInvoice';
 export * from './EntRepairInvoiceEdges';
 export * from './EntReturninvoice';

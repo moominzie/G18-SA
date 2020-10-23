@@ -11,6 +11,7 @@ import (
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
@@ -153,6 +154,25 @@ func (riu *RepairInvoiceUpdate) SetBill(b *Bill) *RepairInvoiceUpdate {
 	return riu.SetBillID(b.ID)
 }
 
+// SetPartInformationsID sets the part_informations edge to Partorder by id.
+func (riu *RepairInvoiceUpdate) SetPartInformationsID(id int) *RepairInvoiceUpdate {
+	riu.mutation.SetPartInformationsID(id)
+	return riu
+}
+
+// SetNillablePartInformationsID sets the part_informations edge to Partorder by id if the given value is not nil.
+func (riu *RepairInvoiceUpdate) SetNillablePartInformationsID(id *int) *RepairInvoiceUpdate {
+	if id != nil {
+		riu = riu.SetPartInformationsID(*id)
+	}
+	return riu
+}
+
+// SetPartInformations sets the part_informations edge to Partorder.
+func (riu *RepairInvoiceUpdate) SetPartInformations(p *Partorder) *RepairInvoiceUpdate {
+	return riu.SetPartInformationsID(p.ID)
+}
+
 // Mutation returns the RepairInvoiceMutation object of the builder.
 func (riu *RepairInvoiceUpdate) Mutation() *RepairInvoiceMutation {
 	return riu.mutation
@@ -191,6 +211,12 @@ func (riu *RepairInvoiceUpdate) ClearReturninvoice() *RepairInvoiceUpdate {
 // ClearBill clears the bill edge to Bill.
 func (riu *RepairInvoiceUpdate) ClearBill() *RepairInvoiceUpdate {
 	riu.mutation.ClearBill()
+	return riu
+}
+
+// ClearPartInformations clears the part_informations edge to Partorder.
+func (riu *RepairInvoiceUpdate) ClearPartInformations() *RepairInvoiceUpdate {
+	riu.mutation.ClearPartInformations()
 	return riu
 }
 
@@ -481,6 +507,41 @@ func (riu *RepairInvoiceUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if riu.mutation.PartInformationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.PartInformationsTable,
+			Columns: []string{repairinvoice.PartInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: partorder.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := riu.mutation.PartInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.PartInformationsTable,
+			Columns: []string{repairinvoice.PartInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: partorder.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, riu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{repairinvoice.Label}
@@ -619,6 +680,25 @@ func (riuo *RepairInvoiceUpdateOne) SetBill(b *Bill) *RepairInvoiceUpdateOne {
 	return riuo.SetBillID(b.ID)
 }
 
+// SetPartInformationsID sets the part_informations edge to Partorder by id.
+func (riuo *RepairInvoiceUpdateOne) SetPartInformationsID(id int) *RepairInvoiceUpdateOne {
+	riuo.mutation.SetPartInformationsID(id)
+	return riuo
+}
+
+// SetNillablePartInformationsID sets the part_informations edge to Partorder by id if the given value is not nil.
+func (riuo *RepairInvoiceUpdateOne) SetNillablePartInformationsID(id *int) *RepairInvoiceUpdateOne {
+	if id != nil {
+		riuo = riuo.SetPartInformationsID(*id)
+	}
+	return riuo
+}
+
+// SetPartInformations sets the part_informations edge to Partorder.
+func (riuo *RepairInvoiceUpdateOne) SetPartInformations(p *Partorder) *RepairInvoiceUpdateOne {
+	return riuo.SetPartInformationsID(p.ID)
+}
+
 // Mutation returns the RepairInvoiceMutation object of the builder.
 func (riuo *RepairInvoiceUpdateOne) Mutation() *RepairInvoiceMutation {
 	return riuo.mutation
@@ -657,6 +737,12 @@ func (riuo *RepairInvoiceUpdateOne) ClearReturninvoice() *RepairInvoiceUpdateOne
 // ClearBill clears the bill edge to Bill.
 func (riuo *RepairInvoiceUpdateOne) ClearBill() *RepairInvoiceUpdateOne {
 	riuo.mutation.ClearBill()
+	return riuo
+}
+
+// ClearPartInformations clears the part_informations edge to Partorder.
+func (riuo *RepairInvoiceUpdateOne) ClearPartInformations() *RepairInvoiceUpdateOne {
+	riuo.mutation.ClearPartInformations()
 	return riuo
 }
 
@@ -937,6 +1023,41 @@ func (riuo *RepairInvoiceUpdateOne) sqlSave(ctx context.Context) (ri *RepairInvo
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: bill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if riuo.mutation.PartInformationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.PartInformationsTable,
+			Columns: []string{repairinvoice.PartInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: partorder.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := riuo.mutation.PartInformationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   repairinvoice.PartInformationsTable,
+			Columns: []string{repairinvoice.PartInformationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: partorder.FieldID,
 				},
 			},
 		}

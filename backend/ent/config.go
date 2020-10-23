@@ -31,6 +31,8 @@ type hooks struct {
 	Device        []ent.Hook
 	Employee      []ent.Hook
 	Faculty       []ent.Hook
+	Part          []ent.Hook
+	Partorder     []ent.Hook
 	RepairInvoice []ent.Hook
 	Returninvoice []ent.Hook
 	Room          []ent.Hook

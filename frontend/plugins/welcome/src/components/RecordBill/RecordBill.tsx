@@ -170,12 +170,12 @@ const CreateBill = async () => {
     <Page theme={pageTheme.tool}>
 
       <Header
-        title={`Bill record`}
+        title={`Payment Billing Record`}
         type="Repairing computer systems"> 
       </Header>
 
       <Content>
-        <ContentHeader title="Bill Record"> 
+        <ContentHeader title="Payment Billing"> 
               <Button onClick={() => {CreateBill();}} variant="contained"  color="primary" startIcon={<SaveRoundedIcon/>}> Create Bill </Button>
               <Button style={{ marginLeft: 20 }} component={RouterLink} to="/recordbilltable" variant="contained" startIcon={<CancelRoundedIcon/>}>  Dismiss </Button>
         </ContentHeader>  

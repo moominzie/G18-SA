@@ -27,6 +27,12 @@ type Employee func(*sql.Selector)
 // Faculty is the predicate function for faculty builders.
 type Faculty func(*sql.Selector)
 
+// Part is the predicate function for part builders.
+type Part func(*sql.Selector)
+
+// Partorder is the predicate function for partorder builders.
+type Partorder func(*sql.Selector)
+
 // RepairInvoice is the predicate function for repairinvoice builders.
 type RepairInvoice func(*sql.Selector)
 

@@ -18,6 +18,8 @@ const (
 	EdgeEmployees = "employees"
 	// EdgeEmployeebill holds the string denoting the employeebill edge name in mutations.
 	EdgeEmployeebill = "employeebill"
+	// EdgeEmployeepart holds the string denoting the employeepart edge name in mutations.
+	EdgeEmployeepart = "employeepart"
 
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
@@ -35,6 +37,13 @@ const (
 	EmployeebillInverseTable = "bills"
 	// EmployeebillColumn is the table column denoting the employeebill relation/edge.
 	EmployeebillColumn = "employee_id"
+	// EmployeepartTable is the table the holds the employeepart relation/edge.
+	EmployeepartTable = "partorders"
+	// EmployeepartInverseTable is the table name for the Partorder entity.
+	// It exists in this package in order to avoid circular dependency with the "partorder" package.
+	EmployeepartInverseTable = "partorders"
+	// EmployeepartColumn is the table column denoting the employeepart relation/edge.
+	EmployeepartColumn = "employee_id"
 )
 
 // Columns holds all SQL columns for employee fields.

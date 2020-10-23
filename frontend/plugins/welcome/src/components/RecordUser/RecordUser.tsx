@@ -181,7 +181,7 @@ const CreateUser = async () => {
     <Page theme={pageTheme.tool}>
 
       <Header
-        title={`User information record`}
+        title={`User Information Record`}
         type="Repairing computer systems"> 
       </Header>
 

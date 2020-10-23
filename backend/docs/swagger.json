@@ -1136,6 +1136,319 @@
                 }
             }
         },
+        "/part": {
+            "post": {
+                "description": "Create part",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create part",
+                "operationId": "create-part",
+                "parameters": [
+                    {
+                        "description": "Part entity",
+                        "name": "part",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ent.Part"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Part"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/partorders": {
+            "get": {
+                "description": "list partorder entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List partorder entities",
+                "operationId": "list-partorder",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Partorder"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create partorder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create partorder",
+                "operationId": "create-partorder",
+                "parameters": [
+                    {
+                        "description": "Partorder entity",
+                        "name": "partorder",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Partorder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Partorder"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/partorders/{id}": {
+            "delete": {
+                "description": "get partorder by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a partorder entity by ID",
+                "operationId": "delete-partorder",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Partorder ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/parts": {
+            "get": {
+                "description": "list part entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List part entities",
+                "operationId": "list-part",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Part"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/parts/{id}": {
+            "get": {
+                "description": "get part by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a part entity by ID",
+                "operationId": "get-part",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Part ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Part"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "get part by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a part entity by ID",
+                "operationId": "delete-part",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Part ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
         "/repairinvoices": {
             "get": {
                 "description": "list repairInvoice entities",
@@ -2231,6 +2544,20 @@
                 }
             }
         },
+        "controllers.Partorder": {
+            "type": "object",
+            "properties": {
+                "employee": {
+                    "type": "integer"
+                },
+                "part": {
+                    "type": "integer"
+                },
+                "repairinvoice": {
+                    "type": "integer"
+                }
+            }
+        },
         "controllers.RepairInvoice": {
             "type": "object",
             "properties": {
@@ -2501,6 +2828,13 @@
                         "$ref": "#/definitions/ent.Bill"
                     }
                 },
+                "employeepart": {
+                    "description": "Employeepart holds the value of the employeepart edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Partorder"
+                    }
+                },
                 "employees": {
                     "description": "Employees holds the value of the employees edge.",
                     "type": "array",
@@ -2547,6 +2881,70 @@
                 }
             }
         },
+        "ent.Part": {
+            "type": "object",
+            "properties": {
+                "Pname": {
+                    "description": "Pname holds the value of the \"Pname\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the PartQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.PartEdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.PartEdges": {
+            "type": "object",
+            "properties": {
+                "partInformations": {
+                    "description": "PartInformations holds the value of the part_informations edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Partorder"
+                    }
+                }
+            }
+        },
+        "ent.Partorder": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the PartorderQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.PartorderEdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.PartorderEdges": {
+            "type": "object",
+            "properties": {
+                "employee": {
+                    "description": "Employee holds the value of the employee edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Employee"
+                },
+                "part": {
+                    "description": "Part holds the value of the part edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Part"
+                },
+                "repairinvoice": {
+                    "description": "Repairinvoice holds the value of the repairinvoice edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.RepairInvoice"
+                }
+            }
+        },
         "ent.RepairInvoice": {
             "type": "object",
             "properties": {
@@ -2577,6 +2975,11 @@
                     "description": "Device holds the value of the device edge.",
                     "type": "object",
                     "$ref": "#/definitions/ent.Device"
+                },
+                "partInformations": {
+                    "description": "PartInformations holds the value of the part_informations edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Partorder"
                 },
                 "returninvoice": {
                     "description": "Returninvoice holds the value of the returninvoice edge.",

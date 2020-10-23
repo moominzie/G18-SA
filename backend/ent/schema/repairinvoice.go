@@ -28,5 +28,6 @@ func (RepairInvoice) Edges() []ent.Edge {
 		edge.To("returninvoice", Returninvoice.Type).Unique().StorageKey(edge.Column("returninvoice_id")),
 
 		edge.To("bill", Bill.Type).Unique().StorageKey(edge.Column("bill_id")),
+		edge.To("part_informations", Partorder.Type).Unique().StorageKey(edge.Column("reparinvoice_id")),
 	}
 }

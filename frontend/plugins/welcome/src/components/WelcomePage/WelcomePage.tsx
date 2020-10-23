@@ -58,7 +58,7 @@ export default function WelcomePage() {
                <Button className={classes.margin}
               variant="outlined" 
               color="secondary" 
-              href="/recordusertable" 
+              href="/partordertable" 
               startIcon={<LocalFloristRoundedIcon />}> 
               Part Order
             </Button>

@@ -25,5 +25,6 @@ func (Employee) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("employees", Returninvoice.Type).StorageKey(edge.Column("employee_id")),
 		edge.To("employeebill", Bill.Type).StorageKey(edge.Column("employee_id")),
+		edge.To("employeepart", Partorder.Type).StorageKey(edge.Column("employee_id")),
 	}
 }

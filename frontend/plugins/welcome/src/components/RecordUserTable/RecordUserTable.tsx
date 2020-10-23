@@ -59,7 +59,7 @@ export default function RecordUserTable() {
   // ui 
  return (
   <Page theme={pageTheme.tool}>
-    <Header title={`User information record`} type="Repairing computer systems" >
+    <Header title={`User Information`} type="Repairing computer systems" >
     <div>&nbsp;&nbsp;&nbsp;</div>
     <Button variant="contained" color="default" href="/recorduser" startIcon={<PersonAddRoundedIcon />}> New user</Button>
     <div>&nbsp;&nbsp;&nbsp;</div>

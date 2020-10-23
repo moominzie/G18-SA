@@ -14,6 +14,7 @@ import (
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/predicate"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
@@ -31,13 +32,14 @@ type RepairInvoiceQuery struct {
 	unique     []string
 	predicates []predicate.RepairInvoice
 	// eager-loading edges.
-	withDevice        *DeviceQuery
-	withStatus        *StatusRQuery
-	withSymptom       *SymptomQuery
-	withUser          *UserQuery
-	withReturninvoice *ReturninvoiceQuery
-	withBill          *BillQuery
-	withFKs           bool
+	withDevice           *DeviceQuery
+	withStatus           *StatusRQuery
+	withSymptom          *SymptomQuery
+	withUser             *UserQuery
+	withReturninvoice    *ReturninvoiceQuery
+	withBill             *BillQuery
+	withPartInformations *PartorderQuery
+	withFKs              bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -168,6 +170,24 @@ func (riq *RepairInvoiceQuery) QueryBill() *BillQuery {
 			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
 			sqlgraph.To(bill.Table, bill.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.BillTable, repairinvoice.BillColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPartInformations chains the current query on the part_informations edge.
+func (riq *RepairInvoiceQuery) QueryPartInformations() *PartorderQuery {
+	query := &PartorderQuery{config: riq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := riq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(repairinvoice.Table, repairinvoice.FieldID, riq.sqlQuery()),
+			sqlgraph.To(partorder.Table, partorder.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, repairinvoice.PartInformationsTable, repairinvoice.PartInformationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(riq.driver.Dialect(), step)
 		return fromU, nil
@@ -420,6 +440,17 @@ func (riq *RepairInvoiceQuery) WithBill(opts ...func(*BillQuery)) *RepairInvoice
 	return riq
 }
 
+//  WithPartInformations tells the query-builder to eager-loads the nodes that are connected to
+// the "part_informations" edge. The optional arguments used to configure the query builder of the edge.
+func (riq *RepairInvoiceQuery) WithPartInformations(opts ...func(*PartorderQuery)) *RepairInvoiceQuery {
+	query := &PartorderQuery{config: riq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	riq.withPartInformations = query
+	return riq
+}
+
 // GroupBy used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -487,13 +518,14 @@ func (riq *RepairInvoiceQuery) sqlAll(ctx context.Context) ([]*RepairInvoice, er
 		nodes       = []*RepairInvoice{}
 		withFKs     = riq.withFKs
 		_spec       = riq.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [7]bool{
 			riq.withDevice != nil,
 			riq.withStatus != nil,
 			riq.withSymptom != nil,
 			riq.withUser != nil,
 			riq.withReturninvoice != nil,
 			riq.withBill != nil,
+			riq.withPartInformations != nil,
 		}
 	)
 	if riq.withDevice != nil || riq.withStatus != nil || riq.withSymptom != nil || riq.withUser != nil {
@@ -679,6 +711,34 @@ func (riq *RepairInvoiceQuery) sqlAll(ctx context.Context) ([]*RepairInvoice, er
 				return nil, fmt.Errorf(`unexpected foreign-key "bill_id" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Bill = n
+		}
+	}
+
+	if query := riq.withPartInformations; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*RepairInvoice)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+		}
+		query.withFKs = true
+		query.Where(predicate.Partorder(func(s *sql.Selector) {
+			s.Where(sql.InValues(repairinvoice.PartInformationsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.reparinvoice_id
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "reparinvoice_id" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "reparinvoice_id" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.PartInformations = n
 		}
 	}
 

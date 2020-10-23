@@ -18,6 +18,9 @@ import {
     ControllersBill,
     ControllersBillFromJSON,
     ControllersBillToJSON,
+    ControllersPartorder,
+    ControllersPartorderFromJSON,
+    ControllersPartorderToJSON,
     ControllersRepairInvoice,
     ControllersRepairInvoiceFromJSON,
     ControllersRepairInvoiceToJSON,
@@ -48,6 +51,12 @@ import {
     EntFaculty,
     EntFacultyFromJSON,
     EntFacultyToJSON,
+    EntPart,
+    EntPartFromJSON,
+    EntPartToJSON,
+    EntPartorder,
+    EntPartorderFromJSON,
+    EntPartorderToJSON,
     EntRepairInvoice,
     EntRepairInvoiceFromJSON,
     EntRepairInvoiceToJSON,
@@ -99,6 +108,14 @@ export interface CreateFacultyRequest {
     faculty: EntFaculty;
 }
 
+export interface CreatePartRequest {
+    part: EntPart;
+}
+
+export interface CreatePartorderRequest {
+    partorder: ControllersPartorder;
+}
+
 export interface CreateRepairInvoiceRequest {
     repairInvoice: ControllersRepairInvoice;
 }
@@ -144,6 +161,14 @@ export interface DeleteEmployeeRequest {
 }
 
 export interface DeleteFacultyRequest {
+    id: number;
+}
+
+export interface DeletePartRequest {
+    id: number;
+}
+
+export interface DeletePartorderRequest {
     id: number;
 }
 
@@ -195,6 +220,10 @@ export interface GetFacultyRequest {
     id: number;
 }
 
+export interface GetPartRequest {
+    id: number;
+}
+
 export interface GetRoomRequest {
     id: number;
 }
@@ -242,6 +271,16 @@ export interface ListEmployeeRequest {
 }
 
 export interface ListFacultyRequest {
+    limit?: number;
+    offset?: number;
+}
+
+export interface ListPartRequest {
+    limit?: number;
+    offset?: number;
+}
+
+export interface ListPartorderRequest {
     limit?: number;
     offset?: number;
 }
@@ -528,6 +567,76 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async createFaculty(requestParameters: CreateFacultyRequest): Promise<EntFaculty> {
         const response = await this.createFacultyRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Create part
+     * Create part
+     */
+    async createPartRaw(requestParameters: CreatePartRequest): Promise<runtime.ApiResponse<EntPart>> {
+        if (requestParameters.part === null || requestParameters.part === undefined) {
+            throw new runtime.RequiredError('part','Required parameter requestParameters.part was null or undefined when calling createPart.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/part`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EntPartToJSON(requestParameters.part),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntPartFromJSON(jsonValue));
+    }
+
+    /**
+     * Create part
+     * Create part
+     */
+    async createPart(requestParameters: CreatePartRequest): Promise<EntPart> {
+        const response = await this.createPartRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Create partorder
+     * Create partorder
+     */
+    async createPartorderRaw(requestParameters: CreatePartorderRequest): Promise<runtime.ApiResponse<ControllersPartorder>> {
+        if (requestParameters.partorder === null || requestParameters.partorder === undefined) {
+            throw new runtime.RequiredError('partorder','Required parameter requestParameters.partorder was null or undefined when calling createPartorder.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/partorders`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ControllersPartorderToJSON(requestParameters.partorder),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ControllersPartorderFromJSON(jsonValue));
+    }
+
+    /**
+     * Create partorder
+     * Create partorder
+     */
+    async createPartorder(requestParameters: CreatePartorderRequest): Promise<ControllersPartorder> {
+        const response = await this.createPartorderRaw(requestParameters);
         return await response.value();
     }
 
@@ -937,6 +1046,70 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get part by ID
+     * Delete a part entity by ID
+     */
+    async deletePartRaw(requestParameters: DeletePartRequest): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deletePart.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/parts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * get part by ID
+     * Delete a part entity by ID
+     */
+    async deletePart(requestParameters: DeletePartRequest): Promise<object> {
+        const response = await this.deletePartRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * get partorder by ID
+     * Delete a partorder entity by ID
+     */
+    async deletePartorderRaw(requestParameters: DeletePartorderRequest): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deletePartorder.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/partorders/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * get partorder by ID
+     * Delete a partorder entity by ID
+     */
+    async deletePartorder(requestParameters: DeletePartorderRequest): Promise<object> {
+        const response = await this.deletePartorderRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get repairInvoice by ID
      * Delete a repairInvoice entity by ID
      */
@@ -1321,6 +1494,38 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get part by ID
+     * Get a part entity by ID
+     */
+    async getPartRaw(requestParameters: GetPartRequest): Promise<runtime.ApiResponse<EntPart>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getPart.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/parts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntPartFromJSON(jsonValue));
+    }
+
+    /**
+     * get part by ID
+     * Get a part entity by ID
+     */
+    async getPart(requestParameters: GetPartRequest): Promise<EntPart> {
+        const response = await this.getPartRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get room by ID
      * Get a room entity by ID
      */
@@ -1697,6 +1902,78 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async listFaculty(requestParameters: ListFacultyRequest): Promise<Array<EntFaculty>> {
         const response = await this.listFacultyRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * list part entities
+     * List part entities
+     */
+    async listPartRaw(requestParameters: ListPartRequest): Promise<runtime.ApiResponse<Array<EntPart>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/parts`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntPartFromJSON));
+    }
+
+    /**
+     * list part entities
+     * List part entities
+     */
+    async listPart(requestParameters: ListPartRequest): Promise<Array<EntPart>> {
+        const response = await this.listPartRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * list partorder entities
+     * List partorder entities
+     */
+    async listPartorderRaw(requestParameters: ListPartorderRequest): Promise<runtime.ApiResponse<Array<EntPartorder>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/partorders`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntPartorderFromJSON));
+    }
+
+    /**
+     * list partorder entities
+     * List partorder entities
+     */
+    async listPartorder(requestParameters: ListPartorderRequest): Promise<Array<EntPartorder>> {
+        const response = await this.listPartorderRaw(requestParameters);
         return await response.value();
     }
 

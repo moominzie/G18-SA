@@ -18,6 +18,10 @@ import {
     EntBillFromJSON,
     EntBillFromJSONTyped,
     EntBillToJSON,
+    EntPartorder,
+    EntPartorderFromJSON,
+    EntPartorderFromJSONTyped,
+    EntPartorderToJSON,
     EntReturninvoice,
     EntReturninvoiceFromJSON,
     EntReturninvoiceFromJSONTyped,
@@ -37,6 +41,12 @@ export interface EntEmployeeEdges {
      */
     employeebill?: Array<EntBill>;
     /**
+     * Employeepart holds the value of the employeepart edge.
+     * @type {Array<EntPartorder>}
+     * @memberof EntEmployeeEdges
+     */
+    employeepart?: Array<EntPartorder>;
+    /**
      * Employees holds the value of the employees edge.
      * @type {Array<EntReturninvoice>}
      * @memberof EntEmployeeEdges
@@ -55,6 +65,7 @@ export function EntEmployeeEdgesFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'employeebill': !exists(json, 'employeebill') ? undefined : ((json['employeebill'] as Array<any>).map(EntBillFromJSON)),
+        'employeepart': !exists(json, 'employeepart') ? undefined : ((json['employeepart'] as Array<any>).map(EntPartorderFromJSON)),
         'employees': !exists(json, 'employees') ? undefined : ((json['employees'] as Array<any>).map(EntReturninvoiceFromJSON)),
     };
 }
@@ -69,6 +80,7 @@ export function EntEmployeeEdgesToJSON(value?: EntEmployeeEdges | null): any {
     return {
         
         'employeebill': value.employeebill === undefined ? undefined : ((value.employeebill as Array<any>).map(EntBillToJSON)),
+        'employeepart': value.employeepart === undefined ? undefined : ((value.employeepart as Array<any>).map(EntPartorderToJSON)),
         'employees': value.employees === undefined ? undefined : ((value.employees as Array<any>).map(EntReturninvoiceToJSON)),
     };
 }

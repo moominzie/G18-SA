@@ -378,6 +378,54 @@ func (f FacultyMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutatio
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.FacultyMutation", m)
 }
 
+// The PartQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type PartQueryRuleFunc func(context.Context, *ent.PartQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f PartQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PartQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.PartQuery", q)
+}
+
+// The PartMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type PartMutationRuleFunc func(context.Context, *ent.PartMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f PartMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.PartMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.PartMutation", m)
+}
+
+// The PartorderQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type PartorderQueryRuleFunc func(context.Context, *ent.PartorderQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f PartorderQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PartorderQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.PartorderQuery", q)
+}
+
+// The PartorderMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type PartorderMutationRuleFunc func(context.Context, *ent.PartorderMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f PartorderMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.PartorderMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.PartorderMutation", m)
+}
+
 // The RepairInvoiceQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type RepairInvoiceQueryRuleFunc func(context.Context, *ent.RepairInvoiceQuery) error

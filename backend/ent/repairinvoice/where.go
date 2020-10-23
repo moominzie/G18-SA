@@ -377,6 +377,34 @@ func HasBillWith(preds ...predicate.Bill) predicate.RepairInvoice {
 	})
 }
 
+// HasPartInformations applies the HasEdge predicate on the "part_informations" edge.
+func HasPartInformations() predicate.RepairInvoice {
+	return predicate.RepairInvoice(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PartInformationsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, PartInformationsTable, PartInformationsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPartInformationsWith applies the HasEdge predicate on the "part_informations" edge with a given conditions (other predicates).
+func HasPartInformationsWith(preds ...predicate.Partorder) predicate.RepairInvoice {
+	return predicate.RepairInvoice(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PartInformationsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, PartInformationsTable, PartInformationsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups list of predicates with the AND operator between them.
 func And(predicates ...predicate.RepairInvoice) predicate.RepairInvoice {
 	return predicate.RepairInvoice(func(s *sql.Selector) {

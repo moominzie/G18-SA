@@ -9,6 +9,7 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/moominzie/user-record/ent/bill"
 	"github.com/moominzie/user-record/ent/device"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
 	"github.com/moominzie/user-record/ent/statusr"
@@ -46,9 +47,11 @@ type RepairInvoiceEdges struct {
 	Returninvoice *Returninvoice
 	// Bill holds the value of the bill edge.
 	Bill *Bill
+	// PartInformations holds the value of the part_informations edge.
+	PartInformations *Partorder
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 }
 
 // DeviceOrErr returns the Device value or an error if the edge
@@ -133,6 +136,20 @@ func (e RepairInvoiceEdges) BillOrErr() (*Bill, error) {
 		return e.Bill, nil
 	}
 	return nil, &NotLoadedError{edge: "bill"}
+}
+
+// PartInformationsOrErr returns the PartInformations value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RepairInvoiceEdges) PartInformationsOrErr() (*Partorder, error) {
+	if e.loadedTypes[6] {
+		if e.PartInformations == nil {
+			// The edge part_informations was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: partorder.Label}
+		}
+		return e.PartInformations, nil
+	}
+	return nil, &NotLoadedError{edge: "part_informations"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -228,6 +245,11 @@ func (ri *RepairInvoice) QueryReturninvoice() *ReturninvoiceQuery {
 // QueryBill queries the bill edge of the RepairInvoice.
 func (ri *RepairInvoice) QueryBill() *BillQuery {
 	return (&RepairInvoiceClient{config: ri.config}).QueryBill(ri)
+}
+
+// QueryPartInformations queries the part_informations edge of the RepairInvoice.
+func (ri *RepairInvoice) QueryPartInformations() *PartorderQuery {
+	return (&RepairInvoiceClient{config: ri.config}).QueryPartInformations(ri)
 }
 
 // Update returns a builder for updating this RepairInvoice.

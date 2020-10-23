@@ -177,12 +177,12 @@ const CreateRepairInvoice = async () => {
     <Page theme={pageTheme.tool}>
 
       <Header
-        title={`Repaired Invoice record`}
+        title={`Repair Invoice Record`}
         type="Repairing computer systems"> 
       </Header>
 
       <Content>
-        <ContentHeader title="Repaired Invoice information"> 
+        <ContentHeader title="Repair Invoice"> 
               <Button onClick={() => {CreateRepairInvoice();}} variant="contained"  color="primary" startIcon={<SaveRoundedIcon/>}> Create new repaired invoice </Button>
               <Button style={{ marginLeft: 20 }} component={RouterLink} to="/recordrepairinvoicetable" variant="contained" startIcon={<CancelRoundedIcon/>}>  Dismiss </Button>
         </ContentHeader>  

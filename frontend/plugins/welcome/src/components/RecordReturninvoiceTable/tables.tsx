@@ -64,7 +64,7 @@ export default function ComponentsRecordReturninvoiceTable() {
   
  return (
   <Page theme={pageTheme.tool}>
-    <Header title={`Return invoice`} type="Repairing computer systems" >
+    <Header title={`Return Invoice`} type="Repairing computer systems" >
     <Button variant="contained" color="default" href="/recordReturninvoice" startIcon={<PersonAddRoundedIcon />}>  New Return invoice</Button>
     <div>&nbsp;&nbsp;&nbsp;</div>
     <Button variant="contained" color="primary" href="/home" startIcon={<HomeRoundedIcon/>}> home</Button>

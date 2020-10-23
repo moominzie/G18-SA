@@ -99,6 +99,14 @@ type Billingstatus struct {
 	Billingstatusname string
 }
 
+type Parts struct {
+	Part []Part
+}
+
+type Part struct {
+	Pname string
+}
+
 // @title SUT SA Example API
 // @version 1.0
 // @description This is a sample server for SUT SE 2563
@@ -168,6 +176,8 @@ func main() {
 	controllers.NewRepairInvoiceController(v1, client)
 	controllers.NewBillingstatusController(v1, client)
 	controllers.NewBillController(v1, client)
+	controllers.NewPartController(v1, client)
+	controllers.NewPartorderController(v1, client)
 
 	// Set Facultys Data
 	facultys := Facultys{
@@ -270,8 +280,8 @@ func main() {
 	// Set Statusrs Data
 	statusrs := StatusRs{
 		StatusR: []StatusR{
-			StatusR{"In process "},
-			StatusR{"Done"},
+			StatusR{"In Delivery "},
+			StatusR{"Completed"},
 		},
 	}
 	for _, s := range statusrs.StatusR {
@@ -324,6 +334,25 @@ func main() {
 		client.Billingstatus.
 			Create().
 			SetBillingstatusname(bs.Billingstatusname).
+			Save(context.Background())
+	}
+
+	// Set Parts Data
+	parts := Parts{
+		Part: []Part{
+			Part{"RAM"},
+			Part{"Hard disk"},
+			Part{"Mainboard"},
+			Part{"Display"},
+			Part{"Keyboard"},
+			Part{"Adapter"},
+			Part{"Battery"},
+		},
+	}
+	for _, bu := range parts.Part {
+		client.Part.
+			Create().
+			SetPname(bu.Pname).
 			Save(context.Background())
 	}
 

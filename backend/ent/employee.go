@@ -32,9 +32,11 @@ type EmployeeEdges struct {
 	Employees []*Returninvoice
 	// Employeebill holds the value of the employeebill edge.
 	Employeebill []*Bill
+	// Employeepart holds the value of the employeepart edge.
+	Employeepart []*Partorder
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // EmployeesOrErr returns the Employees value or an error if the edge
@@ -53,6 +55,15 @@ func (e EmployeeEdges) EmployeebillOrErr() ([]*Bill, error) {
 		return e.Employeebill, nil
 	}
 	return nil, &NotLoadedError{edge: "employeebill"}
+}
+
+// EmployeepartOrErr returns the Employeepart value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) EmployeepartOrErr() ([]*Partorder, error) {
+	if e.loadedTypes[2] {
+		return e.Employeepart, nil
+	}
+	return nil, &NotLoadedError{edge: "employeepart"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -103,6 +114,11 @@ func (e *Employee) QueryEmployees() *ReturninvoiceQuery {
 // QueryEmployeebill queries the employeebill edge of the Employee.
 func (e *Employee) QueryEmployeebill() *BillQuery {
 	return (&EmployeeClient{config: e.config}).QueryEmployeebill(e)
+}
+
+// QueryEmployeepart queries the employeepart edge of the Employee.
+func (e *Employee) QueryEmployeepart() *PartorderQuery {
+	return (&EmployeeClient{config: e.config}).QueryEmployeepart(e)
 }
 
 // Update returns a builder for updating this Employee.

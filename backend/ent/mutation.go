@@ -15,6 +15,8 @@ import (
 	"github.com/moominzie/user-record/ent/device"
 	"github.com/moominzie/user-record/ent/employee"
 	"github.com/moominzie/user-record/ent/faculty"
+	"github.com/moominzie/user-record/ent/part"
+	"github.com/moominzie/user-record/ent/partorder"
 	"github.com/moominzie/user-record/ent/repairinvoice"
 	"github.com/moominzie/user-record/ent/returninvoice"
 	"github.com/moominzie/user-record/ent/room"
@@ -42,6 +44,8 @@ const (
 	TypeDevice        = "Device"
 	TypeEmployee      = "Employee"
 	TypeFaculty       = "Faculty"
+	TypePart          = "Part"
+	TypePartorder     = "Partorder"
 	TypeRepairInvoice = "RepairInvoice"
 	TypeReturninvoice = "Returninvoice"
 	TypeRoom          = "Room"
@@ -2266,6 +2270,8 @@ type EmployeeMutation struct {
 	removedemployees    map[int]struct{}
 	employeebill        map[int]struct{}
 	removedemployeebill map[int]struct{}
+	employeepart        map[int]struct{}
+	removedemployeepart map[int]struct{}
 	done                bool
 	oldValue            func(context.Context) (*Employee, error)
 }
@@ -2544,6 +2550,48 @@ func (m *EmployeeMutation) ResetEmployeebill() {
 	m.removedemployeebill = nil
 }
 
+// AddEmployeepartIDs adds the employeepart edge to Partorder by ids.
+func (m *EmployeeMutation) AddEmployeepartIDs(ids ...int) {
+	if m.employeepart == nil {
+		m.employeepart = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.employeepart[ids[i]] = struct{}{}
+	}
+}
+
+// RemoveEmployeepartIDs removes the employeepart edge to Partorder by ids.
+func (m *EmployeeMutation) RemoveEmployeepartIDs(ids ...int) {
+	if m.removedemployeepart == nil {
+		m.removedemployeepart = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedemployeepart[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEmployeepart returns the removed ids of employeepart.
+func (m *EmployeeMutation) RemovedEmployeepartIDs() (ids []int) {
+	for id := range m.removedemployeepart {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EmployeepartIDs returns the employeepart ids in the mutation.
+func (m *EmployeeMutation) EmployeepartIDs() (ids []int) {
+	for id := range m.employeepart {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEmployeepart reset all changes of the "employeepart" edge.
+func (m *EmployeeMutation) ResetEmployeepart() {
+	m.employeepart = nil
+	m.removedemployeepart = nil
+}
+
 // Op returns the operation name.
 func (m *EmployeeMutation) Op() Op {
 	return m.op
@@ -2693,12 +2741,15 @@ func (m *EmployeeMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *EmployeeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.employees != nil {
 		edges = append(edges, employee.EdgeEmployees)
 	}
 	if m.employeebill != nil {
 		edges = append(edges, employee.EdgeEmployeebill)
+	}
+	if m.employeepart != nil {
+		edges = append(edges, employee.EdgeEmployeepart)
 	}
 	return edges
 }
@@ -2719,6 +2770,12 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case employee.EdgeEmployeepart:
+		ids := make([]ent.Value, 0, len(m.employeepart))
+		for id := range m.employeepart {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -2726,12 +2783,15 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *EmployeeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedemployees != nil {
 		edges = append(edges, employee.EdgeEmployees)
 	}
 	if m.removedemployeebill != nil {
 		edges = append(edges, employee.EdgeEmployeebill)
+	}
+	if m.removedemployeepart != nil {
+		edges = append(edges, employee.EdgeEmployeepart)
 	}
 	return edges
 }
@@ -2752,6 +2812,12 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case employee.EdgeEmployeepart:
+		ids := make([]ent.Value, 0, len(m.removedemployeepart))
+		for id := range m.removedemployeepart {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -2759,7 +2825,7 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *EmployeeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -2789,6 +2855,9 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 		return nil
 	case employee.EdgeEmployeebill:
 		m.ResetEmployeebill()
+		return nil
+	case employee.EdgeEmployeepart:
+		m.ResetEmployeepart()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee edge %s", name)
@@ -3227,29 +3296,816 @@ func (m *FacultyMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Faculty edge %s", name)
 }
 
-// RepairInvoiceMutation represents an operation that mutate the RepairInvoices
+// PartMutation represents an operation that mutate the Parts
 // nodes in the graph.
-type RepairInvoiceMutation struct {
+type PartMutation struct {
+	config
+	op                       Op
+	typ                      string
+	id                       *int
+	_Pname                   *string
+	clearedFields            map[string]struct{}
+	part_informations        map[int]struct{}
+	removedpart_informations map[int]struct{}
+	done                     bool
+	oldValue                 func(context.Context) (*Part, error)
+}
+
+var _ ent.Mutation = (*PartMutation)(nil)
+
+// partOption allows to manage the mutation configuration using functional options.
+type partOption func(*PartMutation)
+
+// newPartMutation creates new mutation for $n.Name.
+func newPartMutation(c config, op Op, opts ...partOption) *PartMutation {
+	m := &PartMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePart,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPartID sets the id field of the mutation.
+func withPartID(id int) partOption {
+	return func(m *PartMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Part
+		)
+		m.oldValue = func(ctx context.Context) (*Part, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Part.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPart sets the old Part of the mutation.
+func withPart(node *Part) partOption {
+	return func(m *PartMutation) {
+		m.oldValue = func(context.Context) (*Part, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PartMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PartMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *PartMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetPname sets the Pname field.
+func (m *PartMutation) SetPname(s string) {
+	m._Pname = &s
+}
+
+// Pname returns the Pname value in the mutation.
+func (m *PartMutation) Pname() (r string, exists bool) {
+	v := m._Pname
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPname returns the old Pname value of the Part.
+// If the Part object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *PartMutation) OldPname(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPname is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPname requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPname: %w", err)
+	}
+	return oldValue.Pname, nil
+}
+
+// ResetPname reset all changes of the "Pname" field.
+func (m *PartMutation) ResetPname() {
+	m._Pname = nil
+}
+
+// AddPartInformationIDs adds the part_informations edge to Partorder by ids.
+func (m *PartMutation) AddPartInformationIDs(ids ...int) {
+	if m.part_informations == nil {
+		m.part_informations = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.part_informations[ids[i]] = struct{}{}
+	}
+}
+
+// RemovePartInformationIDs removes the part_informations edge to Partorder by ids.
+func (m *PartMutation) RemovePartInformationIDs(ids ...int) {
+	if m.removedpart_informations == nil {
+		m.removedpart_informations = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedpart_informations[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPartInformations returns the removed ids of part_informations.
+func (m *PartMutation) RemovedPartInformationsIDs() (ids []int) {
+	for id := range m.removedpart_informations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PartInformationsIDs returns the part_informations ids in the mutation.
+func (m *PartMutation) PartInformationsIDs() (ids []int) {
+	for id := range m.part_informations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPartInformations reset all changes of the "part_informations" edge.
+func (m *PartMutation) ResetPartInformations() {
+	m.part_informations = nil
+	m.removedpart_informations = nil
+}
+
+// Op returns the operation name.
+func (m *PartMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Part).
+func (m *PartMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *PartMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m._Pname != nil {
+		fields = append(fields, part.FieldPname)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *PartMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case part.FieldPname:
+		return m.Pname()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *PartMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case part.FieldPname:
+		return m.OldPname(ctx)
+	}
+	return nil, fmt.Errorf("unknown Part field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *PartMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case part.FieldPname:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPname(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Part field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *PartMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *PartMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *PartMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Part numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *PartMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *PartMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PartMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Part nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *PartMutation) ResetField(name string) error {
+	switch name {
+	case part.FieldPname:
+		m.ResetPname()
+		return nil
+	}
+	return fmt.Errorf("unknown Part field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *PartMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.part_informations != nil {
+		edges = append(edges, part.EdgePartInformations)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *PartMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case part.EdgePartInformations:
+		ids := make([]ent.Value, 0, len(m.part_informations))
+		for id := range m.part_informations {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *PartMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedpart_informations != nil {
+		edges = append(edges, part.EdgePartInformations)
+	}
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *PartMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case part.EdgePartInformations:
+		ids := make([]ent.Value, 0, len(m.removedpart_informations))
+		for id := range m.removedpart_informations {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *PartMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *PartMutation) EdgeCleared(name string) bool {
+	switch name {
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *PartMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Part unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *PartMutation) ResetEdge(name string) error {
+	switch name {
+	case part.EdgePartInformations:
+		m.ResetPartInformations()
+		return nil
+	}
+	return fmt.Errorf("unknown Part edge %s", name)
+}
+
+// PartorderMutation represents an operation that mutate the Partorders
+// nodes in the graph.
+type PartorderMutation struct {
 	config
 	op                   Op
 	typ                  string
 	id                   *int
-	_Rename              *string
 	clearedFields        map[string]struct{}
-	device               *int
-	cleareddevice        bool
-	status               *int
-	clearedstatus        bool
-	symptom              *int
-	clearedsymptom       bool
-	user                 *int
-	cleareduser          bool
-	returninvoice        *int
-	clearedreturninvoice bool
-	bill                 *int
-	clearedbill          bool
+	repairinvoice        *int
+	clearedrepairinvoice bool
+	employee             *int
+	clearedemployee      bool
+	part                 *int
+	clearedpart          bool
 	done                 bool
-	oldValue             func(context.Context) (*RepairInvoice, error)
+	oldValue             func(context.Context) (*Partorder, error)
+}
+
+var _ ent.Mutation = (*PartorderMutation)(nil)
+
+// partorderOption allows to manage the mutation configuration using functional options.
+type partorderOption func(*PartorderMutation)
+
+// newPartorderMutation creates new mutation for $n.Name.
+func newPartorderMutation(c config, op Op, opts ...partorderOption) *PartorderMutation {
+	m := &PartorderMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePartorder,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPartorderID sets the id field of the mutation.
+func withPartorderID(id int) partorderOption {
+	return func(m *PartorderMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Partorder
+		)
+		m.oldValue = func(ctx context.Context) (*Partorder, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Partorder.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPartorder sets the old Partorder of the mutation.
+func withPartorder(node *Partorder) partorderOption {
+	return func(m *PartorderMutation) {
+		m.oldValue = func(context.Context) (*Partorder, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PartorderMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PartorderMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *PartorderMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetRepairinvoiceID sets the repairinvoice edge to RepairInvoice by id.
+func (m *PartorderMutation) SetRepairinvoiceID(id int) {
+	m.repairinvoice = &id
+}
+
+// ClearRepairinvoice clears the repairinvoice edge to RepairInvoice.
+func (m *PartorderMutation) ClearRepairinvoice() {
+	m.clearedrepairinvoice = true
+}
+
+// RepairinvoiceCleared returns if the edge repairinvoice was cleared.
+func (m *PartorderMutation) RepairinvoiceCleared() bool {
+	return m.clearedrepairinvoice
+}
+
+// RepairinvoiceID returns the repairinvoice id in the mutation.
+func (m *PartorderMutation) RepairinvoiceID() (id int, exists bool) {
+	if m.repairinvoice != nil {
+		return *m.repairinvoice, true
+	}
+	return
+}
+
+// RepairinvoiceIDs returns the repairinvoice ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// RepairinvoiceID instead. It exists only for internal usage by the builders.
+func (m *PartorderMutation) RepairinvoiceIDs() (ids []int) {
+	if id := m.repairinvoice; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRepairinvoice reset all changes of the "repairinvoice" edge.
+func (m *PartorderMutation) ResetRepairinvoice() {
+	m.repairinvoice = nil
+	m.clearedrepairinvoice = false
+}
+
+// SetEmployeeID sets the employee edge to Employee by id.
+func (m *PartorderMutation) SetEmployeeID(id int) {
+	m.employee = &id
+}
+
+// ClearEmployee clears the employee edge to Employee.
+func (m *PartorderMutation) ClearEmployee() {
+	m.clearedemployee = true
+}
+
+// EmployeeCleared returns if the edge employee was cleared.
+func (m *PartorderMutation) EmployeeCleared() bool {
+	return m.clearedemployee
+}
+
+// EmployeeID returns the employee id in the mutation.
+func (m *PartorderMutation) EmployeeID() (id int, exists bool) {
+	if m.employee != nil {
+		return *m.employee, true
+	}
+	return
+}
+
+// EmployeeIDs returns the employee ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// EmployeeID instead. It exists only for internal usage by the builders.
+func (m *PartorderMutation) EmployeeIDs() (ids []int) {
+	if id := m.employee; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEmployee reset all changes of the "employee" edge.
+func (m *PartorderMutation) ResetEmployee() {
+	m.employee = nil
+	m.clearedemployee = false
+}
+
+// SetPartID sets the part edge to Part by id.
+func (m *PartorderMutation) SetPartID(id int) {
+	m.part = &id
+}
+
+// ClearPart clears the part edge to Part.
+func (m *PartorderMutation) ClearPart() {
+	m.clearedpart = true
+}
+
+// PartCleared returns if the edge part was cleared.
+func (m *PartorderMutation) PartCleared() bool {
+	return m.clearedpart
+}
+
+// PartID returns the part id in the mutation.
+func (m *PartorderMutation) PartID() (id int, exists bool) {
+	if m.part != nil {
+		return *m.part, true
+	}
+	return
+}
+
+// PartIDs returns the part ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// PartID instead. It exists only for internal usage by the builders.
+func (m *PartorderMutation) PartIDs() (ids []int) {
+	if id := m.part; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPart reset all changes of the "part" edge.
+func (m *PartorderMutation) ResetPart() {
+	m.part = nil
+	m.clearedpart = false
+}
+
+// Op returns the operation name.
+func (m *PartorderMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Partorder).
+func (m *PartorderMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *PartorderMutation) Fields() []string {
+	fields := make([]string, 0, 0)
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *PartorderMutation) Field(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *PartorderMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, fmt.Errorf("unknown Partorder field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *PartorderMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Partorder field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *PartorderMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *PartorderMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *PartorderMutation) AddField(name string, value ent.Value) error {
+	return fmt.Errorf("unknown Partorder numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *PartorderMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *PartorderMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PartorderMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Partorder nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *PartorderMutation) ResetField(name string) error {
+	return fmt.Errorf("unknown Partorder field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *PartorderMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.repairinvoice != nil {
+		edges = append(edges, partorder.EdgeRepairinvoice)
+	}
+	if m.employee != nil {
+		edges = append(edges, partorder.EdgeEmployee)
+	}
+	if m.part != nil {
+		edges = append(edges, partorder.EdgePart)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *PartorderMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case partorder.EdgeRepairinvoice:
+		if id := m.repairinvoice; id != nil {
+			return []ent.Value{*id}
+		}
+	case partorder.EdgeEmployee:
+		if id := m.employee; id != nil {
+			return []ent.Value{*id}
+		}
+	case partorder.EdgePart:
+		if id := m.part; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *PartorderMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *PartorderMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *PartorderMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedrepairinvoice {
+		edges = append(edges, partorder.EdgeRepairinvoice)
+	}
+	if m.clearedemployee {
+		edges = append(edges, partorder.EdgeEmployee)
+	}
+	if m.clearedpart {
+		edges = append(edges, partorder.EdgePart)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *PartorderMutation) EdgeCleared(name string) bool {
+	switch name {
+	case partorder.EdgeRepairinvoice:
+		return m.clearedrepairinvoice
+	case partorder.EdgeEmployee:
+		return m.clearedemployee
+	case partorder.EdgePart:
+		return m.clearedpart
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *PartorderMutation) ClearEdge(name string) error {
+	switch name {
+	case partorder.EdgeRepairinvoice:
+		m.ClearRepairinvoice()
+		return nil
+	case partorder.EdgeEmployee:
+		m.ClearEmployee()
+		return nil
+	case partorder.EdgePart:
+		m.ClearPart()
+		return nil
+	}
+	return fmt.Errorf("unknown Partorder unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *PartorderMutation) ResetEdge(name string) error {
+	switch name {
+	case partorder.EdgeRepairinvoice:
+		m.ResetRepairinvoice()
+		return nil
+	case partorder.EdgeEmployee:
+		m.ResetEmployee()
+		return nil
+	case partorder.EdgePart:
+		m.ResetPart()
+		return nil
+	}
+	return fmt.Errorf("unknown Partorder edge %s", name)
+}
+
+// RepairInvoiceMutation represents an operation that mutate the RepairInvoices
+// nodes in the graph.
+type RepairInvoiceMutation struct {
+	config
+	op                       Op
+	typ                      string
+	id                       *int
+	_Rename                  *string
+	clearedFields            map[string]struct{}
+	device                   *int
+	cleareddevice            bool
+	status                   *int
+	clearedstatus            bool
+	symptom                  *int
+	clearedsymptom           bool
+	user                     *int
+	cleareduser              bool
+	returninvoice            *int
+	clearedreturninvoice     bool
+	bill                     *int
+	clearedbill              bool
+	part_informations        *int
+	clearedpart_informations bool
+	done                     bool
+	oldValue                 func(context.Context) (*RepairInvoice, error)
 }
 
 var _ ent.Mutation = (*RepairInvoiceMutation)(nil)
@@ -3602,6 +4458,45 @@ func (m *RepairInvoiceMutation) ResetBill() {
 	m.clearedbill = false
 }
 
+// SetPartInformationsID sets the part_informations edge to Partorder by id.
+func (m *RepairInvoiceMutation) SetPartInformationsID(id int) {
+	m.part_informations = &id
+}
+
+// ClearPartInformations clears the part_informations edge to Partorder.
+func (m *RepairInvoiceMutation) ClearPartInformations() {
+	m.clearedpart_informations = true
+}
+
+// PartInformationsCleared returns if the edge part_informations was cleared.
+func (m *RepairInvoiceMutation) PartInformationsCleared() bool {
+	return m.clearedpart_informations
+}
+
+// PartInformationsID returns the part_informations id in the mutation.
+func (m *RepairInvoiceMutation) PartInformationsID() (id int, exists bool) {
+	if m.part_informations != nil {
+		return *m.part_informations, true
+	}
+	return
+}
+
+// PartInformationsIDs returns the part_informations ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// PartInformationsID instead. It exists only for internal usage by the builders.
+func (m *RepairInvoiceMutation) PartInformationsIDs() (ids []int) {
+	if id := m.part_informations; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPartInformations reset all changes of the "part_informations" edge.
+func (m *RepairInvoiceMutation) ResetPartInformations() {
+	m.part_informations = nil
+	m.clearedpart_informations = false
+}
+
 // Op returns the operation name.
 func (m *RepairInvoiceMutation) Op() Op {
 	return m.op
@@ -3717,7 +4612,7 @@ func (m *RepairInvoiceMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *RepairInvoiceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.device != nil {
 		edges = append(edges, repairinvoice.EdgeDevice)
 	}
@@ -3735,6 +4630,9 @@ func (m *RepairInvoiceMutation) AddedEdges() []string {
 	}
 	if m.bill != nil {
 		edges = append(edges, repairinvoice.EdgeBill)
+	}
+	if m.part_informations != nil {
+		edges = append(edges, repairinvoice.EdgePartInformations)
 	}
 	return edges
 }
@@ -3767,6 +4665,10 @@ func (m *RepairInvoiceMutation) AddedIDs(name string) []ent.Value {
 		if id := m.bill; id != nil {
 			return []ent.Value{*id}
 		}
+	case repairinvoice.EdgePartInformations:
+		if id := m.part_informations; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
@@ -3774,7 +4676,7 @@ func (m *RepairInvoiceMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *RepairInvoiceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	return edges
 }
 
@@ -3789,7 +4691,7 @@ func (m *RepairInvoiceMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *RepairInvoiceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.cleareddevice {
 		edges = append(edges, repairinvoice.EdgeDevice)
 	}
@@ -3807,6 +4709,9 @@ func (m *RepairInvoiceMutation) ClearedEdges() []string {
 	}
 	if m.clearedbill {
 		edges = append(edges, repairinvoice.EdgeBill)
+	}
+	if m.clearedpart_informations {
+		edges = append(edges, repairinvoice.EdgePartInformations)
 	}
 	return edges
 }
@@ -3827,6 +4732,8 @@ func (m *RepairInvoiceMutation) EdgeCleared(name string) bool {
 		return m.clearedreturninvoice
 	case repairinvoice.EdgeBill:
 		return m.clearedbill
+	case repairinvoice.EdgePartInformations:
+		return m.clearedpart_informations
 	}
 	return false
 }
@@ -3852,6 +4759,9 @@ func (m *RepairInvoiceMutation) ClearEdge(name string) error {
 		return nil
 	case repairinvoice.EdgeBill:
 		m.ClearBill()
+		return nil
+	case repairinvoice.EdgePartInformations:
+		m.ClearPartInformations()
 		return nil
 	}
 	return fmt.Errorf("unknown RepairInvoice unique edge %s", name)
@@ -3879,6 +4789,9 @@ func (m *RepairInvoiceMutation) ResetEdge(name string) error {
 		return nil
 	case repairinvoice.EdgeBill:
 		m.ResetBill()
+		return nil
+	case repairinvoice.EdgePartInformations:
+		m.ResetPartInformations()
 		return nil
 	}
 	return fmt.Errorf("unknown RepairInvoice edge %s", name)
